@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buat Soal PG & Esai</title>
+
+  <!-- ================= CSS ================= -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/buat-soal.css">
+
+  <!-- ================= ICON ================= -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  >
+
+  <!-- ================= MATHJAX ================= -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<!-- ================= DASHBOARD ================= -->
+<div class="dashboard">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+
+    <ul class="menu">
+      <li><a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li>
+        <a href="buat-soal.html" class="active">
+          <i class="fa fa-pen"></i> Buat Soal
+        </a>
+      </li>
+      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+      <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
+    </ul>
+    <button class="logout" id="logout">
+     🚪 Logout
+    </button>
+  </aside>
+
+  <!-- ================= CONTENT ================= -->
+  <main class="content">
+    <div class="container">
+
+      <h1>Buat Soal PG & Esai</h1>
+
+      <!-- ===== INFO UJIAN ===== -->
+      <div class="form-row">
+        <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
+        <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
+        <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
+      </div>
+
+      <!-- ===== PERTANYAAN ===== -->
+      <div
+        class="pertanyaan"
+        contenteditable="true"
+        data-placeholder="Ketik pertanyaan..."
+      ></div>
+
+      <!-- ===== AKSI ===== -->
+      <div class="form-row">
+        <input type="file" id="fileWord" accept=".docx">
+
+        <button type="button" onclick="importWord(this)">
+          📥 Import Word
+        </button>
+
+        <button type="button" onclick="downloadTemplate()">
+          ⬇️ Unduh Template Word
+        </button>
+
+        <button type="button" onclick="tambahSoal()">
+          ➕ Tambah Soal Manual
+        </button>
+
+        <button type="button" id="btnSimpan" onclick="simpanSemua()">
+          💾 Simpan Semua
+        </button>
+      </div>
+
+      <!-- ===== PREVIEW ===== -->
+      <button type="button" onclick="previewSoal()">
+        👁️ Preview Soal
+      </button>
+
+      <div id="previewBox" class="preview-box" style="display:none;">
+        <h3>Preview Soal (Tampilan Siswa)</h3>
+        <div id="previewPG"></div>
+        <hr>
+        <div id="previewEsai"></div>
+      </div>
+
+      <hr>
+
+      <!-- ===== DAFTAR SOAL ===== -->
+      <div id="daftarSoal"></div>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast"></div>
+
+<!-- ================= LIBRARY ================= -->
+<script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+
+<!-- ================= JS ================= -->
+<script type="module" src="../assets/js/buat-soal.js"></script>
+<script type="module" src="../assets/js/logout.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Ujian Online</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/login.css">
+
+  <!-- Font Awesome (jika icon dipakai) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="dark">
+  <div class="container">
+    <div class="card">
+
+      <!-- Logo Sekolah -->
+      <img
+        src="assets/img/logo-sekolah.png"
+        class="logo"
+        alt="Logo SMPN 20 Konawe Selatan"
+      >
+
+      <!-- Icon -->
+      <i class="fas fa-laptop-code icon"></i>
+
+      <!-- Judul -->
+      <h1>UJIAN ONLINE SEKOLAH</h1>
+      <p class="subtitle">SMPN 20 KONAWE SELATAN</p>
+
+      <!-- Form Login -->
+      <h2>Login</h2>
+
+      <select id="role">
+        <option value="admin">Admin</option>
+        <option value="guru">Guru</option>
+      </select>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Email"
+        required
+      >
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        required
+      >
+
+      <!-- Tombol Login -->
+      <button id="loginBtn">
+        <span class="btn-text">Login</span>
+        <span class="btn-loader"></span>
+      </button>
+
+      <!-- Error -->
+      <p id="error"></p>
+
+    </div>
+  </div>
+
+  <!-- Script Loading Button -->
+  <script>
+    const loginBtn = document.getElementById("loginBtn");
+
+    loginBtn.addEventListener("click", () => {
+      loginBtn.classList.add("loading");
+      loginBtn.disabled = true;
+
+      // SIMULASI LOGIN (hapus jika sudah pakai Firebase)
+      setTimeout(() => {
+        loginBtn.classList.remove("loading");
+        loginBtn.disabled = false;
+      }, 2000);
+    });
+  </script>
+
+  <!-- Auth Firebase -->
+  <script type="module" src="assets/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Rekap Nilai Per Mapel</title>
+
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="stylesheet" href="../assets/css/rekap-nilai.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
+
+    <ul class="menu">
+      <li><a href="dashboard-guru.html"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="koreksi-essay.html"><i class="fa fa-book"></i> Koreksi Essay</a></li>
+      <li><a href="rekap-nilai.html" class="active"><i class="fa fa-chart-column"></i> Rekap Nilai</a></li>
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1><i class="fa fa-chart-bar"></i> Rekap Nilai Siswa</h1>
+    <p>Berdasarkan Mapel</p>
+
+    <!-- FILTER -->
+    <div class="card" style="margin-bottom:15px">
+      <div class="toolbar">
+        <select id="filterMapel">
+          <option value="">Semua Mapel</option>
+        </select>
+
+        <select id="filterKelas">
+          <option value="">Semua Kelas</option>
+        </select>
+
+        <button id="btnFilter"><i class="fa fa-filter"></i> Filter</button>
+        <button id="btnReset"><i class="fa fa-rotate"></i> Reset</button>
+        <button id="btnExport"><i class="fa fa-file-excel"></i> Export Excel</button>
+      </div>
+    </div>
+
+    <div id="infoRekap" style="margin-bottom:10px;font-weight:bold"></div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Siswa</th>
+            <th>Kelas</th>
+            <th>Mapel</th>
+            <th>Ujian</th>
+            <th>PG</th>
+            <th>Essay</th>
+            <th>Nilai</th>
+          </tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- FIREBASE LOGIC -->
+<script type="module">
+import { db } from "../assets/js/firebase.js";
+import { collection, getDocs }
+  from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const list = document.getElementById("list");
+const filterMapel = document.getElementById("filterMapel");
+const filterKelas = document.getElementById("filterKelas");
+const btnFilter = document.getElementById("btnFilter");
+const btnReset = document.getElementById("btnReset");
+const btnExport = document.getElementById("btnExport");
+const infoRekap = document.getElementById("infoRekap");
+
+let semuaNilai = [];
+
+// ================= LOAD DATA =================
+async function loadNilai() {
+  semuaNilai = [];
+  list.innerHTML = "";
+  filterMapel.innerHTML = `<option value="">Semua Mapel</option>`;
+  filterKelas.innerHTML = `<option value="">Semua Kelas</option>`;
+
+  const snap = await getDocs(collection(db, "jawaban_siswa"));
+
+  const mapelSet = new Set();
+  const kelasSet = new Set();
+
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    semuaNilai.push(d);
+
+    if (d.mapel) mapelSet.add(d.mapel);
+    if (d.kelas) kelasSet.add(d.kelas);
+  });
+
+  mapelSet.forEach(m => {
+    filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
+  });
+
+  kelasSet.forEach(k => {
+    filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
+  });
+
+  tampilkan(semuaNilai);
+}
+
+// ================= TAMPILKAN =================
+function tampilkan(data) {
+  list.innerHTML = "";
+  infoRekap.textContent = "";
+
+  if (!data || data.length === 0) {
+    list.innerHTML = `
+      <tr><td colspan="8" style="text-align:center">Data tidak ditemukan</td></tr>`;
+    return;
+  }
+
+  let total = 0;
+
+  data.forEach((n, i) => {
+    const pg = Number(n.nilaiPG || 0);
+    const essay = Number(n.nilaiEssay || 0);
+    const totalNilai = Number(n.nilaiTotal || 0);
+    total += totalNilai;
+
+    list.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${n.namaSiswa || "-"}</td>
+        <td>${n.kelas || "-"}</td>
+        <td>${n.mapel || "-"}</td>
+        <td>${n.judulUjian || "-"}</td>
+        <td>${pg}</td>
+        <td>${essay}</td>
+        <td><b>${totalNilai}</b></td>
+      </tr>`;
+  });
+
+  infoRekap.textContent =
+    `Jumlah siswa: ${data.length} | Rata-rata nilai: ${(total / data.length).toFixed(2)}`;
+}
+
+// ================= FILTER =================
+btnFilter.onclick = () => {
+  const mapel = filterMapel.value;
+  const kelas = filterKelas.value;
+
+  const hasil = semuaNilai.filter(n =>
+    (!mapel || n.mapel === mapel) &&
+    (!kelas || n.kelas === kelas)
+  );
+
+  tampilkan(hasil);
+};
+
+// ================= RESET =================
+btnReset.onclick = () => {
+  filterMapel.value = "";
+  filterKelas.value = "";
+  tampilkan(semuaNilai);
+};
+
+// ================= EXPORT EXCEL =================
+btnExport.onclick = () => {
+  const mapel = filterMapel.value;
+  if (!mapel) return alert("Pilih mapel terlebih dahulu");
+
+  const data = semuaNilai
+    .filter(n => n.mapel === mapel)
+    .map((n, i) => ({
+      No: i + 1,
+      Nama: n.namaSiswa,
+      Kelas: n.kelas,
+      Mapel: n.mapel,
+      Ujian: n.judulUjian,
+      PG: n.nilaiPG || 0,
+      Essay: n.nilaiEssay || 0,
+      Total: n.nilaiTotal || 0
+    }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
+  XLSX.writeFile(wb, `Rekap_Nilai_${mapel}.xlsx`);
+};
+
+// ================= INIT =================
+loadNilai();
+</script>
+
+<script type="module" src="../assets/js/logout.js"></script>
+</body>
+</html>

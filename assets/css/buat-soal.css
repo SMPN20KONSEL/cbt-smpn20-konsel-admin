@@ -1,0 +1,410 @@
+/* =====================================================
+   RESET DASAR
+===================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* =====================================================
+   VARIABEL WARNA & RADIUS
+===================================================== */
+:root {
+  --primary: #2a5298;
+  --primary-dark: #1e3c72;
+  --danger: #ef4444;
+
+  --bg-light: #f1f5f9;
+  --bg-dashboard: #f4f6f9;
+
+  --text-dark: #333;
+  --text-muted: #666;
+
+  --radius-lg: 18px;
+  --radius-md: 12px;
+}
+
+/* =====================================================
+   BODY & GLOBAL
+===================================================== */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bg-dashboard);
+  color: var(--text-dark);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Placeholder contenteditable */
+[contenteditable]:empty::before {
+  content: attr(data-placeholder);
+  color: #999;
+}
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 1000;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.brand-text strong {
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.brand-text small {
+  display: block;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* =====================================================
+   DASHBOARD / LAYOUT
+===================================================== */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  margin-top: 60px; /* sesuai topbar */
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+.sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 260px;
+  height: calc(100vh - 60px);
+  background: #fff;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.08);
+  z-index: 900;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--text-dark);
+}
+
+/* Menu sidebar */
+.menu {
+  list-style: none;
+  flex: 1;
+}
+
+.menu li {
+  margin-bottom: 12px;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.menu a i {
+  margin-right: 10px;
+}
+
+.menu a:hover,
+.menu a.active {
+  background: #f3f4f6;
+}
+
+/* Logout Button */
+.logout {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+/* =====================================================
+   CONTENT AREA
+===================================================== */
+.content {
+  margin-left: 260px;
+  flex: 1;
+  padding: 40px;
+  background: var(--bg-light);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card utama container */
+.container {
+  background: #fff;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Judul halaman */
+.container h1 {
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+/* Subtitle/keterangan */
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* =====================================================
+   FORM ROW (INFO UJIAN & TOOLS)
+===================================================== */
+.form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Info ujian */
+.form-row:first-of-type {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid #e5e7eb;
+}
+
+/* Tools / Aksi (sticky) */
+.form-row:nth-of-type(2) {
+  position: sticky;
+  top: 70px; /* di bawah topbar */
+  z-index: 500;
+  background: rgba(255,255,255,0.95);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  backdrop-filter: blur(6px);
+}
+
+/* Input fields */
+.form-row input[type="text"],
+.form-row input[type="file"] {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.form-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Buttons */
+.form-row button,
+button {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.form-row button:hover,
+button:hover {
+  background: var(--primary-dark);
+}
+
+/* Tombol simpan */
+#btnSimpan {
+  background: #16a34a;
+}
+
+#btnSimpan:hover {
+  background: #15803d;
+}
+
+/* =====================================================
+   PREVIEW SOAL
+===================================================== */
+#previewBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+#previewBox h3 {
+  margin-bottom: 15px;
+  color: var(--primary);
+}
+
+#previewPG,
+#previewEsai {
+  margin-top: 10px;
+}
+
+/* =====================================================
+   DAFTAR SOAL
+===================================================== */
+#daftarSoal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card soal */
+.soal-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.soal-card h4 {
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.soal-card textarea,
+.soal-card [contenteditable] {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid #d1d5db;
+  font-family: inherit;
+}
+
+.soal-card textarea:focus,
+.soal-card [contenteditable]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Action buttons soal */
+.soal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.soal-actions button {
+  background: #e5e7eb;
+  color: #111;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.soal-actions button:hover {
+  background: #d1d5db;
+}
+
+.soal-actions .hapus {
+  background: var(--danger);
+  color: #fff;
+}
+
+.soal-actions .hapus:hover {
+  background: #dc2626;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+/* =====================
+   TABLET & HP BESAR
+===================== */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    width: 100%;
+    border-radius: 0;
+    padding: 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+/* =====================
+   HP NORMAL
+===================== */
+@media (max-width: 576px) {
+  .content {
+    padding: 16px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+/* =====================
+   HP KECIL
+===================== */
+@media (max-width: 360px) {
+  .content {
+    padding: 12px;
+  }
+
+  h1, h2, h3 {
+    font-size: 16px;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

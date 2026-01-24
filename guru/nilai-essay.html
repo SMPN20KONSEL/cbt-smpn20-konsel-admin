@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Penilaian Essay</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="stylesheet" href="../assets/css/nilai-essay.css">
+
+  <!-- FONT AWESOME -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
+
+    <ul class="menu">
+      <li><a href="dashboard-guru.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+       <li>
+        <a href="koreksi-essay.html">
+          <i class="fa fa-book"></i> Koreksi Essay
+        </a>
+      </li>
+      <li><a href="rekap-nilai.html"><i class="fa fa-chart-column"></i> Rekap Nilai</a></li>
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <div class="card">
+
+      <!-- HEADER SISWA -->
+      <div class="header-siswa">
+        <div class="info-siswa">
+          <h2 id="namaSiswa">Nama Siswa</h2>
+          <p id="infoUjian">Matematika · Kelas VIII A</p>
+        </div>
+
+        <div class="nilai-pg">
+          <span>Nilai PG</span>
+          <strong id="nilaiPG">80</strong>
+        </div>
+      </div>
+
+      <!-- ESSAY -->
+      <div id="essayContainer"></div>
+
+      <button id="btnSimpan" class="btn-simpan">
+        💾 Simpan Nilai Essay
+      </button>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script type="module" src="../assets/js/nilai-essay.js"></script>
+</body>
+</html>

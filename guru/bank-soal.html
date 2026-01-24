@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Bank Soal</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:20px;
+  margin-top:20px;
+}
+.bank-card{
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  box-shadow:0 6px 15px rgba(0,0,0,.08);
+  transition:.3s;
+  cursor:pointer;
+}
+.bank-card:hover{transform:translateY(-4px);}
+.bank-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.badge{
+  background:#2563eb;
+  color:#fff;
+  padding:5px 12px;
+  border-radius:20px;
+  font-size:12px;
+}
+.actions button{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:16px;
+  margin-left:8px;
+}
+.edit{color:#2563eb;}
+.hapus{color:#dc2626;}
+.subtitle{color:#666;margin-bottom:15px;}
+.soal-info{
+  margin-top:8px;
+  color:#444;
+  font-size:14px;
+}
+.soal-info i{
+  color:#2563eb;
+  margin-right:6px;
+}
+.total{
+  margin-top:6px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
+
+    <ul class="menu">
+      <li>
+        <a href="dashboard-guru.html" class="active">
+          <i class="fa fa-home"></i> Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="buat-soal.html">
+          <i class="fa fa-pen"></i> Buat Soal
+        </a>
+      </li>
+      <li>
+        <a href="bank-soal.html">
+          <i class="fa fa-book"></i> Bank Soal
+        </a>
+      </li>
+       <li>
+        <a href="koreksi-essay.html">
+          <i class="fa fa-book"></i> Koreksi Essay
+        </a>
+      </li>
+      <li>
+        <a href="rekap-nilai.html">
+          <i class="fa fa-chart-column"></i> Rekap Nilai
+        </a>
+      </li>
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+<!-- CONTENT -->
+<main class="content">
+  <h1><i class="fa fa-book"></i> Bank Soal</h1>
+  <p class="subtitle">Daftar seluruh bank soal</p>
+  <div id="list" class="cards-grid"></div>
+</main>
+
+</div>
+
+<!-- JS -->
+<script type="module">
+import { db, auth } from "../assets/js/firebase.js";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+const list = document.getElementById("list");
+
+// AUTH
+onAuthStateChanged(auth, user => {
+  if (!user) location.href = "../login.html";
+  loadBankSoal();
+});
+
+// LOAD BANK SOAL
+async function loadBankSoal() {
+  list.innerHTML = "<p>Memuat data...</p>";
+
+  const snap = await getDocs(collection(db, "bank_soal"));
+
+  if (snap.empty) {
+    list.innerHTML = "<p>Belum ada bank soal</p>";
+    return;
+  }
+
+  list.innerHTML = "";
+
+  snap.forEach(docSnap => {
+    const s = docSnap.data();
+
+    const jumlahPG = Array.isArray(s.soalPG) ? s.soalPG.length : 0;
+    const jumlahEsai = Array.isArray(s.soalEssay) ? s.soalEssay.length : 0;
+    const total = jumlahPG + jumlahEsai;
+
+    list.innerHTML += `
+      <div class="bank-card" onclick="lihatSoal('${docSnap.id}')">
+        <div class="bank-header">
+          <span class="badge">${s.mapel} • Kelas ${s.kelas}</span>
+          <div class="actions" onclick="event.stopPropagation()">
+            <button class="edit" onclick="editBankSoal('${docSnap.id}')">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="hapus" onclick="hapusBankSoal('${docSnap.id}')">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <h3>${s.judul}</h3>
+
+        <div class="soal-info">
+          <i class="fa fa-list"></i>
+          PG: <b>${jumlahPG}</b> |
+          Esai: <b>${jumlahEsai}</b>
+        </div>
+
+        <div class="total">
+          Total Soal: ${total}
+        </div>
+      </div>
+    `;
+  });
+}
+
+// NAVIGASI
+window.lihatSoal = id => {
+  location.href = `lihat-soal.html?id=${id}`;
+};
+
+// HAPUS
+window.hapusBankSoal = async id => {
+  if (!confirm("Hapus bank soal ini?")) return;
+  await deleteDoc(doc(db, "bank_soal", id));
+  loadBankSoal();
+};
+
+// EDIT
+window.editBankSoal = id => {
+  location.href = `edit-soal.html?id=${id}`;
+};
+</script>
+
+<script type="module" src="../assets/js/logout.js"></script>
+
+</body>
+</html>

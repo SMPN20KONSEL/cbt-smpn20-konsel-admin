@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Siswa</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+
+  <!-- ICON -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+<header class="topbar">
+    <div class="brand">
+      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+      <div class="brand-text">
+        <strong>SMPN 20 KONAWE SELATAN</strong>
+        <small>CBT Application</small>
+      </div>
+    </div>
+  </header>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+    <ul class="menu">
+      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+      <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
+    </ul>
+    <button class="logout" id="logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+  <!-- CONTENT -->
+<main class="content">
+  <h1><i class="fa fa-users"></i> Data Siswa</h1>
+
+  <div class="forms-container">
+    <!-- TAMBAH SISWA -->
+    <div class="card">
+      <h3>Tambah Siswa</h3>
+      <input id="nis" placeholder="NIS">
+      <input id="nama" placeholder="Nama Lengkap">
+      <input id="kelas" placeholder="Kelas">
+      <button class="btn secondary" onclick="tambahSiswa()">
+  <span class="btn-icon">➕</span>
+  <span>Tambah Siswa</span>
+</button>
+
+      <small>
+        Akun & password akan dibuat otomatis <br>
+        Email: namadepanNIS@smp.belajar.id <br>
+        Password: 2 huruf nama + NIS
+      </small>
+    </div>
+
+    <!-- IMPORT CSV -->
+    <div class="card">
+      <h3>Import CSV</h3>
+      <small>Format: nis,nama,kelas</small><br><br>
+      <input type="file" id="fileImport" accept=".csv">
+      <button class="btn primary" onclick="importSiswa()">
+  <span class="btn-icon">📥</span>
+  <span>Import</span>
+</button>
+    </div>
+  </div>
+
+  <!-- DAFTAR SISWA -->
+  <div class="card">
+    <h3>Daftar Siswa</h3>
+    <table class="tabel-siswa">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>NIS</th>
+          <th>Kelas</th>
+          <th>Email</th>
+          <th>PW</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+</main>
+
+</div>
+
+<!-- SCRIPT -->
+<script type="module" src="../assets/js/siswa.js"></script>
+<script type="module" src="../assets/js/logout.js"></script>
+
+</body>
+</html>

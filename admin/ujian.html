@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Jadwal Ujian</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+      <div class="brand-text">
+        <strong>SMPN 20 KONAWE SELATAN</strong>
+        <small>CBT Application</small>
+      </div>
+    </div>
+  </header>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+    <ul class="menu">
+      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+      <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
+    </ul>
+    <button class="logout" id="logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+  
+<!-- CONTENT -->
+<main class="content">
+
+<h1><i class="fa fa-clock"></i> Jadwal Ujian</h1>
+<p>Buat jadwal ujian dari Bank Soal</p>
+
+<!-- FORM -->
+<div class="card">
+  <h3>Buat Jadwal</h3>
+
+  <label>Pilih Bank Soal</label>
+  <select id="soalSelect"></select>
+  <input id="durasi" type="number" placeholder="Durasi (menit)">
+
+  <button class="btn" id="btnBuat">
+  ➕ Buat Jadwal
+</button>
+
+
+</div>
+
+<!-- LIST -->
+<div class="card">
+  <h3>Daftar Jadwal</h3>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ujian</th>
+        <th>Mapel</th>
+        <th>Kelas</th>
+        <th>Kode</th>
+        <th>Durasi</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+</div>
+
+</main>
+</div>
+<script type="module" src="../assets/js/logout.js"></script>
+
+<!-- SCRIPT -->
+<script type="module" src="../assets/js/jadwal-ujian.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Guru</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/admin.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    .card-menu{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:20px;
+      margin-top:25px;
+    }
+    .menu-card{
+      background:#fff;
+      padding:25px;
+      border-radius:12px;
+      text-decoration:none;
+      color:#111827;
+      box-shadow:0 6px 15px rgba(0,0,0,.08);
+      transition:.3s;
+      display:block;
+    }
+    .menu-card:hover{
+      transform:translateY(-5px);
+      box-shadow:0 10px 25px rgba(0,0,0,.12);
+    }
+    .menu-card i{
+      font-size:38px;
+      color:#2563eb;
+      margin-bottom:10px;
+    }
+    .menu-card h3{
+      margin:10px 0 5px;
+    }
+    .menu-card p{
+      color:#6b7280;
+      font-size:14px;
+    }
+  </style>
+
+  <!-- PROTECT LOGIN -->
+  <script type="module" src="../assets/js/protect.js"></script>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
+
+    <ul class="menu">
+      <li>
+        <a href="dashboard-guru.html" class="active">
+          <i class="fa fa-home"></i> Dashboard
+        </a>
+      </li>
+      <li>
+        <a href="buat-soal.html">
+          <i class="fa fa-pen"></i> Buat Soal
+        </a>
+      </li>
+      <li>
+        <a href="bank-soal.html">
+          <i class="fa fa-book"></i> Bank Soal
+        </a>
+      </li>
+      <li>
+        <a href="koreksi-essay.html">
+          <i class="fa fa-book"></i> Koreksi Essay
+        </a>
+      </li>
+      <li>
+        <a href="rekap-nilai.html">
+          <i class="fa fa-chart-column"></i> Rekap Nilai
+        </a>
+      </li>
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <p class="subtitle">Dashboard</p>
+    <h1>Dashboard Guru</h1>
+
+    <!-- STATISTIK -->
+    <div class="card-menu">
+      <div class="menu-card">
+        <i class="fa fa-users"></i>
+        <h3 id="totalSiswa">0</h3>
+        <p>Total Siswa Mengikuti Ujian</p>
+      </div>
+
+      <div class="menu-card">
+        <i class="fa fa-file-lines"></i>
+        <h3 id="totalUjian">0</h3>
+        <p>Total Ujian</p>
+      </div>
+      
+      <div class="menu-card">
+        <i class="fa fa-pen-to-square"></i>
+        <h3 id="belumKoreksi">0</h3>
+        <p>Essay Belum Dikoreksi</p>
+      </div>
+
+    </div>
+
+    <!-- MENU UTAMA -->
+    <div class="card-menu">
+
+      <a href="buat-soal.html" class="menu-card">
+        <i class="fa fa-pen"></i>
+        <h3>Buat Soal</h3>
+        <p>Membuat soal ujian baru</p>
+      </a>
+
+      <a href="bank-soal.html" class="menu-card">
+        <i class="fa fa-book"></i>
+        <h3>Bank Soal</h3>
+        <p>Kelola dan lihat daftar soal</p>
+      </a>
+
+      <a href="koreksi-essay.html" class="menu-card">
+        <i class="fa fa-check-double"></i>
+        <h3>Koreksi Essay</h3>
+        <p>Periksa & beri nilai essay</p>
+      </a>
+
+      <a href="rekap-nilai.html" class="menu-card">
+        <i class="fa fa-chart-column"></i>
+        <h3>Rekap Nilai</h3>
+        <p>Lihat & export nilai siswa</p>
+      </a>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- FIREBASE DASHBOARD INFO -->
+<script type="module">
+import { db } from "../assets/js/firebase.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+async function loadDashboardInfo() {
+  const snap = await getDocs(collection(db, "jawaban_siswa"));
+
+  const siswaSet = new Set();
+  const ujianSet = new Set();
+  let belum = 0;
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    if (d.siswaUid) siswaSet.add(d.siswaUid);
+    if (d.ujianId) ujianSet.add(d.ujianId);
+    if (d.statusKoreksi !== "sudah") belum++;
+  });
+
+  document.getElementById("totalSiswa").textContent = siswaSet.size;
+  document.getElementById("totalUjian").textContent = ujianSet.size;
+  document.getElementById("belumKoreksi").textContent = belum;
+}
+
+loadDashboardInfo();
+</script>
+
+<!-- LOGOUT -->
+<script type="module" src="../assets/js/logout.js"></script>
+
+</body>
+</html>

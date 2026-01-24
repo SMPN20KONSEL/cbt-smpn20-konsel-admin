@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Lihat Soal</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+
+  <!-- MathJax -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    .soal-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+
+    .nomor {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .jenis {
+      font-size: 12px;
+      background: #2563eb;
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .opsi div {
+      margin: 4px 0;
+    }
+
+    .aksi {
+      margin-top: 12px;
+    }
+
+    .aksi button {
+      margin-right: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img 
+      src="../assets/img/logo-sekolah.png" 
+      class="brand-logo" 
+      alt="Logo Sekolah"
+    >
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>Admin</h2>
+    <ul class="menu">
+      <li>
+        <a href="bank-soal.html">⬅ Kembali</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1 id="judul">Soal</h1>
+    <p id="info"></p>
+
+    <div id="soal-list">
+      <!-- Soal akan dimuat dari Firestore -->
+    </div>
+  </main>
+
+</div>
+
+<!-- JS -->
+<script type="module" src="../assets/js/load-bank-soal.js"></script>
+
+</body>
+</html>

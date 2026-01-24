@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Nilai Siswa</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/rekap-nilai.css">
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- SheetJS untuk Export Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+      <div class="brand-text">
+        <strong>SMPN 20 KONAWE SELATAN</strong>
+        <small>CBT Application</small>
+      </div>
+    </div>
+  </header>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+    <ul class="menu">
+      <li><a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+      <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
+      <li><a href="nilai.html" class="active"><i class="fa fa-chart-bar"></i> Nilai</a></li>
+    </ul>
+    <button class="logout" id="logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+ <!-- CONTENT -->
+  <main class="content">
+    <h1><i class="fa fa-chart-bar"></i> Nilai Siswa</h1>
+    <p>Rekap hasil ujian siswa</p>
+
+    <!-- FILTER -->
+    <div class="card" style="margin-bottom:15px">
+      <div class="toolbar">
+        <select id="filterMapel">
+          <option value="">Semua Mapel</option>
+        </select>
+
+        <select id="filterKelas">
+          <option value="">Semua Kelas</option>
+        </select>
+
+       <button id="btnFilter">
+  🔍 Filter
+</button>
+
+<button id="btnReset">
+  🔄 Reset
+</button>
+
+<button id="btnExport">
+  📊 Export Excel
+</button>
+
+      </div>
+    </div>
+
+    <div id="infoRekap" style="margin-bottom:10px;font-weight:bold"></div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama Siswa</th>
+            <th>Kelas</th>
+            <th>Mapel</th>
+            <th>Ujian</th>
+            <th>PG</th>
+            <th>Essay</th>
+            <th>Nilai</th>
+          </tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
+  </main>
+
+</div>
+
+
+<script type="module" src="../assets/js/logout.js"></script>
+<script type="module" src="../assets/js/rekap-nilai.js"></script>
+
+</body>
+</html>

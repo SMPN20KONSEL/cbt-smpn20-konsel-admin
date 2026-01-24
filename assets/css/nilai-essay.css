@@ -1,0 +1,171 @@
+/* ================= HEADER SISWA ================= */
+.header-siswa {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.info-siswa h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.info-siswa p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.nilai-pg {
+  text-align: right;
+  background: #eef4ff;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.nilai-pg span {
+  font-size: 13px;
+  color: #555;
+}
+
+.nilai-pg strong {
+  display: block;
+  font-size: 22px;
+  color: #1e40af;
+}
+
+/* ================= ESSAY ================= */
+.essay-box {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+/* BARIS SOAL + NILAI (SATU BARIS FIX) */
+.baris-soal {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
+  margin-bottom: 12px;
+}
+
+.soal {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.input-nilai {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px;
+}
+
+.input-nilai input {
+  width: 70px !important;
+  padding: 4px;
+  text-align: center;
+}
+
+/* BLOK TEKS */
+.blok-teks {
+  margin-top: 10px;
+}
+
+.blok-teks b {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.blok-teks p {
+  margin: 0;
+  background: #f9fafb;
+  padding: 8px;
+  border-radius: 6px;
+}
+/* ================= FIX ALIGN ESSAY CONTENT ================= */
+.card,
+#essayContainer,
+.essay-box,
+.baris-soal,
+.blok-teks,
+.blok-teks p {
+  text-align: left !important;
+}
+
+/* ================= BUTTON ================= */
+.btn-simpan {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-simpan:hover {
+  background: #1e40af;
+}
+
+/* ================= FIX ALIGN ESSAY CONTENT ================= */
+.card,
+#essayContainer,
+.essay-box,
+.baris-soal,
+.blok-teks,
+.blok-teks p {
+  text-align: left !important;
+}
+
+
+/* =====================
+   TABLET & HP BESAR
+===================== */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    width: 100%;
+    border-radius: 0;
+    padding: 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+/* =====================
+   HP NORMAL
+===================== */
+@media (max-width: 576px) {
+  .content {
+    padding: 16px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+/* =====================
+   HP KECIL
+===================== */
+@media (max-width: 360px) {
+  .content {
+    padding: 12px;
+  }
+
+  h1, h2, h3 {
+    font-size: 16px;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 13px;
+  }
+}

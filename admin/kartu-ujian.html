@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kartu Ujian</title>
+
+<!-- QR CODE -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+<link rel="stylesheet" href="../assets/css/kartu-ujian.css">
+
+<!-- ICON -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">
+      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+      <div class="brand-text">
+        <strong>SMPN 20 KONAWE SELATAN</strong>
+        <small>CBT Application</small>
+      </div>
+    </div>
+  </header>
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+    <ul class="menu">
+      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+      <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
+    </ul>
+    <button class="logout" id="logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <h1><i class="fa fa-id-card"></i> Kartu Ujian</h1>
+    <p class="subtitle">Buat kartu ujian siswa</p>
+
+    <div class="grid-2">
+
+      <!-- INPUT MANUAL -->
+      <div class="card card-satukartu">
+  <h3>Input Satu Kartu</h3>
+
+  <!-- NAMA -->
+  <label for="nama">Nama</label>
+  <input
+    id="nama"
+    type="text"
+    placeholder="Ketik nama siswa"
+    autocomplete="off"
+  />
+  <div id="hasilSiswa" class="autocomplete-list"></div>
+
+  <!-- KELAS -->
+  <label for="kelas">Kelas</label>
+  <input
+    id="kelas"
+    type="text"
+    placeholder="Kelas"
+    readonly
+  />
+
+  <!-- NIS -->
+  <label for="nis">NIS</label>
+  <input
+    id="nis"
+    type="text"
+    placeholder="NIS"
+    readonly
+  />
+
+  <!-- EMAIL -->
+  <label for="email">Email</label>
+  <input
+    id="email"
+    type="text"
+    placeholder="Email siswa"
+    readonly
+  />
+
+  <!-- PASSWORD -->
+  <label for="password">Password</label>
+  <input
+    id="password"
+    type="text"
+    placeholder="Password siswa"
+    readonly
+  />
+  <!-- TOMBOL -->
+  <button class="btn primary" onclick="buatKartu()">
+    Tampilkan Kartu
+  </button>
+</div>
+
+      <!-- AMBIL DATA DARI DATABASE -->
+      <div class="card">
+        <h3>Input Kartu Perkelas</h3>
+        <label>Pilih Kelas</label>
+        <select id="filterKelas">
+          <option value="">-- Semua Kelas --</option>
+        </select>
+       <button class="btn primary" onclick="previewKartuPerKelas()">
+  <span class="btn-icon">🔍</span>
+  <span class="btn-text">Tampilkan</span>
+</button>
+
+      </div>
+
+    </div>
+
+    <!-- TOMBOL CETAK / UNDUH PDF -->
+    <div style="margin-top:15px; display:flex; gap:12px;">
+      <button class="btn secondary" onclick="cetakSemua()">🖨️ Cetak Semua</button>
+      <button class="btn secondary" onclick="unduhPDF()">⬇️ Unduh PDF</button>
+    </div>
+
+    <!-- PREVIEW KARTU -->
+    <div id="hasil"></div>
+    <p id="msgKartu">Belum ada kartu yang ditampilkan</p>
+  </main>
+</div>
+<script type="module" src="../assets/js/logout.js"></script>
+
+<script type="module" src="../assets/js/kartu-ujian.js"></script>
+</body>
+</html>

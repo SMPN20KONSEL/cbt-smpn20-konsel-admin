@@ -1,0 +1,272 @@
+/* =====================================================
+   GRID INPUT FORM (2 KOLOM)
+===================================================== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Urutan card */
+.card.card-satukartu { order: 1; }
+.card.card-perkelas  { order: 2; }
+
+/* =====================================================
+   CARD INPUT
+===================================================== */
+.card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.card label {
+  margin-top: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.card input,
+.card select {
+  width: 100%;
+  margin: 4px 0 10px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   AUTOCOMPLETE
+===================================================== */
+.autocomplete-list {
+  border: 1px solid #ccc;
+  background: #fff;
+  max-height: 160px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 99;
+}
+
+.autocomplete-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.autocomplete-item:hover {
+  background: #f0f0f0;
+}
+
+/* =====================================================
+   TOMBOL
+===================================================== */
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.btn.primary   { background: #007bff; color: #fff; }
+.btn.secondary { background: #6c757d; color: #fff; }
+
+/* =====================================================
+   KONTAINER HASIL / PREVIEW
+===================================================== */
+#hasil {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4mm;
+  padding: 5mm;
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   KARTU UJIAN (REAL SIZE)
+===================================================== */
+.kartu {
+  width: 100mm;
+  height: 60.8mm;
+  padding: 2mm;
+  background: #fff;
+  border: 1px solid #000;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  page-break-inside: avoid;
+}
+
+/* Garis potong */
+.kartu::before,
+.kartu::after {
+  content: "";
+  position: absolute;
+  width: 6mm;
+  height: 6mm;
+  border: 0.3mm solid #000;
+}
+
+.kartu::before {
+  top: -3mm;
+  left: -3mm;
+  border-right: none;
+  border-bottom: none;
+}
+
+.kartu::after {
+  bottom: -3mm;
+  right: -3mm;
+  border-left: none;
+  border-top: none;
+}
+
+/* =====================================================
+   HEADER KARTU
+===================================================== */
+.kartu-header {
+  text-align: center;
+  font-weight: bold;
+  font-size: 10pt;
+  line-height: 1.2;
+  border-bottom: 1px solid #000;
+  padding-bottom: 1mm;
+  margin-bottom: 1mm;
+}
+
+.nama-sekolah {
+  margin: 2px 0;
+}
+
+/* =====================================================
+   BODY KARTU
+===================================================== */
+.kartu-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.kartu-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 10pt;
+  margin-bottom: 2mm;
+}
+
+.body-content {
+  display: flex;
+  justify-content: space-between; /* teks kiri - QR kanan */
+  align-items: flex-start;
+}
+
+/* Info siswa */
+.info-siswa {
+  font-size: 9pt;
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+.info-siswa p {
+  margin: 0.5mm 0;
+}
+
+/* QR */
+.ruang-qr {
+  width: 30mm;
+  height: 30mm;
+  padding: 2mm;
+  margin-right: 1mm;
+
+  background: #fff;
+  border: 2px solid #000;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* =====================================================
+   PRINT (F4)
+===================================================== */
+@media print {
+  body {
+    margin: 0;
+  }
+
+  #hasil {
+    width: 210mm;
+    height: 330mm;
+    grid-template-rows: repeat(5, 1fr);
+    page-break-after: always;
+  }
+
+  .kartu {
+    box-shadow: none;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .card.card-satukartu,
+  .card.card-perkelas {
+    order: 0;
+  }
+
+  .content {
+    width: 100%;
+    margin-left: 0;
+    border-radius: 0;
+    padding: 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 576px) {
+  .content {
+    padding: 16px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .content {
+    padding: 12px;
+  }
+
+  h1, h2, h3 {
+    font-size: 16px;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 13px;
+  }
+}
