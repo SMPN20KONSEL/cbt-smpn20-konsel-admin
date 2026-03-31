@@ -42,8 +42,16 @@ const list       = document.getElementById("list");
 ================================ */
 function setLoading(btn, state) {
   if (!btn) return;
+
+  const text = document.getElementById("textBtn");
+
   btn.disabled = state;
-  btn.innerHTML = state ? "⏳ Proses..." : btn.dataset.label;
+
+  if (state) {
+    text.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Proses...';
+  } else {
+    text.innerHTML = 'Tambah Guru';
+  }
 }
 
 /* ===============================
