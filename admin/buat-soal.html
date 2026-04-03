@@ -3,26 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buat Soal Lengkap</title>
+  <title>Buat Soal PG & Esai</title>
 
-  <!-- CSS -->
+  <!-- ================= CSS ================= -->
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/buat-soal.css">
 
-  <!-- ICON -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- ================= ICON ================= -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  >
 
-  <!-- MATHJAX -->
+  <!-- ================= MATHJAX ================= -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
 
-  
+<!-- ================= HEADER ================= -->
 <header class="topbar">
   <div class="brand">
-    <img src="../assets/img/logo-sekolah.png" class="brand-logo">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
     <div class="brand-text">
       <strong>SMPN 20 KONAWE SELATAN</strong>
       <small>CBT Application</small>
@@ -30,10 +32,10 @@
   </div>
 </header>
 
-
+<!-- ================= DASHBOARD ================= -->
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
+  <!-- ================= SIDEBAR ================= -->
   <aside class="sidebar">
     <h2><i class="fas fa-user-shield"></i> Admin</h2>
 
@@ -42,115 +44,67 @@
       <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
       <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
       <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-      <li><a href="buat-soal.html" class="active"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li>
+        <a href="buat-soal.html" class="active">
+          <i class="fa fa-pen"></i> Buat Soal
+        </a>
+      </li>
       <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
       <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
       <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
     </ul>
-
-    <button class="logout" id="logout">🚪 Logout</button>
+    <button class="logout" id="logout">
+     🚪 Logout
+    </button>
   </aside>
 
-  <!-- CONTENT -->
+  <!-- ================= CONTENT ================= -->
   <main class="content">
     <div class="container">
 
-      <h1>Buat Soal Lengkap</h1>
+      <h1>Buat Soal PG & Esai</h1>
 
-      <!-- INFO UJIAN -->
+      <!-- ===== INFO UJIAN ===== -->
       <div class="form-row">
-        <input id="judulUjian" placeholder="Judul Ujian">
-        <input id="mapelInput" placeholder="Mata Pelajaran">
-        <input id="kelasInput" placeholder="Kelas">
+        <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
+        <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
+        <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
       </div>
 
-      <!-- TIPE SOAL -->
-      <div class="form-row">
-        <label><b>Tipe Soal:</b></label>
-        <select id="tipeSoal">
-          <option value="pg">Pilihan Ganda</option>
-          <option value="esai">Essay</option>
-          <option value="bs">Benar / Salah</option>
-          <option value="isian">Isian Singkat</option>
-          <option value="menjodohkan">Menjodohkan</option>
-        </select>
-      </div>
+      <!-- ===== PERTANYAAN ===== -->
+      <div
+        class="pertanyaan"
+        contenteditable="true"
+        data-placeholder="Ketik pertanyaan..."
+      ></div>
 
-      <!-- PERTANYAAN -->
-      <div class="pertanyaan" contenteditable="true"
-        data-placeholder="Ketik pertanyaan..."></div>
-
-      <!-- OPSI PILIHAN GANDA -->
-      <div id="opsiPG" class="opsi-box">
-        <h4>Opsi Jawaban (PG)</h4>
-        <input placeholder="Opsi A">
-        <input placeholder="Opsi B">
-        <input placeholder="Opsi C">
-        <input placeholder="Opsi D">
-
-        <select id="kunciPG">
-          <option value="">Pilih Kunci Jawaban</option>
-          <option value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
-        </select>
-      </div>
-
-      <!-- OPSI ESSAY -->
-      <div id="opsiEssay" class="opsi-box">
-        <h4>Jawaban / Pembahasan (Opsional)</h4>
-        <textarea placeholder="Tuliskan pembahasan atau kunci jawaban..."></textarea>
-      </div>
-
-      <!-- OPSI BENAR SALAH -->
-      <div id="opsiBS" class="opsi-box">
-        <h4>Kunci Jawaban</h4>
-        <select id="kunciBS">
-          <option value="benar">Benar</option>
-          <option value="salah">Salah</option>
-        </select>
-      </div>
-
-      <!-- OPSI ISIAN -->
-      <div id="opsiIsian" class="opsi-box">
-        <h4>Jawaban Benar</h4>
-        <input id="kunciIsian" placeholder="Contoh: 25">
-      </div>
-
-      <!-- OPSI MENJODOHKAN -->
-      <div id="opsiMenjodohkan" class="opsi-box">
-        <h4>Pasangan Soal</h4>
-
-        <div class="pasangan-row">
-          <input placeholder="Soal 1">
-          <input placeholder="Jawaban 1">
-        </div>
-
-        <div class="pasangan-row">
-          <input placeholder="Soal 2">
-          <input placeholder="Jawaban 2">
-        </div>
-
-        <div class="pasangan-row">
-          <input placeholder="Soal 3">
-          <input placeholder="Jawaban 3">
-        </div>
-      </div>
-
-      <!-- AKSI -->
+      <!-- ===== AKSI ===== -->
       <div class="form-row">
         <input type="file" id="fileWord" accept=".docx">
-        <button>📥 Import Word</button>
-        <button>⬇️ Template</button>
-        <button>➕ Tambah Soal</button>
-        <button>💾 Simpan Semua</button>
+
+        <button type="button" onclick="importWord(this)">
+          📥 Import Word
+        </button>
+
+        <button type="button" onclick="downloadTemplate()">
+          ⬇️ Unduh Template Word
+        </button>
+
+        <button type="button" onclick="tambahSoal()">
+          ➕ Tambah Soal Manual
+        </button>
+
+        <button type="button" id="btnSimpan" onclick="simpanSemua()">
+          💾 Simpan Semua
+        </button>
       </div>
 
-      <!-- PREVIEW -->
-      <button>👁️ Preview Soal</button>
+      <!-- ===== PREVIEW ===== -->
+      <button type="button" onclick="previewSoal()">
+        👁️ Preview Soal
+      </button>
 
-      <div id="previewBox" style="display:none;">
+      <div id="previewBox" class="preview-box" style="display:none;">
         <h3>Preview Soal (Tampilan Siswa)</h3>
         <div id="previewPG"></div>
         <hr>
@@ -159,7 +113,7 @@
 
       <hr>
 
-      <!-- LIST -->
+      <!-- ===== DAFTAR SOAL ===== -->
       <div id="daftarSoal"></div>
 
     </div>
