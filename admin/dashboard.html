@@ -8,16 +8,13 @@
   <link rel="stylesheet" href="../assets/css/dasbor.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body>
 
   <!-- ================= TOPBAR ================= -->
   <header class="topbar">
     <div class="brand">
-      <img
-        src="../assets/img/logo-sekolah.png"
-        class="brand-logo"
-        alt="Logo Sekolah"
-      >
+      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
       <div class="brand-text">
         <strong>SMPN 20 KONAWE SELATAN</strong>
         <small>CBT Application</small>
@@ -30,51 +27,17 @@
 
     <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar">
-      <h2>
-        <i class="fas fa-user-shield"></i> Admin
-      </h2>
+      <h2><i class="fas fa-user-shield"></i> Admin</h2>
 
       <ul class="menu">
-        <li>
-          <a href="dashboard.html" class="active">
-            <i class="fa fa-home"></i> Dashboard
-          </a>
-        </li>
-        <li>
-          <a href="siswa.html">
-            <i class="fa fa-users"></i> Data Siswa
-          </a>
-        </li>
-        <li>
-          <a href="guru.html">
-            <i class="fa fa-chalkboard-teacher"></i> Data Guru
-          </a>
-        </li>
-        <li>
-          <a href="bank-soal.html">
-            <i class="fa fa-book"></i> Bank Soal
-          </a>
-        </li>
-        <li>
-          <a href="buat-soal.html">
-            <i class="fa fa-pen"></i> Buat Soal
-          </a>
-        </li>
-        <li>
-          <a href="kartu-ujian.html">
-            <i class="fa fa-id-card"></i> Kartu Ujian
-          </a>
-        </li>
-        <li>
-          <a href="ujian.html">
-            <i class="fa fa-chart-bar"></i> Ruang Ujian
-          </a>
-        </li>
-        <li>
-          <a href="nilai.html">
-            <i class="fa fa-chart-bar"></i> Nilai
-          </a>
-        </li>
+        <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+        <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+        <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+        <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+        <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+        <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+        <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
+        <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
       </ul>
 
       <button class="logout" id="logout">
@@ -84,12 +47,35 @@
 
     <!-- ===== CONTENT ===== -->
     <main class="content">
-      <h1>Dashboard Admin</h1>
-      <p class="subtitle">
-        Selamat datang di sistem ujian online sekolah
-      </p>
 
-      <div class="cards">
+      <h1>Dashboard Admin</h1>
+      <p class="subtitle">Selamat datang di sistem ujian online sekolah</p>
+
+      <!-- 🔥 STATISTIK -->
+      <section class="stats">
+        <div class="stat-box">
+          <h2 id="totalSiswa">0</h2>
+          <p>Total Siswa</p>
+        </div>
+
+        <div class="stat-box">
+          <h2 id="totalUjian">0</h2>
+          <p>Jumlah Ujian</p>
+        </div>
+
+        <div class="stat-box">
+          <h2 id="ujianAktif">0</h2>
+          <p>Ujian Aktif</p>
+        </div>
+
+        <div class="stat-box">
+          <h2 id="belumUjian">0</h2>
+          <p>Belum Mengerjakan</p>
+        </div>
+      </section>
+
+      <!-- ⚡ MENU UTAMA -->
+      <section class="cards">
 
         <a href="siswa.html" class="card-box">
           <i class="fa fa-users"></i>
@@ -115,7 +101,7 @@
           </div>
         </a>
 
-          <a href="buat-soal.html" class="card-box">
+        <a href="buat-soal.html" class="card-box">
           <i class="fa fa-pen"></i>
           <div class="card-text">
             <h3>Buat Soal</h3>
@@ -132,10 +118,10 @@
         </a>
 
         <a href="ujian.html" class="card-box">
-          <i class="fa fa-user-plus"></i>
+          <i class="fa fa-desktop"></i>
           <div class="card-text">
             <h3>Ruang Ujian</h3>
-            <p>Tambah Ujian</p>
+            <p>Kelola ujian</p>
           </div>
         </a>
 
@@ -147,13 +133,39 @@
           </div>
         </a>
 
-      </div>
+      </section>
+
+      <!-- 👀 MONITORING -->
+      <section class="monitoring">
+        <h2>Monitoring Ujian</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Kelas</th>
+              <th>Status</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+
+          <tbody id="monitoringTable">
+            <tr>
+              <td>Andi</td>
+              <td>9A</td>
+              <td class="aktif">Sedang Mengerjakan</td>
+              <td>08:15</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
     </main>
 
   </div>
 
   <!-- ================= SCRIPT ================= -->
   <script type="module" src="../assets/js/logout.js"></script>
-
+<script type="module" src="../assets/js/dashboard.js"></script>
 </body>
 </html>
