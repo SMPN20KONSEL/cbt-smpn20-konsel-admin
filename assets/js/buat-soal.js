@@ -52,15 +52,16 @@ function bersihkanPertanyaan(text = "") {
 // ======================================================
 function toast(msg, type = "success") {
   const div = document.createElement("div");
+  div.className = `toast-item toast-${type}`;
   div.innerText = msg;
-  div.style.background = type === "error" ? "#dc2626" : "#16a34a";
-  div.style.color = "#fff";
-  div.style.padding = "10px 15px";
-  div.style.marginTop = "10px";
-  div.style.borderRadius = "6px";
 
   toastBox.appendChild(div);
-  setTimeout(() => div.remove(), 3000);
+
+  setTimeout(() => {
+    div.style.opacity = "0";
+    div.style.transform = "translateY(-10px)";
+    setTimeout(() => div.remove(), 300);
+  }, 3000);
 }
 
 
@@ -215,15 +216,15 @@ function parseSoalHtml(html) {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
-  const lines = temp.innerText
-    .split("\n")
-    .map(l => l.trim())
-    .filter(Boolean);
+  const paragraphs = temp.querySelectorAll("p");
 
   let soal = null;
 
-  lines.forEach(text => {
+  paragraphs.forEach(p => {
+    let text = p.innerText.trim();
+    if (!text) return;
 
+    // DETEKSI NOMOR SOAL
     if (/^\d+[\.\)]/.test(text)) {
       if (soal) tambahSoal(soal);
 
@@ -240,28 +241,28 @@ function parseSoalHtml(html) {
 
     if (!soal) return;
 
-    const opsi = text.match(/^([A-D])\./);
-    if (opsi) {
+    // OPSI A-D
+    const opsiMatch = text.match(/^([A-D])[\.\)]\s*(.*)/i);
+    if (opsiMatch) {
       soal.tipe = "pg";
-      soal.opsi[opsi[1]] =
-        bersihkanPertanyaan(text.replace(/^([A-D])\./, ""));
+      soal.opsi[opsiMatch[1].toUpperCase()] =
+        bersihkanPertanyaan(opsiMatch[2]);
       return;
     }
 
-    if (/KUNCI:/i.test(text)) {
+    // KUNCI
+    if (/KUNCI\s*:/i.test(text)) {
       soal.jawabanBenar =
-        text.replace(/KUNCI:/i, "").trim().toUpperCase();
+        text.replace(/KUNCI\s*:/i, "").trim().toUpperCase();
       return;
     }
 
-    if (text) {
-      soal.pertanyaan += " " + bersihkanPertanyaan(text);
-    }
+    // PERTANYAAN
+    soal.pertanyaan += " " + bersihkanPertanyaan(text);
   });
 
   if (soal) tambahSoal(soal);
 }
-
 
 // ======================================================
 // ================= DOWNLOAD TEMPLATE ==================
