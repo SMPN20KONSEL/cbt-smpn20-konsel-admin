@@ -74,59 +74,63 @@
       <h1>Buat Soal PG & Esai</h1>
 
       <!-- ===== INFO UJIAN ===== -->
-      <div class="form-row">
-        <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
-        <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
-        <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
-      </div>
+      <section class="form-section">
+        <div class="form-row">
+          <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
+          <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
+          <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
+        </div>
+      </section>
 
-      <!-- ===== PERTANYAAN ===== -->
-      <div
-        class="pertanyaan"
-        contenteditable="true"
-        data-placeholder="Ketik pertanyaan..."
-      ></div>
 
       <!-- ===== AKSI ===== -->
-      <div class="form-row">
-        <input type="file" id="fileWord" accept=".docx">
+      <section class="form-section">
+        <div class="form-row">
 
-        <button type="button" onclick="importWord(this)">
-          📥 Import Word
-        </button>
+  <button type="button" onclick="downloadTemplate()">
+    ⬇️ Template Word
+  </button>
 
-        <button type="button" onclick="downloadTemplate()">
-          ⬇️ Unduh Template Word
-        </button>
+  <input type="file" id="fileWord"
+    accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 
-        <button type="button" onclick="tambahSoal()">
-          ➕ Tambah Soal Manual
-        </button>
+  <button type="button" onclick="importWord(this)">
+    📥 Import Word
+  </button>
 
-        <button id="btnSimpan" type="button" onclick="simpanSemua()">
-          💾 Simpan Semua
-        </button>
-      </div>
+  <button type="button" onclick="tambahSoal()">
+    ➕ Tambah Soal
+  </button>
+
+  <button type="button" id="btnSimpan">
+    💾 Simpan
+  </button>
+
+</div>
+      </section>
 
       <!-- ===== PREVIEW ===== -->
-      <button type="button" onclick="previewSoal()">
-        👁️ Preview Soal
-      </button>
+      <section class="form-section">
+        <button type="button" onclick="previewSoal()">
+          👁️ Preview Soal
+        </button>
 
-      <div
-        id="previewBox"
-        style="display:none; margin-top:20px; background:#fff; padding:20px; border-radius:12px"
-      >
-        <h3>Preview Soal (Tampilan Siswa)</h3>
-        <div id="previewPG"></div>
-        <hr>
-        <div id="previewEsai"></div>
-      </div>
+        <div id="previewBox" class="preview-box" style="display:none;">
+          <h3>Preview Soal (Tampilan Siswa)</h3>
+
+          <div id="previewPG"></div>
+          <hr>
+          <div id="previewEsai"></div>
+        </div>
+      </section>
 
       <hr>
 
       <!-- ===== DAFTAR SOAL ===== -->
-      <div id="daftarSoal"></div>
+      <section>
+        <h3>Daftar Soal</h3>
+        <div id="daftarSoal"></div>
+      </section>
 
     </div>
   </main>

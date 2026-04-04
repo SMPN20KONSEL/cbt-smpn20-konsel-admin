@@ -69,37 +69,31 @@
         </div>
       </section>
 
-      <!-- ===== PERTANYAAN UTAMA (OPTIONAL EDITOR) ===== -->
-      <section class="form-section">
-        <div class="pertanyaan"
-             contenteditable="true"
-             data-placeholder="Ketik pertanyaan...">
-        </div>
-      </section>
 
       <!-- ===== AKSI ===== -->
       <section class="form-section">
         <div class="form-row">
 
-          <input type="file" id="fileWord" accept=".docx">
+  <button type="button" onclick="downloadTemplate()">
+    ⬇️ Template Word
+  </button>
 
-          <button type="button" onclick="importWord(this)">
-            📥 Import Word
-          </button>
+  <input type="file" id="fileWord"
+    accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 
-          <button type="button" onclick="downloadTemplate()">
-            ⬇️ Template Word
-          </button>
+  <button type="button" onclick="importWord(this)">
+    📥 Import Word
+  </button>
 
-          <button type="button" onclick="tambahSoal()">
-            ➕ Tambah Soal
-          </button>
+  <button type="button" onclick="tambahSoal()">
+    ➕ Tambah Soal
+  </button>
 
-          <button type="button" id="btnSimpan" onclick="simpanSemua()">
-            💾 Simpan
-          </button>
+  <button type="button" id="btnSimpan">
+    💾 Simpan
+  </button>
 
-        </div>
+</div>
       </section>
 
       <!-- ===== PREVIEW ===== -->

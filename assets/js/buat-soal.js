@@ -79,6 +79,8 @@ function stopLoading(btn) {
   btn.disabled = false;
   btn.innerHTML = btn.dataset.text;
 }
+
+
 // ======================================================
 // ===================== TAMBAH SOAL ====================
 // ======================================================
@@ -101,14 +103,14 @@ window.tambahSoal = (data = null) => {
     ${data?.gambar ? `<img src="${data.gambar}" style="max-width:100%;margin:10px 0">` : ""}
 
     <div class="pg-options" style="margin-top:8px">
-     ${["A","B","C","D"].map(l => `
-  <div style="display:flex; align-items:center; margin-bottom:6px;">
-    <b style="width:25px;">${l}.</b>
-    <span contenteditable class="opsi-input"
-      style="flex:1; border:1px solid #ccc; padding:6px; border-radius:6px; min-height:30px;">
-    </span>
-  </div>
-`).join("")}
+      ${["A","B","C","D"].map(l => `
+        <div style="display:flex; align-items:center; margin-bottom:6px;">
+          <b style="width:25px;">${l}.</b>
+          <span contenteditable class="opsi-input"
+            style="flex:1; border:1px solid #ccc; padding:6px; border-radius:6px; min-height:30px;">
+          </span>
+        </div>
+      `).join("")}
 
       <select class="jawaban">
         <option value="">Kunci Jawaban</option>
@@ -116,15 +118,9 @@ window.tambahSoal = (data = null) => {
       </select>
     </div>
 
-    <!-- ✅ TOMBOL BARU -->
     <div style="margin-top:10px; display:flex; gap:10px;">
-      <button type="button" onclick="tambahSoalDiBawah(this)">
-        ➕ Tambah
-      </button>
-
-      <button type="button" onclick="this.closest('.soal-card').remove()">
-        🗑 Hapus
-      </button>
+      <button type="button" onclick="tambahSoalDiBawah(this)">➕ Tambah</button>
+      <button type="button" onclick="this.closest('.soal-card').remove()">🗑 Hapus</button>
     </div>
   `;
 
@@ -155,67 +151,21 @@ window.tambahSoal = (data = null) => {
 };
 
 
-
 // ======================================================
 // ================= TAMBAH DI BAWAH ====================
 // ======================================================
 window.tambahSoalDiBawah = (btn) => {
   const cardLama = btn.closest(".soal-card");
 
-  const cardBaru = document.createElement("div");
-  cardBaru.className = "soal-card";
-  cardBaru.style.border = "1px solid #ccc";
-  cardBaru.style.padding = "15px";
-  cardBaru.style.marginBottom = "15px";
-  cardBaru.style.borderRadius = "10px";
+  const wrapper = document.createElement("div");
+  daftarSoal.appendChild(wrapper);
 
-  cardBaru.innerHTML = `
-    <select class="tipe-soal">
-      <option value="pg">Pilihan Ganda</option>
-      <option value="esai">Esai</option>
-    </select>
+  tambahSoal();
 
-    <div class="pertanyaan" contenteditable style="margin-top:8px"></div>
-
-    <div class="pg-options" style="margin-top:8px">
-${["A","B","C","D"].map(l => `
-  <div style="display:flex; align-items:center; margin-bottom:6px;">
-    <b style="width:25px;">${l}.</b>
-    <span contenteditable class="opsi-input"
-      style="flex:1; border:1px solid #ccc; padding:6px; border-radius:6px; min-height:30px;">
-    </span>
-  </div>
-`).join("")}
-
-      <select class="jawaban">
-        <option value="">Kunci Jawaban</option>
-        ${["A","B","C","D"].map(l => `<option>${l}</option>`).join("")}
-      </select>
-    </div>
-
-    <div style="margin-top:10px; display:flex; gap:10px;">
-      <button type="button" onclick="tambahSoalDiBawah(this)">
-        ➕ Tambah
-      </button>
-
-      <button type="button" onclick="this.closest('.soal-card').remove()">
-        🗑 Hapus
-      </button>
-    </div>
-  `;
-
-  // 🔥 INTI: muncul tepat di bawah
+  const cardBaru = daftarSoal.lastElementChild;
   cardLama.after(cardBaru);
-
-  const tipe  = cardBaru.querySelector(".tipe-soal");
-  const pgBox = cardBaru.querySelector(".pg-options");
-
-  tipe.onchange = () => {
-    pgBox.style.display = tipe.value === "pg" ? "block" : "none";
-  };
-
-  tipe.dispatchEvent(new Event("change"));
 };
+
 
 // ======================================================
 // ===================== IMPORT WORD ====================
@@ -224,7 +174,15 @@ window.importWord = async (btn) => {
   setLoading(btn, "📄 Importing...");
   try {
     const file = document.getElementById("fileWord").files[0];
-    if (!file) throw new Error("Pilih file Word");
+    if (!file) throw new Error("Pilih file Word (.docx)");
+
+    if (daftarSoal.children.length > 0) {
+      if (!confirm("Soal lama akan diganti. Lanjut?")) {
+        stopLoading(btn);
+        return;
+      }
+      daftarSoal.innerHTML = "";
+    }
 
     const buffer = await file.arrayBuffer();
 
@@ -240,6 +198,7 @@ window.importWord = async (btn) => {
     );
 
     parseSoalHtml(result.value);
+
     toast("✅ Import Word berhasil");
   } catch (err) {
     toast("❌ " + err.message, "error");
@@ -256,13 +215,18 @@ function parseSoalHtml(html) {
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
+  const lines = temp.innerText
+    .split("\n")
+    .map(l => l.trim())
+    .filter(Boolean);
+
   let soal = null;
 
-  [...temp.children].forEach(block => {
-    let text = block.textContent?.trim();
+  lines.forEach(text => {
 
     if (/^\d+[\.\)]/.test(text)) {
       if (soal) tambahSoal(soal);
+
       soal = {
         tipe: "esai",
         pertanyaan: "",
@@ -270,15 +234,11 @@ function parseSoalHtml(html) {
         jawabanBenar: "",
         gambar: null
       };
+
       text = text.replace(/^\d+[\.\)]\s*/, "");
     }
 
     if (!soal) return;
-
-    const img = block.querySelector("img");
-    if (img && !soal.gambar) {
-      soal.gambar = img.src;
-    }
 
     const opsi = text.match(/^([A-D])\./);
     if (opsi) {
@@ -302,8 +262,12 @@ function parseSoalHtml(html) {
   if (soal) tambahSoal(soal);
 }
 
+
+// ======================================================
+// ================= DOWNLOAD TEMPLATE ==================
+// ======================================================
 window.downloadTemplate = async () => {
-  const { Document, Packer, Paragraph, TextRun } = window.docx;
+  const { Document, Packer, Paragraph } = window.docx;
 
   const doc = new Document({
     sections: [
@@ -312,38 +276,43 @@ window.downloadTemplate = async () => {
           new Paragraph("SOAL PILIHAN GANDA"),
           new Paragraph(""),
 
-          new Paragraph("1. Berapakah 2 + 2?"),
-          new Paragraph("A. 1"),
-          new Paragraph("B. 2"),
-          new Paragraph("C. 4"),
-          new Paragraph("D. 5"),
+          new Paragraph("1. Berapakah 2 + 2? "),
+          new Paragraph("A. 1 "),
+          new Paragraph("B. 2 "),
+          new Paragraph("C. 4 "),
+          new Paragraph("D. 5 "),
           new Paragraph("KUNCI: C"),
 
           new Paragraph(""),
-          new Paragraph("2. Ibu kota Indonesia adalah?"),
-          new Paragraph("A. Bandung"),
-          new Paragraph("B. Jakarta"),
-          new Paragraph("C. Surabaya"),
-          new Paragraph("D. Medan"),
+          new Paragraph("2. Ibu kota Indonesia adalah? "),
+          new Paragraph("A. Bandung "),
+          new Paragraph("B. Jakarta "),
+          new Paragraph("C. Surabaya "),
+          new Paragraph("D. Medan "),
           new Paragraph("KUNCI: B"),
 
           new Paragraph(""),
           new Paragraph("SOAL ESAI"),
           new Paragraph(""),
-          new Paragraph("3. Jelaskan arti kemerdekaan!"),
-          new Paragraph("4. Sebutkan 3 energi terbarukan!")
+
+          new Paragraph("3. Jelaskan arti kemerdekaan! "),
+          new Paragraph("4. Sebutkan 3 energi terbarukan! ")
         ]
       }
     ]
   });
 
   const blob = await Packer.toBlob(doc);
+  const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   a.download = "Template_Soal.docx";
   a.click();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
+
 
 // ======================================================
 // ===================== SIMPAN SEMUA ===================
@@ -425,7 +394,46 @@ window.simpanSemua = async () => {
     stopLoading(btnSimpan);
   }
 };
+window.previewSoal = () => {
+  const box = document.getElementById("previewBox");
+  const pgBox = document.getElementById("previewPG");
+  const esaiBox = document.getElementById("previewEsai");
 
+  box.style.display = "block";
+  pgBox.innerHTML = "";
+  esaiBox.innerHTML = "";
+
+  let noPG = 1;
+  let noE = 1;
+
+  document.querySelectorAll(".soal-card").forEach(card => {
+    const tipe = card.querySelector(".tipe-soal").value;
+    const pertanyaan = card.querySelector(".pertanyaan").innerText;
+    const gambar = card.querySelector("img")?.src;
+
+    if (tipe === "pg") {
+      let html = `<div><b>${noPG}. ${pertanyaan}</b>`;
+      if (gambar) html += `<br><img src="${gambar}" style="max-width:200px">`;
+
+      card.querySelectorAll(".opsi-input").forEach((o, i) => {
+        if (o.innerText.trim()) {
+          html += `<div>${String.fromCharCode(65+i)}. ${o.innerText}</div>`;
+        }
+      });
+
+      html += "</div><br>";
+      pgBox.innerHTML += html;
+      noPG++;
+    } else {
+      let html = `<div><b>${noE}. ${pertanyaan}</b>`;
+      if (gambar) html += `<br><img src="${gambar}" style="max-width:200px">`;
+      html += "</div><br>";
+
+      esaiBox.innerHTML += html;
+      noE++;
+    }
+  });
+};
 btnSimpan?.addEventListener("click", e => {
   e.preventDefault();
   simpanSemua();
