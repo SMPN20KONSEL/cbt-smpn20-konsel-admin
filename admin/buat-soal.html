@@ -5,17 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Buat Soal PG & Esai</title>
 
-  <!-- ================= CSS ================= -->
+  <!-- CSS -->
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/buat-soal.css">
 
-  <!-- ================= ICON ================= -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  >
+  <!-- ICON -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- ================= MATHJAX ================= -->
+  <!-- MATHJAX -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
@@ -32,7 +30,6 @@
   </div>
 </header>
 
-<!-- ================= DASHBOARD ================= -->
 <div class="dashboard">
 
   <!-- ================= SIDEBAR ================= -->
@@ -53,9 +50,8 @@
       <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
       <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
     </ul>
-    <button class="logout" id="logout">
-     🚪 Logout
-    </button>
+
+    <button class="logout" id="logout">🚪 Logout</button>
   </aside>
 
   <!-- ================= CONTENT ================= -->
@@ -65,56 +61,69 @@
       <h1>Buat Soal PG & Esai</h1>
 
       <!-- ===== INFO UJIAN ===== -->
-      <div class="form-row">
-        <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
-        <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
-        <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
-      </div>
+      <section class="form-section">
+        <div class="form-row">
+          <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
+          <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
+          <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
+        </div>
+      </section>
 
-      <!-- ===== PERTANYAAN ===== -->
-      <div
-        class="pertanyaan"
-        contenteditable="true"
-        data-placeholder="Ketik pertanyaan..."
-      ></div>
+      <!-- ===== PERTANYAAN UTAMA (OPTIONAL EDITOR) ===== -->
+      <section class="form-section">
+        <div class="pertanyaan"
+             contenteditable="true"
+             data-placeholder="Ketik pertanyaan...">
+        </div>
+      </section>
 
       <!-- ===== AKSI ===== -->
-      <div class="form-row">
-        <input type="file" id="fileWord" accept=".docx">
+      <section class="form-section">
+        <div class="form-row">
 
-        <button type="button" onclick="importWord(this)">
-          📥 Import Word
-        </button>
+          <input type="file" id="fileWord" accept=".docx">
 
-        <button type="button" onclick="downloadTemplate()">
-          ⬇️ Unduh Template Word
-        </button>
+          <button type="button" onclick="importWord(this)">
+            📥 Import Word
+          </button>
 
-        <button type="button" onclick="tambahSoal()">
-          ➕ Tambah Soal Manual
-        </button>
+          <button type="button" onclick="downloadTemplate()">
+            ⬇️ Template Word
+          </button>
 
-        <button type="button" id="btnSimpan" onclick="simpanSemua()">
-          💾 Simpan Semua
-        </button>
-      </div>
+          <button type="button" onclick="tambahSoal()">
+            ➕ Tambah Soal
+          </button>
+
+          <button type="button" id="btnSimpan" onclick="simpanSemua()">
+            💾 Simpan
+          </button>
+
+        </div>
+      </section>
 
       <!-- ===== PREVIEW ===== -->
-      <button type="button" onclick="previewSoal()">
-        👁️ Preview Soal
-      </button>
+      <section class="form-section">
+        <button type="button" onclick="previewSoal()">
+          👁️ Preview Soal
+        </button>
 
-      <div id="previewBox" class="preview-box" style="display:none;">
-        <h3>Preview Soal (Tampilan Siswa)</h3>
-        <div id="previewPG"></div>
-        <hr>
-        <div id="previewEsai"></div>
-      </div>
+        <div id="previewBox" class="preview-box" style="display:none;">
+          <h3>Preview Soal (Tampilan Siswa)</h3>
+
+          <div id="previewPG"></div>
+          <hr>
+          <div id="previewEsai"></div>
+        </div>
+      </section>
 
       <hr>
 
       <!-- ===== DAFTAR SOAL ===== -->
-      <div id="daftarSoal"></div>
+      <section>
+        <h3>Daftar Soal</h3>
+        <div id="daftarSoal"></div>
+      </section>
 
     </div>
   </main>
@@ -128,7 +137,7 @@
 <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
 <script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 
-<!-- ================= JS ================= -->
+<!-- ================= SCRIPT ================= -->
 <script type="module" src="../assets/js/buat-soal.js"></script>
 <script type="module" src="../assets/js/logout.js"></script>
 

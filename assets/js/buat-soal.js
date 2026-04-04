@@ -302,6 +302,47 @@ function parseSoalHtml(html) {
   if (soal) tambahSoal(soal);
 }
 
+window.downloadTemplate = () => {
+  const isi = `
+SOAL PILIHAN GANDA
+
+1. Berapakah hasil dari 2 + 2?
+A. 1
+B. 2
+C. 4
+D. 5
+KUNCI: C
+
+2. Ibu kota Indonesia adalah?
+A. Bandung
+B. Jakarta
+C. Surabaya
+D. Medan
+KUNCI: B
+
+
+SOAL ESAI
+
+3. Jelaskan arti kemerdekaan!
+
+4. Sebutkan 3 contoh energi terbarukan!
+`;
+
+  const blob = new Blob([isi], {
+    type: "application/msword"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Template_Soal.doc";
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
 
 // ======================================================
 // ===================== SIMPAN SEMUA ===================
