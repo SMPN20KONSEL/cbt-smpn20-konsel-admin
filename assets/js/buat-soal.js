@@ -302,46 +302,47 @@ function parseSoalHtml(html) {
   if (soal) tambahSoal(soal);
 }
 
-window.downloadTemplate = () => {
-  const isi = `
-SOAL PILIHAN GANDA
+window.downloadTemplate = async () => {
+  const { Document, Packer, Paragraph, TextRun } = window.docx;
 
-1. Berapakah hasil dari 2 + 2?
-A. 1
-B. 2
-C. 4
-D. 5
-KUNCI: C
+  const doc = new Document({
+    sections: [
+      {
+        children: [
+          new Paragraph("SOAL PILIHAN GANDA"),
+          new Paragraph(""),
 
-2. Ibu kota Indonesia adalah?
-A. Bandung
-B. Jakarta
-C. Surabaya
-D. Medan
-KUNCI: B
+          new Paragraph("1. Berapakah 2 + 2?"),
+          new Paragraph("A. 1"),
+          new Paragraph("B. 2"),
+          new Paragraph("C. 4"),
+          new Paragraph("D. 5"),
+          new Paragraph("KUNCI: C"),
 
+          new Paragraph(""),
+          new Paragraph("2. Ibu kota Indonesia adalah?"),
+          new Paragraph("A. Bandung"),
+          new Paragraph("B. Jakarta"),
+          new Paragraph("C. Surabaya"),
+          new Paragraph("D. Medan"),
+          new Paragraph("KUNCI: B"),
 
-SOAL ESAI
-
-3. Jelaskan arti kemerdekaan!
-
-4. Sebutkan 3 contoh energi terbarukan!
-`;
-
-  const blob = new Blob([isi], {
-    type: "application/msword"
+          new Paragraph(""),
+          new Paragraph("SOAL ESAI"),
+          new Paragraph(""),
+          new Paragraph("3. Jelaskan arti kemerdekaan!"),
+          new Paragraph("4. Sebutkan 3 energi terbarukan!")
+        ]
+      }
+    ]
   });
 
-  const url = URL.createObjectURL(blob);
+  const blob = await Packer.toBlob(doc);
 
   const a = document.createElement("a");
-  a.href = url;
-  a.download = "Template_Soal.doc";
-  document.body.appendChild(a);
+  a.href = URL.createObjectURL(blob);
+  a.download = "Template_Soal.docx";
   a.click();
-
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 };
 
 // ======================================================
