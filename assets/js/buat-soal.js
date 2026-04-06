@@ -140,23 +140,30 @@ function parseSoalHtml(html){
     .map(p => p.innerText.trim())
     .filter(x => x);
 
-  let soal=null;
-  let tipe="esai";
+  let soal = null;
+  let tipe = "esai";
 
   lines.forEach(line=>{
 
-    if(/SOAL PG KOMPLEKS|PG KOMPLEK|MCMA/i.test(line)){
-  tipe="mcma";
-  return;
-}
+    // DETEKSI TIPE
+    if(/SOAL\s*(PG KOMPLEKS|MCMA)/i.test(line)){
+      tipe = "mcma";
+      return;
+    }
+    else if(/SOAL KATEGORI/i.test(line)){
+      tipe="kategori";
+      return;
+    }
+    else if(/SOAL ESAI/i.test(line)){
+      tipe="esai";
+      return;
+    }
+    else if(/SOAL\s*PG/i.test(line)){
+      tipe = "pg";
+      return;
+    }
 
-if(/SOAL PG(?! KOMPLEKS)/i.test(line)){
-  tipe="pg";
-  return;
-}
-    if(/SOAL KATEGORI/i.test(line)){ tipe="kategori"; return; }
-    if(/SOAL ESAI/i.test(line)){ tipe="esai"; return; }
-
+    // SOAL BARU
     if(/^\d+\./.test(line)){
       if(soal) renderSoal(soal);
 
@@ -172,18 +179,25 @@ if(/SOAL PG(?! KOMPLEKS)/i.test(line)){
 
     if(!soal) return;
 
+    // OPSI
     let opsi = line.match(/^([A-D])\.\s*(.*)/);
     if(opsi){
       soal.opsi[opsi[1]] = opsi[2];
       return;
     }
 
+    // KUNCI
     if(/KUNCI/i.test(line)){
       let kunci = line.replace(/KUNCI\s*:/i,"").trim();
-      soal.jawabanBenar = kunci.split(",").map(x=>x.trim());
+
+      soal.jawabanBenar = kunci
+        .split(",")
+        .map(x => x.trim().toUpperCase());
+
       return;
     }
 
+    // KATEGORI
     let kat = line.match(/^[a-z]\.\s*(.*?)\s*\((Benar|Salah)\)/i);
     if(kat){
       soal.pernyataan.push({
@@ -193,12 +207,12 @@ if(/SOAL PG(?! KOMPLEKS)/i.test(line)){
       return;
     }
 
+    // LANJUT PERTANYAAN
     soal.pertanyaan += " " + line;
   });
-console.log("TIPE TERDETEKSI:", tipe);
+
   if(soal) renderSoal(soal);
 }
-
 
 // ======================================================
 // ===================== RENDER =========================
@@ -229,7 +243,7 @@ function renderSoal(data){
 
       row.innerHTML = `
         <b>${key}.</b>
-        <textarea class="opsi-text">${val}</textarea>
+        <div class="opsi-text" contenteditable>${val}</div>
       `;
 
       box.appendChild(row);
@@ -249,17 +263,23 @@ function renderSoal(data){
     box.innerHTML = "";
 
     Object.entries(data.opsi).forEach(([key,val])=>{
-      const checked = data.jawabanBenar.includes(key);
-
+const checked = data.jawabanBenar
+  .map(x => x.trim().toUpperCase())
+  .includes(key.toUpperCase());
       const row = document.createElement("div");
       row.className = "opsi-row";
 
-      row.innerHTML = `
-        <b>${key}.</b>
-        <textarea class="opsi-text">${val}</textarea>
-        <input type="checkbox" value="${key}" ${checked ? "checked" : ""}>
-        <button class="hapus-opsi">✖</button>
-      `;
+row.innerHTML = `
+  <div class="opsi-kiri">
+    <b>${key}.</b>
+    <div class="opsi-text" contenteditable>${val}</div>
+  </div>
+
+  <div class="opsi-kanan">
+    <input type="checkbox" value="${key}" ${checked ? "checked" : ""}>
+    <button class="hapus-opsi">✖</button>
+  </div>
+`;
 
       box.appendChild(row);
     });
@@ -354,31 +374,36 @@ window.tambahSoal = () => {
 
   const kunciSelect = card.querySelector(".jawaban");
 
-  function tambahOpsi(container, isMCMA=false){
-    const i = container.children.length;
-    const label = huruf(i);
+ function tambahOpsi(container, isMCMA=false){
+  const i = container.children.length;
+  const label = huruf(i);
 
-    const row = document.createElement("div");
-    row.className = "opsi-row";
+  const row = document.createElement("div");
+  row.className = "opsi-row";
 
-    row.innerHTML = `
+  row.innerHTML = `
+    <div class="opsi-kiri">
       <b>${label}.</b>
-      <textarea class="opsi-text"></textarea>
+      <div class="opsi-text" contenteditable data-placeholder="Tulis opsi..."></div>
+    </div>
+
+    <div class="opsi-kanan">
       ${isMCMA ? `<input type="checkbox" value="${label}">` : ""}
       <button class="hapus-opsi">✖</button>
-    `;
+    </div>
+  `;
 
-    container.appendChild(row);
+  container.appendChild(row);
 
-    if(!isMCMA){
-      const opt = document.createElement("option");
-      opt.value = label;
-      opt.textContent = label;
-      kunciSelect.appendChild(opt);
-    }
-
-    row.querySelector(".hapus-opsi").onclick = ()=>row.remove();
+  if(!isMCMA){
+    const opt = document.createElement("option");
+    opt.value = label;
+    opt.textContent = label;
+    kunciSelect.appendChild(opt);
   }
+
+  row.querySelector(".hapus-opsi").onclick = ()=>row.remove();
+}
 
   function tambahKategori(){
     const tr = document.createElement("tr");
@@ -420,18 +445,6 @@ window.tambahSoal = () => {
   };
 };
 
-
-// ======================================================
-// ===================== AUTO RESIZE ====================
-// ======================================================
-document.addEventListener("input", function(e) {
-  if (e.target.classList.contains("opsi-text")) {
-    e.target.style.height = "auto";
-    e.target.style.height = e.target.scrollHeight + "px";
-  }
-});
-
-
 // ======================================================
 // ===================== SIMPAN =========================
 // ======================================================
@@ -457,7 +470,7 @@ window.simpanSemua = async ()=>{
         const opsi={};
 
         card.querySelectorAll(".pg-options .opsi-text").forEach((o,i)=>{
-          opsi[huruf(i)] = o.value.trim();
+          opsi[huruf(i)] = o.innerText.trim();
         });
 
         soalPG.push({
@@ -471,7 +484,7 @@ window.simpanSemua = async ()=>{
         const opsi={}, kunci=[];
 
         card.querySelectorAll(".mcma-options .opsi-text").forEach((o,i)=>{
-          opsi[huruf(i)] = o.value.trim();
+          opsi[huruf(i)] = o.innerText.trim();
         });
 
         card.querySelectorAll(".mcma-options input:checked").forEach(cb=>{

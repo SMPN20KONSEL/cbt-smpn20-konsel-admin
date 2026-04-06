@@ -1,38 +1,59 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Lihat Soal</title>
+  <meta charset="UTF-8">
+  <title>Lihat Soal</title>
 
-<link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/admin.css">
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
 
-<style>
-.soal-box{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
-  margin-bottom:20px;
-}
-.nomor{
-  font-weight:bold;
-  margin-bottom:8px;
-}
-.jenis{
-  font-size:12px;
-  background:#2563eb;
-  color:#fff;
-  padding:3px 10px;
-  border-radius:20px;
-  display:inline-block;
-  margin-bottom:10px;
-}
-.opsi div{margin:4px 0}
-.aksi{margin-top:10px}
-.aksi button{margin-right:6px}
-</style>
+  <!-- MathJax -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    .soal-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+
+    .nomor {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    /* 🔥 FIX: hilangkan duplikat */
+    .jenis {
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:20px;
+      font-size:12px;
+      color:#fff;
+      margin-bottom:10px;
+      background:#3b82f6;
+    }
+
+    /* 🔥 WARNA TIPE SOAL */
+    .jenis.pg { background:#3b82f6; }
+    .jenis.mcma { background:#f59e0b; }
+    .jenis.kategori { background:#8b5cf6; }
+    .jenis.esai { background:#16a34a; }
+
+    .opsi div {
+      margin: 4px 0;
+    }
+
+    .aksi {
+      margin-top: 12px;
+    }
+
+    .aksi button {
+      margin-right: 6px;
+    }
+  </style>
 </head>
 
 <body>
@@ -40,7 +61,11 @@
 <!-- TOPBAR -->
 <header class="topbar">
   <div class="brand">
-    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <img 
+      src="../assets/img/logo-sekolah.png" 
+      class="brand-logo" 
+      alt="Logo Sekolah"
+    >
     <div class="brand-text">
       <strong>SMPN 20 KONAWE SELATAN</strong>
       <small>CBT Application</small>
@@ -48,48 +73,32 @@
   </div>
 </header>
 
+<!-- DASHBOARD -->
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+   <aside class="sidebar">
     <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
-
     <ul class="menu">
       <li>
-        <a href="dashboard-guru.html" class="active">
-          <i class="fa fa-home"></i> Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="buat-soal.html">
-          <i class="fa fa-pen"></i> Buat Soal
-        </a>
-      </li>
-      <li>
-        <a href="bank-soal.html">
-          <i class="fa fa-book"></i> Bank Soal
-        </a>
-      </li>
-      <li>
-        <a href="rekap-nilai.html">
-          <i class="fa fa-chart-column"></i> Rekap Nilai
-        </a>
+        <a href="bank-soal.html">⬅ Kembali</a>
       </li>
     </ul>
-
-    <button class="logout" id="logout">
-      <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
   </aside>
 
-<main class="content">
-  <h1 id="judul"></h1>
-  <p id="info"></p>
-  <div id="soal-list"></div>
-</main>
+  <!-- CONTENT -->
+  <main class="content">
+    <h1 id="judul">Soal</h1>
+    <p id="info"></p>
+
+    <div id="soal-list">
+      <!-- Soal dari Firestore -->
+    </div>
+  </main>
 
 </div>
 
+<!-- JS -->
 <script type="module" src="../assets/js/load-bank-soal.js"></script>
 
 </body>

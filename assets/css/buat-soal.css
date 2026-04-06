@@ -172,9 +172,9 @@ body {
 ===================================================== */
 .content {
   margin-left: 260px;
-  flex: 1;
-
+  width: calc(100% - 260px); /* 🔥 penting */
   padding: 40px;
+
   background: var(--bg-light);
 
   display: flex;
@@ -190,6 +190,7 @@ body {
   border-radius: var(--radius-lg);
 
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  width: 100%;
 
   display: flex;
   flex-direction: column;
@@ -336,9 +337,14 @@ button:hover {
 #daftarSoal {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: stretch !important;
+  width: 100%;
 }
 
+.soal-card {
+  width: 100% !important;
+  max-width: 100% !important;
+}
 .soal-card {
   background: #f9fafb;
   border: 1px solid #e5e7eb;
@@ -353,8 +359,7 @@ button:hover {
 }
 
 /* input soal */
-.soal-card textarea,
-.soal-card [contenteditable] {
+.soal-card > .pertanyaan[contenteditable] {
   width: 100%;
  min-height: 36px;     /* 🔥 lebih pendek */
   padding: 6px 10px;    /* 🔥 kecilin atas bawah */
@@ -365,7 +370,10 @@ button:hover {
 
   font-family: inherit;
 }
-
+.opsi-text {
+  margin-top: 0 !important;
+  width: auto !important;
+}
 .soal-card textarea:focus,
 .soal-card [contenteditable]:focus {
   outline: none;
@@ -400,120 +408,87 @@ button:hover {
 .soal-actions .hapus:hover {
   background: #dc2626;
 }
-/* =====================================================
-   PG (PILIHAN GANDA) - FIX
-===================================================== */
 
-.pg-options .opsi-row {
+/* =========================
+   OPSI (PG & MCMA RAPI)
+========================= */
+.opsi-row {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-
-  margin-top: 8px;
+  gap: 12px;
+  margin-bottom: 10px;
   padding: 6px 8px;
-
   border-radius: 8px;
 }
 
-/* hover */
-.pg-options .opsi-row:hover {
+.opsi-row:hover {
   background: #f9fafb;
 }
 
-/* label */
-.pg-options .opsi-row b {
-  width: 30px;
+/* kiri */
+.opsi-kiri {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
 }
 
-/* input teks */
-.pg-options .opsi-text {
+/* label */
+.opsi-kiri b {
+  width: 25px;
+  flex-shrink: 0;
+}
+
+/* teks */
+.opsi-text {
   flex: 1;
   width: 100%;
   min-height: 36px;
-
   padding: 6px 10px;
 
   border: 1px solid #d1d5db;
   border-radius: 6px;
+  background: #fff;
+
+  word-break: break-word;
 }
 
-/* tombol X */
-.pg-options .hapus-opsi {
-  margin-left: auto;   /* 🔥 dorong ke kanan */
-  background: #2a5298;
-  color: #fff;
-  border-radius: 8px;
-  padding: 5px 9px;
-  border: none;
-}
-/* =====================================================
-   PG KOMPLEKS (MCMA) - FIX FINAL
-===================================================== */
-
-/* 🔥 target spesifik */
-.mcma-options .opsi-row {
+/* kanan */
+.opsi-kanan {
   display: flex;
   align-items: center;
   gap: 10px;
-
-  margin-top: 8px;
-  padding: 6px 8px;
-
-  border-radius: 8px;
+  flex-shrink: 0;
 }
 
-/* hover */
-.mcma-options .opsi-row:hover {
-  background: #f9fafb;
-}
-
-/* label */
-.mcma-options .opsi-row b {
-  width: 30px;
-}
-
-/* 🔥 textarea FULL */
-.mcma-options .opsi-text {
-  flex: 1;
-  width: 100%;       /* penting */
-  min-height: 36px;
-
-  padding: 6px 10px;
-
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-
-  resize: none;
-}
-
-/* 🔥 checkbox ke kanan */
-.mcma-options input[type="checkbox"] {
-  margin-left: auto;
-  transform: scale(1.2);
+/* checkbox */
+.opsi-kanan input[type="checkbox"] {
+  transform: scale(1.3);
+  cursor: pointer;
 }
 
 /* tombol hapus */
-.mcma-options .hapus-opsi {
-  margin-left: 8px;
-  background: #ef4444;
-  color: #fff;
-  border-radius: 8px;
-  padding: 5px 9px;
+.hapus-opsi {
+  background: #2c5aa0;
+  color: white;
   border: none;
-}
-.mcma-options .opsi-row {
-  display: flex !important;
-}
-
-.mcma-options .opsi-text {
-  flex: 1 !important;
-  width: 100% !important;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
 }
 
+.hapus-opsi:hover {
+  background: #1b3f73;
+}
+[contenteditable] {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 /* =====================================================
    DROPDOWN JAWABAN (RAPI)
 ===================================================== */
-
 .jawaban {
   margin-top: 10px;
   padding: 6px 10px;          /* 🔥 lebih ramping */
@@ -676,14 +651,4 @@ button:hover {
   button {
     font-size: 13px;
   }
-}
-#daftarSoal {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 🔥 ini kunci */
-}
-
-.soal-card {
-  width: 100%;
-  max-width: 1200px; /* 🔥 batasi lebar */
 }

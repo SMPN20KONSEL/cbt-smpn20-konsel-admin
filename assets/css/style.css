@@ -159,6 +159,7 @@ select:focus {
 .content {
   padding: 30px;
   flex: 1;
+  width: 100%;
 }
 
 .card-menu {
@@ -204,9 +205,9 @@ select:focus {
 /* =====================
    HP KECIL
 ===================== */
-@media (max-width: 360px) {
-  .content {
-    padding: 12px;
+@media (max-width: 576px) {
+  .card {
+    padding: 20px;
   }
 
   h1, h2, h3 {
