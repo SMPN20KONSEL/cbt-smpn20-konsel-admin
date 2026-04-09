@@ -61,6 +61,32 @@
   margin-top:6px;
   font-weight:bold;
 }
+.modal{
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,.5);
+  justify-content:center;
+  align-items:center;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  width:350px;
+}
+
+.save{
+  background:#2563eb;
+  color:#fff;
+}
+
+.batal{
+  background:#dc2626;
+  color:#fff;
+}
 </style>
 </head>
 
@@ -100,22 +126,42 @@
   <p class="subtitle">Daftar seluruh bank soal</p>
   <div id="list" class="cards-grid"></div>
 </main>
+<!-- MODAL EDIT -->
+<div id="modalEdit" class="modal">
+  <div class="modal-content">
+    <h3>Edit Bank Soal</h3>
 
+    <label>Judul</label>
+    <input id="editJudul">
+
+    <label>Mapel</label>
+    <input id="editMapel">
+
+    <label>Kelas</label>
+    <input id="editKelas">
+
+    <br><br>
+
+    <button onclick="simpanEdit()" class="save">💾 Simpan</button>
+    <button onclick="tutupModal()" class="batal">Batal</button>
+  </div>
+</div>
 </div>
 
 <!-- JS -->
 <script type="module">
 import { db, auth } from "../assets/js/firebase.js";
 import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import {
   collection,
   getDocs,
   deleteDoc,
-  doc
+  doc,
+  getDoc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-
 const list = document.getElementById("list");
 
 // AUTH
@@ -182,7 +228,9 @@ async function loadBankSoal() {
         </div>
 
         <h3>${s.judul}</h3>
-
+<p style="font-size:12px;color:#666;">
+  Dibuat oleh: ${s.namaGuru || "-"}
+</p>
         <div class="soal-info">
           ${infoHTML || "<i>Tidak ada soal</i>"}
         </div>
@@ -206,10 +254,40 @@ window.hapusBankSoal = async id => {
   await deleteDoc(doc(db, "bank_soal", id));
   loadBankSoal();
 };
+let currentId = "";
 
-// EDIT
-window.editBankSoal = id => {
-  location.href = `edit-soal.html?id=${id}`;
+// BUKA MODAL
+window.editBankSoal = async (id) => {
+  currentId = id;
+
+  const ref = doc(db, "bank_soal", id);
+  const snap = await getDoc(ref);
+  const data = snap.data();
+
+  document.getElementById("editJudul").value = data.judul || "";
+  document.getElementById("editMapel").value = data.mapel || "";
+  document.getElementById("editKelas").value = data.kelas || "";
+
+  document.getElementById("modalEdit").style.display = "flex";
+};
+
+// TUTUP MODAL
+window.tutupModal = () => {
+  document.getElementById("modalEdit").style.display = "none";
+};
+
+// SIMPAN
+window.simpanEdit = async () => {
+  await updateDoc(doc(db, "bank_soal", currentId), {
+    judul: document.getElementById("editJudul").value,
+    mapel: document.getElementById("editMapel").value,
+    kelas: document.getElementById("editKelas").value
+  });
+
+  alert("Berhasil diupdate");
+
+  tutupModal();
+  loadBankSoal();
 };
 </script>
 

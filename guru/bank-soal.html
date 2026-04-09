@@ -129,7 +129,9 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  doc
+  doc,
+  where,
+  query    
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 import {
   onAuthStateChanged
@@ -139,15 +141,24 @@ const list = document.getElementById("list");
 
 // AUTH
 onAuthStateChanged(auth, user => {
-  if (!user) location.href = "../login.html";
-  loadBankSoal();
+  if (!user) {
+    location.href = "../login.html";
+    return;
+  }
+
+  loadBankSoal(user); // 🔥 kirim user
 });
 
 // LOAD BANK SOAL
-async function loadBankSoal() {
+async function loadBankSoal(user) {
   list.innerHTML = "<p>Memuat data...</p>";
 
-  const snap = await getDocs(collection(db, "bank_soal"));
+  const q = query(
+  collection(db, "bank_soal"),
+  where("guruId", "==", user.uid) // 🔥 FILTER GURU LOGIN
+);
+
+const snap = await getDocs(q);
 
   if (snap.empty) {
     list.innerHTML = "<p>Belum ada bank soal</p>";
@@ -201,7 +212,9 @@ async function loadBankSoal() {
         </div>
 
         <h3>${s.judul}</h3>
-
+<p style="font-size:12px;color:#666;">
+  Dibuat oleh: ${s.namaGuru || "-"}
+</p>
         <div class="soal-info">
           ${infoHTML || "<i>Tidak ada soal</i>"}
         </div>
@@ -222,8 +235,11 @@ window.lihatSoal = id => {
 // HAPUS
 window.hapusBankSoal = async id => {
   if (!confirm("Hapus bank soal ini?")) return;
+
   await deleteDoc(doc(db, "bank_soal", id));
-  loadBankSoal();
+
+  const user = auth.currentUser; // 🔥 ambil lagi user
+  loadBankSoal(user);
 };
 
 // EDIT

@@ -1,7 +1,7 @@
 // ======================================================
 // ======================= FIREBASE =====================
 // ======================================================
-import { db } from "./firebase.js";
+import { db, auth } from "./firebase.js"; // 🔥 tambah auth
 import {
   doc,
   setDoc,
@@ -58,35 +58,33 @@ window.downloadTemplate = async () => {
   const { Document, Packer, Paragraph } = window.docx;
 
   const docFile = new Document({
-    sections: [{
-      children: [
-        new Paragraph("=== SOAL PG ==="),
-        new Paragraph("1. 2 + 2?"),
-        new Paragraph("A. 1"),
-        new Paragraph("B. 2"),
-        new Paragraph("C. 4"),
-        new Paragraph("D. 5"),
-        new Paragraph("KUNCI: C"),
+  sections: [{
+    children: [
 
-        new Paragraph(""),
-        new Paragraph("=== SOAL MCMA ==="),
-        new Paragraph("2. Pilih yang benar"),
-        new Paragraph("A. 2 genap"),
-        new Paragraph("B. 3 genap"),
-        new Paragraph("C. 4 genap"),
-        new Paragraph("D. 5 genap"),
-        new Paragraph("KUNCI: A,C"),
+      new Paragraph("SOAL PG"),
+      new Paragraph("1. 2 + 2?"),
+      new Paragraph("A. 1"),
+      new Paragraph("B. 2"),
+      new Paragraph("C. 4"),
+      new Paragraph("D. 5"),
+      new Paragraph("KUNCI: C"),
 
-        new Paragraph(""),
-        new Paragraph("=== SOAL KATEGORI ==="),
-        new Paragraph("3. Tentukan benar/salah"),
-        new Paragraph("a. 2+2=4 (Benar)"),
-        new Paragraph("b. 5x2=20 (Salah)"),
+      new Paragraph("SOAL MCMA"),
+      new Paragraph("2. Pilih yang benar"),
+      new Paragraph("A. 2 genap"),
+      new Paragraph("B. 3 genap"),
+      new Paragraph("C. 4 genap"),
+      new Paragraph("D. 5 genap"),
+      new Paragraph("KUNCI: A, C"),
 
-        new Paragraph(""),
-        new Paragraph("=== SOAL ESAI ==="),
-        new Paragraph("4. Jelaskan...")
-      ]
+      new Paragraph("SOAL KATEGORI"),
+      new Paragraph("3. Tentukan benar/salah"),
+      new Paragraph("a. 2+2=4 (Benar)"),
+      new Paragraph("b. 5x2=20 (Salah)"),
+      
+      new Paragraph("SOAL ESAI"),
+      new Paragraph("4. Jelaskan..."),
+     ]
     }]
   });
 
@@ -136,40 +134,53 @@ function parseSoalHtml(html){
   const temp = document.createElement("div");
   temp.innerHTML = html;
 
-  const lines = Array.from(temp.querySelectorAll("p"))
+  // ================= NORMALIZE =================
+  let rawLines = Array.from(temp.querySelectorAll("p"))
     .map(p => p.innerText.trim())
     .filter(x => x);
 
+  const lines = [];
+  rawLines.forEach(line=>{
+    let split = line
+      // pecah opsi (lebih aman)
+      .replace(/(^|\s)([A-D]\.)/g, '\n$2')
+      .split('\n')
+      .map(x=>x.trim())
+      .filter(x=>x);
+
+    lines.push(...split);
+  });
+
   let soal = null;
-  let tipe = "esai";
+  let currentTipe = "esai";
 
   lines.forEach(line=>{
 
-    // DETEKSI TIPE
+    // ================= DETEKSI TIPE GLOBAL =================
     if(/SOAL\s*(PG KOMPLEKS|MCMA)/i.test(line)){
-      tipe = "mcma";
+      currentTipe = "mcma";
       return;
     }
     else if(/SOAL KATEGORI/i.test(line)){
-      tipe="kategori";
+      currentTipe="kategori";
       return;
     }
     else if(/SOAL ESAI/i.test(line)){
-      tipe="esai";
+      currentTipe="esai";
       return;
     }
     else if(/SOAL\s*PG/i.test(line)){
-      tipe = "pg";
+      currentTipe = "pg";
       return;
     }
 
-    // SOAL BARU
-    if(/^\d+\./.test(line)){
-      if(soal) renderSoal(soal);
+    // ================= SOAL BARU =================
+    if(/^\d+[\.\)\-]/.test(line)){
+      if(soal) finalizeSoal(soal);
 
       soal = {
-        tipe,
-        pertanyaan: line.replace(/^\d+\.\s*/,""),
+        tipe: currentTipe,
+        pertanyaan: line.replace(/^\d+[\.\)\-]\s*/,""),
         opsi:{},
         jawabanBenar:[],
         pernyataan:[]
@@ -179,27 +190,36 @@ function parseSoalHtml(html){
 
     if(!soal) return;
 
-    // OPSI
+    // ================= OPSI =================
     let opsi = line.match(/^([A-D])\.\s*(.*)/);
     if(opsi){
       soal.opsi[opsi[1]] = opsi[2];
+
+      // auto detect PG
+      if(soal.tipe === "esai"){
+        soal.tipe = "pg";
+      }
       return;
     }
 
-    // KUNCI
-    if(/KUNCI/i.test(line)){
-      let kunci = line.replace(/KUNCI\s*:/i,"").trim();
+    // ================= KUNCI =================
+    if(/(KUNCI|JAWABAN)/i.test(line)){
+      let kunci = line
+        .replace(/(KUNCI|JAWABAN)(\s*JAWABAN)?\s*:/i,"")
+        .trim();
 
       soal.jawabanBenar = kunci
-        .split(",")
-        .map(x => x.trim().toUpperCase());
+        .split(/[^A-D]+/)
+        .map(x => x.trim().toUpperCase())
+        .filter(x => x);
 
       return;
     }
 
-    // KATEGORI
+    // ================= KATEGORI =================
     let kat = line.match(/^[a-z]\.\s*(.*?)\s*\((Benar|Salah)\)/i);
     if(kat){
+      soal.tipe = "kategori";
       soal.pernyataan.push({
         teks: kat[1],
         jawabanBenar: kat[2].toLowerCase()==="benar"
@@ -207,11 +227,35 @@ function parseSoalHtml(html){
       return;
     }
 
-    // LANJUT PERTANYAAN
+    // ================= FILTER SAMPAH =================
+    if(/^(Catatan|Pembahasan)/i.test(line)){
+      return;
+    }
+
+    // ================= LANJUT PERTANYAAN =================
     soal.pertanyaan += " " + line;
   });
 
-  if(soal) renderSoal(soal);
+  if(soal) finalizeSoal(soal);
+
+  // ================= FINAL CHECK =================
+  function finalizeSoal(s){
+
+    // PG → MCMA
+    if(s.tipe === "pg" && s.jawabanBenar.length > 1){
+      s.tipe = "mcma";
+    }
+
+    // kalau tidak ada opsi & kategori → esai
+    if(Object.keys(s.opsi).length === 0 && s.pernyataan.length === 0){
+      s.tipe = "esai";
+    }
+
+    // bersihin pertanyaan
+    s.pertanyaan = s.pertanyaan.trim();
+
+    renderSoal(s);
+  }
 }
 
 // ======================================================
@@ -450,6 +494,11 @@ window.tambahSoal = () => {
 // ======================================================
 window.simpanSemua = async ()=>{
   try{
+    const user = auth.currentUser;
+
+     if (!user) {
+     throw new Error("User belum login");
+    }
     const judul = judulUjian.value.trim();
     const mapel = mapelInput.value.trim();
     const kelas = kelasInput.value.trim();
@@ -525,11 +574,21 @@ window.simpanSemua = async ()=>{
 
     const docId = buatDocId(judul,mapel,kelas);
 
-    await setDoc(doc(db,"bank_soal",docId),{
-      judul,mapel,kelas,
-      soalPG,soalMCMA,soalKategori,soalEssay,
-      dibuat: serverTimestamp()
-    });
+await setDoc(doc(db,"bank_soal",docId),{
+  judul,
+  mapel,
+  kelas,
+
+  soalPG,
+  soalMCMA,
+  soalKategori,
+  soalEssay,
+
+  guruId: user.uid,
+  namaGuru: user.email, // 👍 biar bisa tampil nanti
+
+  dibuat: serverTimestamp()
+});
 
     toast("✅ Berhasil simpan");
 
