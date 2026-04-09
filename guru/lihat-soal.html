@@ -11,49 +11,196 @@
   <!-- MathJax -->
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-  <style>
-    .soal-box {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-      margin-bottom: 20px;
-    }
+<style>
 
-    .nomor {
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
+/* ================= HEADER SOAL ================= */
+.soal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
 
-    /* 🔥 FIX: hilangkan duplikat */
-    .jenis {
-      display:inline-block;
-      padding:4px 10px;
-      border-radius:20px;
-      font-size:12px;
-      color:#fff;
-      margin-bottom:10px;
-      background:#3b82f6;
-    }
+.btn-edit{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+  color:#2563eb;
+}
 
-    /* 🔥 WARNA TIPE SOAL */
-    .jenis.pg { background:#3b82f6; }
-    .jenis.mcma { background:#f59e0b; }
-    .jenis.kategori { background:#8b5cf6; }
-    .jenis.esai { background:#16a34a; }
+.soal-box{
+  background:#fff;
+  padding:18px;
+  border-radius:12px;
+  margin-bottom:16px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
 
-    .opsi div {
-      margin: 4px 0;
-    }
+/* ================= LABEL JENIS ================= */
+.jenis{
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  color:#fff;
+  font-weight:600;
+}
 
-    .aksi {
-      margin-top: 12px;
-    }
+.pg{background:#3b82f6;}
+.mcma{background:#f59e0b;}
+.kategori{background:#8b5cf6;}
+.esai{background:#16a34a;}
 
-    .aksi button {
-      margin-right: 6px;
-    }
-  </style>
+/* ================= MODAL ================= */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+/* SATU VERSION SAJA (hapus duplikat sebelumnya) */
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  width:800px;
+  max-width:95%;
+  max-height:90vh;
+  overflow-y:auto;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+/* ================= BUTTON ================= */
+.save{
+  background:#2563eb;
+  color:#fff;
+  padding:10px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.batal{
+  background:#dc2626;
+  color:#fff;
+  padding:10px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* ================= CARD EDIT ================= */
+.soal-card{
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:16px;
+  margin-top:12px;
+  background:#f9fafb;
+}
+
+/* ================= LABEL TIPE EDIT ================= */
+.tipe-label{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  color:#fff;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+/* ================= PERTANYAAN ================= */
+.pertanyaan{
+  min-height:80px;
+  border:1px solid #ddd;
+  padding:10px;
+  border-radius:8px;
+  margin:10px 0;
+  background:#fff;
+}
+
+/* ================= OPSI ================= */
+.opsi-row{
+  display:grid;
+  grid-template-columns: 30px 1fr 50px;
+  align-items:center;
+  gap:10px;
+  padding:6px 0;
+}
+.opsi-row b{
+  text-align:right;
+}
+
+.opsi-text{
+  border:1px solid #ddd;
+  padding:6px 10px;
+  border-radius:6px;
+  background:#fff;
+  min-height:36px;
+  display:flex;
+  align-items:center;
+}
+
+.opsi-kanan{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.opsi-kiri{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1;
+}
+
+.opsi-text{
+  flex:1;
+  border:1px solid #ddd;
+  padding:6px;
+  border-radius:6px;
+  background:#fff;
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  word-break: break-word;
+}
+
+/* checkbox / radio kanan */
+.opsi-kanan{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:60px;
+  justify-content:flex-end;
+}
+
+/* ================= KATEGORI ================= */
+.kategori-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+.kategori-table td,
+.kategori-table th{
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:center;
+}
+
+/* ================= SELECT (kalau dipakai nanti) ================= */
+.tipe-soal{
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+</style>
 </head>
 
 <body>
@@ -96,10 +243,21 @@
     </div>
   </main>
 
+<!-- MODAL -->
+<div id="modalSoal" class="modal">
+  <div class="modal-content">
+    <h3 id="judulModal">Edit Soal</h3>
+
+    <div id="editContainer"></div>
+
+    <br>
+    <button onclick="simpanSoal()" class="save">💾 Simpan</button>
+    <button onclick="tutupModalSoal()" class="batal">Batal</button>
+  </div>
 </div>
 
-<!-- JS -->
-<script type="module" src="../assets/js/load-bank-soal.js"></script>
+</div>
 
+<script type="module" src="../assets/js/load-bank-soal.js"></script>
 </body>
 </html>

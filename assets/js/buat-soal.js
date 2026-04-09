@@ -16,10 +16,18 @@ const daftarSoal = document.getElementById("daftarSoal");
 const btnSimpan  = document.getElementById("btnSimpan");
 const toastBox   = document.getElementById("toast");
 
-const judulUjian = document.getElementById("judulUjian");
+const judulSelect = document.getElementById("judulSelect");
+const judulManual = document.getElementById("judulManual");
 const mapelInput = document.getElementById("mapelInput");
 const kelasInput = document.getElementById("kelasInput");
-
+judulSelect?.addEventListener("change", () => {
+  if (judulSelect.value === "lainnya") {
+    judulManual.style.display = "block";
+  } else {
+    judulManual.style.display = "none";
+    judulManual.value = "";
+  }
+});
 
 // ======================================================
 // ======================== UTIL ========================
@@ -32,7 +40,39 @@ function buatDocId(judul, mapel, kelas) {
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_]/g, "");
 }
+function toTitleCase(str){
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+const daftarMapelSMP = [
+  "Pendidikan Agama Islam",
+  "Pendidikan Agama Kristen",
+  "Pendidikan Agama Katolik",
+  "Pendidikan Agama Hindu",
+  "Pendidikan Agama Buddha",
+  "Pendidikan Agama Konghucu",
 
+  "PPKn",
+  "Bahasa Indonesia",
+  "Matematika",
+  "IPA",
+  "IPS",
+  "Bahasa Inggris",
+
+  "Seni Budaya",
+  "Pendidikan Jasmani, Olahraga, dan Kesehatan (PJOK)",
+  "Prakarya",
+  "Informatika",
+
+  "Bahasa Daerah",
+  "Muatan Lokal"
+];
+// isi dropdown mapel otomatis
+daftarMapelSMP.forEach(mapel => {
+  const opt = document.createElement("option");
+  opt.value = mapel;
+  opt.textContent = mapel;
+  mapelInput.appendChild(opt);
+});
 
 // ======================================================
 // ======================== TOAST =======================
@@ -499,9 +539,22 @@ window.simpanSemua = async ()=>{
      if (!user) {
      throw new Error("User belum login");
     }
-    const judul = judulUjian.value.trim();
-    const mapel = mapelInput.value.trim();
-    const kelas = kelasInput.value.trim();
+    // ===== JUDUL =====
+let judul = "";
+
+if (judulSelect.value === "lainnya") {
+  judul = toTitleCase(judulManual.value.trim());
+} else {
+  judul = judulSelect.value;
+}
+if (judulSelect.value === "lainnya" && !judul) {
+  throw new Error("Judul manual harus diisi");
+}
+// ===== MAPEL =====
+const mapel = mapelInput.value.trim();
+
+// ===== KELAS (AUTO HURUF BESAR) =====
+const kelas = kelasInput.value.trim().toUpperCase();
 
     if(!judul||!mapel||!kelas){
       throw new Error("Data wajib diisi");

@@ -63,8 +63,18 @@
       <!-- ===== INFO UJIAN ===== -->
       <section class="form-section">
         <div class="form-row">
-          <input id="judulUjian" type="text" placeholder="Judul Ujian (contoh: SAS)">
-          <input id="mapelInput" type="text" placeholder="Mata Pelajaran (contoh: Matematika)">
+          <select id="judulSelect">
+  <option value="">-- Pilih Jenis Ujian --</option>
+  <option value="Sumatif Akhir Semester">Sumatif Akhir Semester</option>
+  <option value="Sumatif Tengah Semester">Sumatif Tengah Semester</option>
+  <option value="Sumatif Harian">Sumatif Harian</option>
+  <option value="lainnya">Lainnya</option>
+</select>
+
+<input id="judulManual" placeholder="Tulis judul..." style="display:none;">
+          <select id="mapelInput">
+  <option value="">-- Pilih Mata Pelajaran --</option>
+</select>
           <input id="kelasInput" type="text" placeholder="Kelas (contoh: VII)">
         </div>
       </section>

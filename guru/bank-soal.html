@@ -61,6 +61,13 @@
   margin-top:6px;
   font-weight:bold;
 }
+#modalEdit{
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn{
+  from{opacity:0;}
+  to{opacity:1;}
+}
 </style>
 </head>
 
@@ -119,7 +126,35 @@
   <p class="subtitle">Daftar seluruh bank soal</p>
   <div id="list" class="cards-grid"></div>
 </main>
+<div id="modalEdit" style="
+position:fixed;
+top:0;left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:999;
+">
+  <div style="
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    width:300px;
+  ">
+    <h3>Edit Bank Soal</h3>
 
+    <input id="editJudul" placeholder="Judul" style="width:100%;margin:5px 0;">
+    <input id="editMapel" placeholder="Mapel" style="width:100%;margin:5px 0;">
+    <input id="editKelas" placeholder="Kelas" style="width:100%;margin:5px 0;">
+
+    <div style="margin-top:10px;text-align:right;">
+      <button onclick="tutupModal()">Batal</button>
+      <button onclick="simpanEdit()">Simpan</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <!-- JS -->
@@ -131,14 +166,16 @@ import {
   deleteDoc,
   doc,
   where,
-  query    
+  query,
+  getDoc,       // ✅ tambahkan
+  updateDoc     // ✅ tambahkan
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 const list = document.getElementById("list");
-
+let currentUser = null;
 // AUTH
 onAuthStateChanged(auth, user => {
   if (!user) {
@@ -146,7 +183,8 @@ onAuthStateChanged(auth, user => {
     return;
   }
 
-  loadBankSoal(user); // 🔥 kirim user
+  currentUser = user; // ✅ simpan
+  loadBankSoal(user);
 });
 
 // LOAD BANK SOAL
@@ -226,6 +264,10 @@ const snap = await getDocs(q);
     `;
   });
 }
+window.toggleFolder = (id) => {
+  const el = document.getElementById("group-" + id);
+  el.parentElement.classList.toggle("folder-open");
+};
 
 // NAVIGASI
 window.lihatSoal = id => {
@@ -236,16 +278,47 @@ window.lihatSoal = id => {
 window.hapusBankSoal = async id => {
   if (!confirm("Hapus bank soal ini?")) return;
 
+  list.innerHTML = "<p>Menghapus...</p>"; // optional loading
+
   await deleteDoc(doc(db, "bank_soal", id));
+  loadBankSoal(currentUser); // ✅ BENAR
+};
+let currentId = "";
 
-  const user = auth.currentUser; // 🔥 ambil lagi user
-  loadBankSoal(user);
+// BUKA MODAL
+window.editBankSoal = async (id) => {
+  currentId = id;
+
+  const ref = doc(db, "bank_soal", id);
+  const snap = await getDoc(ref);
+  const data = snap.data();
+
+  document.getElementById("editJudul").value = data.judul || "";
+  document.getElementById("editMapel").value = data.mapel || "";
+  document.getElementById("editKelas").value = data.kelas || "";
+
+  document.getElementById("modalEdit").style.display = "flex";
 };
 
-// EDIT
-window.editBankSoal = id => {
-  location.href = `edit-soal.html?id=${id}`;
+// TUTUP MODAL
+window.tutupModal = () => {
+  document.getElementById("modalEdit").style.display = "none";
 };
+
+// SIMPAN
+window.simpanEdit = async () => {
+  await updateDoc(doc(db, "bank_soal", currentId), {
+    judul: document.getElementById("editJudul").value,
+    mapel: document.getElementById("editMapel").value,
+    kelas: document.getElementById("editKelas").value
+  });
+
+  alert("Berhasil diupdate");
+
+  tutupModal();
+  loadBankSoal(currentUser);
+};
+
 </script>
 
 <script type="module" src="../assets/js/logout.js"></script>

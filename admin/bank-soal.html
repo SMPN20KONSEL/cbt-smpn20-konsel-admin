@@ -87,6 +87,30 @@
   background:#dc2626;
   color:#fff;
 }
+.folder-header{
+  cursor:pointer;
+  padding:10px;
+  border-radius:8px;
+  margin-top:20px;
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.folder-content{
+  display:none;
+}
+
+.folder-open .folder-content{
+  display:grid;
+}
+
+/* warna beda */
+.sas{ background:#2563eb; }
+.sts{ background:#16a34a; }
+.sh{ background:#f59e0b; }
+.lain{ background:#6b7280; }
 </style>
 </head>
 
@@ -124,7 +148,12 @@
 <main class="content">
   <h1><i class="fa fa-book"></i> Bank Soal</h1>
   <p class="subtitle">Daftar seluruh bank soal</p>
-  <div id="list" class="cards-grid"></div>
+  <input 
+  type="text" 
+  id="searchInput" 
+  placeholder="🔍 Cari bank soal..." 
+  style="padding:10px;width:100%;max-width:400px;border-radius:8px;border:1px solid #ccc;margin-bottom:15px;">
+  <div id="list"></div>
 </main>
 <!-- MODAL EDIT -->
 <div id="modalEdit" class="modal">
@@ -183,6 +212,33 @@ async function loadBankSoal() {
 
   list.innerHTML = "";
 
+  const kelompok = {
+    "Sumatif Akhir Semester": [],
+    "Sumatif Tengah Semester": [],
+    "Sumatif Harian": [],
+    "Lainnya": []
+  };
+
+  snap.forEach(docSnap => {
+    const s = docSnap.data() || {};
+    const data = { id: docSnap.id, ...s };
+
+    const judul = (s.judul || "").toLowerCase();
+
+    if (judul.includes("sumatif akhir semester")) {
+      kelompok["Sumatif Akhir Semester"].push(data);
+    }
+    else if (judul.includes("sumatif tengah semester")) {
+      kelompok["Sumatif Tengah Semester"].push(data);
+    }
+    else if (judul.includes("sumatif harian")) {
+      kelompok["Sumatif Harian"].push(data);
+    }
+    else {
+      kelompok["Lainnya"].push(data);
+    }
+  });
+
   const labelMap = {
     soalPG: "Pilihan Ganda",
     soalMCMA: "PG Kompleks",
@@ -190,8 +246,35 @@ async function loadBankSoal() {
     soalEssay: "Esai"
   };
 
-  snap.forEach(docSnap => {
-    const s = docSnap.data();
+  Object.keys(kelompok).forEach(nama => {
+
+  const dataList = kelompok[nama];
+  if (dataList.length === 0) return;
+
+  let classWarna = "lain";
+  if (nama === "Sumatif Akhir Semester") classWarna = "sas";
+  else if (nama === "Sumatif Tengah Semester") classWarna = "sts";
+  else if (nama === "Sumatif Harian") classWarna = "sh";
+
+  const idGroup = nama.replace(/\s+/g, '_');
+
+  list.innerHTML += `
+    <div class="folder ${classWarna}">
+      
+      <div class="folder-header ${classWarna}" onclick="toggleFolder('${idGroup}')">
+        <span>📂 ${nama} (${dataList.length})</span>
+        <span>▼</span>
+      </div>
+
+      <div class="folder-content cards-grid" id="group-${idGroup}">
+      </div>
+
+    </div>
+  `;
+
+  const container = document.getElementById(`group-${idGroup}`);
+
+  dataList.forEach(s => {
 
     let total = 0;
     let infoHTML = "";
@@ -211,37 +294,62 @@ async function loadBankSoal() {
       }
     });
 
-    list.innerHTML += `
-      <div class="bank-card" onclick="lihatSoal('${docSnap.id}')">
-        <div class="bank-header">
-          <span class="badge">${s.mapel} • Kelas ${s.kelas}</span>
+    container.innerHTML += `
+      <div class="bank-card" data-judul="${(s.judul || '').toLowerCase()}">
+        <div onclick="lihatSoal('${s.id}')">
 
-          <div class="actions" onclick="event.stopPropagation()">
-            <button class="edit" onclick="editBankSoal('${docSnap.id}')">
-              <i class="fa fa-edit"></i>
-            </button>
+          <div class="bank-header">
+            <span class="badge">${s.mapel} • Kelas ${s.kelas}</span>
 
-            <button class="hapus" onclick="hapusBankSoal('${docSnap.id}')">
-              <i class="fa fa-trash"></i>
-            </button>
+            <div class="actions" onclick="event.stopPropagation()">
+              <button class="edit" onclick="editBankSoal('${s.id}')">
+                <i class="fa fa-edit"></i>
+              </button>
+
+              <button class="hapus" onclick="hapusBankSoal('${s.id}')">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
           </div>
-        </div>
 
-        <h3>${s.judul}</h3>
-<p style="font-size:12px;color:#666;">
-  Dibuat oleh: ${s.namaGuru || "-"}
-</p>
-        <div class="soal-info">
-          ${infoHTML || "<i>Tidak ada soal</i>"}
-        </div>
+          <h3>${s.judul}</h3>
 
-        <div class="total">
-          Total Soal: ${total}
+          <p style="font-size:12px;color:#666;">
+            Dibuat oleh: ${s.namaGuru || "-"}
+          </p>
+
+          <div class="soal-info">
+            ${infoHTML || "<i>Tidak ada soal</i>"}
+          </div>
+
+          <div class="total">
+            Total Soal: ${total}
+          </div>
+
         </div>
       </div>
     `;
   });
+
+});
+window.toggleFolder = (id) => {
+  const el = document.getElementById("group-" + id);
+  el.parentElement.classList.toggle("folder-open");
+};
 }
+document.getElementById("searchInput").addEventListener("input", function(){
+  const keyword = this.value.toLowerCase();
+
+  document.querySelectorAll(".bank-card").forEach(card=>{
+    const judul = card.dataset.judul + " " + card.innerText.toLowerCase();
+
+    if(judul.includes(keyword)){
+      card.style.display = "block";
+    }else{
+      card.style.display = "none";
+    }
+  });
+});
 
 // NAVIGASI
 window.lihatSoal = id => {

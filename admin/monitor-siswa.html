@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor Siswa</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/dasbor.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+    }
+
+    th {
+      background: #0b48ac;
+      color: white;
+    }
+
+    tr:hover {
+      background: #f1f1f1;
+    }
+
+    .online { color: orange; }
+    .kerja { color: blue; font-weight: bold; }
+    .selesai { color: green; font-weight: bold; }
+    .offline { color: red; }
+
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      background: #0b48ac;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #08337a;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<div class="dashboard">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+
+    <ul class="menu">
+      <li><a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+      <li><a href="ujian.html"><i class="fa fa-chart-bar"></i> Ruang Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-chart-bar"></i> Nilai</a></li>
+    </ul>
+
+    <button class="logout" id="logout">🚪 Logout</button>
+  </aside>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="content">
+
+    <h1>📊 Monitoring Siswa Ujian</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Email</th>
+          <th>Kelas</th>
+          <th>Kode Ujian</th>
+          <th>Status</th>
+          <th>Login</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+
+  </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script type="module">
+import { db } from "../assets/js/firebase.js";
+import {
+  collection,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const tableBody = document.getElementById("table-body");
+
+// 🔥 cek offline (tidak aktif > 1 menit)
+function isOffline(lastActive) {
+  if (!lastActive) return true;
+  return (Date.now() - lastActive.toDate().getTime()) > 60000;
+}
+
+onSnapshot(collection(db, "peserta"), (snapshot) => {
+
+  tableBody.innerHTML = "";
+  let no = 1;
+
+  const docs = [];
+  snapshot.forEach(doc => {
+    docs.push({ id: doc.id, ...doc.data() });
+  });
+
+  docs.sort((a, b) => {
+    const order = {
+      mengerjakan: 1,
+      mulai: 1,
+      online: 2,
+      selesai: 3
+    };
+    return (order[a.status] || 4) - (order[b.status] || 4);
+  });
+
+  docs.forEach(data => {
+
+    let statusBadge = "🔴 Offline";
+    let statusClass = "offline";
+
+    const lastOnline = data.lastOnline;
+
+    if (lastOnline && (Date.now() - lastOnline.toDate().getTime()) <= 60000) {
+
+      if (data.status === "login") {
+  statusBadge = "🟡 Login";
+  statusClass = "online";
+}
+
+if (data.status === "belum_mulai") {
+  statusBadge = "🟣 Belum Mulai";
+  statusClass = "online";
+}
+
+if (data.status === "mengerjakan") {
+  statusBadge = "🔵 Sedang Ujian";
+  statusClass = "kerja";
+}
+
+if (data.status === "selesai") {
+  statusBadge = "🟢 Selesai";
+  statusClass = "selesai";
+}
+    }
+
+    tableBody.innerHTML += `
+      <tr>
+        <td>${no++}</td>
+        <td>${data.nama || "-"}</td>
+        <td>${data.email || "-"}</td>
+        <td>${data.kelas || "-"}</td>
+        <td>${data.kodeUjian || "-"}</td>
+        <td class="${statusClass}">${statusBadge}</td>
+        <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
+        <td>
+          <button onclick="location.href='detail-siswa.html?id=${data.id}'">
+            Lihat
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+});
+</script>
+
+</body>
+</html>
