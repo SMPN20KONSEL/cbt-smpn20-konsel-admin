@@ -71,7 +71,8 @@
   align-items:center;
 }
 
-.modal-content{
+.modal-content {
+  animation: scaleIn 0.2s ease;
   background:#fff;
   padding:20px;
   border-radius:12px;
@@ -111,6 +112,40 @@
 .sts{ background:#16a34a; }
 .sh{ background:#f59e0b; }
 .lain{ background:#6b7280; }
+
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.toast {
+  pointer-events: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  background: #16a34a;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 9999;
+  
+  box-shadow: 0 10px 25px rgba(0,0,0,.25);
+  animation: fadeIn 0.3s ease;
+  text-align: center;
+  min-width: 260px;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
 </style>
 </head>
 
@@ -173,6 +208,16 @@
 
     <button onclick="simpanEdit()" class="save">💾 Simpan</button>
     <button onclick="tutupModal()" class="batal">Batal</button>
+  </div>
+</div>
+<div id="modalHapus" class="modal">
+  <div class="modal-content">
+    <h3>Konfirmasi Hapus</h3>
+    <p>Yakin ingin menghapus bank soal ini?</p>
+
+    <br>
+    <button id="btnHapusOk" class="save">🗑️ Hapus</button>
+    <button id="btnHapusBatal" class="batal">Batal</button>
   </div>
 </div>
 </div>
@@ -357,9 +402,33 @@ window.lihatSoal = id => {
 };
 
 // HAPUS
-window.hapusBankSoal = async id => {
-  if (!confirm("Hapus bank soal ini?")) return;
-  await deleteDoc(doc(db, "bank_soal", id));
+let idYangAkanDihapus = null;
+
+// Klik tombol hapus
+window.hapusBankSoal = (id) => {
+  idYangAkanDihapus = id;
+  document.getElementById("modalHapus").style.display = "flex";
+};
+
+// Tombol batal
+document.getElementById("btnHapusBatal").onclick = () => {
+  document.getElementById("modalHapus").style.display = "none";
+  idYangAkanDihapus = null;
+};
+
+// Tombol OK hapus
+document.getElementById("btnHapusOk").onclick = async () => {
+  if (!idYangAkanDihapus) return;
+
+  tampilkanToast("⏳ Menghapus...");
+
+  await deleteDoc(doc(db, "bank_soal", idYangAkanDihapus));
+
+  tampilkanToast("🗑️ Berhasil dihapus");
+
+  document.getElementById("modalHapus").style.display = "none";
+
+  idYangAkanDihapus = null;
   loadBankSoal();
 };
 let currentId = "";
@@ -392,11 +461,22 @@ window.simpanEdit = async () => {
     kelas: document.getElementById("editKelas").value
   });
 
-  alert("Berhasil diupdate");
+  tampilkanToast("✅ Berhasil diupdate");
 
   tutupModal();
   loadBankSoal();
 };
+function tampilkanToast(pesan) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = pesan;
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 </script>
 
 <script type="module" src="../assets/js/logout.js"></script>

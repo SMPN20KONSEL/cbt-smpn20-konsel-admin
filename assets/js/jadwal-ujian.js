@@ -44,7 +44,7 @@ async function buatUjian() {
     const durasi = Number(document.getElementById("durasi").value);
 
     if (!bankSoalId || !durasi) {
-      alert("❗ Lengkapi semua data");
+      tampilkanToast("❗ Lengkapi semua data", "red");
       return;
     }
 
@@ -58,14 +58,14 @@ async function buatUjian() {
 );
 
 if (!cek.empty) {
-  alert("❌ Masih ada jadwal AKTIF untuk bank soal ini");
+  tampilkanToast("❌ Bank soal masih dipakai", "red");
   return;
 }
 
     // Ambil data bank soal
     const soalSnap = await getDoc(doc(db, "bank_soal", bankSoalId));
     if (!soalSnap.exists()) {
-      alert("❌ Bank soal tidak ditemukan");
+      tampilkanToast("❌ Bank soal tidak ditemukan", "red");
       return;
     }
 
@@ -84,12 +84,12 @@ if (!cek.empty) {
       createdAt: serverTimestamp()
     });
 
-    alert(`✅ Jadwal ujian berhasil dibuat\nKode Ujian: ${kode}`);
+    tampilkanToast(`✅ Ujian dibuat | Kode: ${kode}`);
     loadJadwal();
 
   } catch (err) {
     console.error(err);
-    alert("❌ Gagal membuat jadwal\n" + err.message);
+    tampilkanToast("❌ Gagal membuat jadwal", "red");
   }
 }
 
@@ -198,7 +198,21 @@ async function loadJadwal() {
     `;
   });
 }
+function tampilkanToast(pesan, warna = "green") {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = pesan;
 
+  // warna dinamis
+  if (warna === "red") toast.style.background = "#dc2626";
+  if (warna === "yellow") toast.style.background = "#f59e0b";
+
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 /* ================= INIT ================= */
 btnBuat.addEventListener("click", buatUjian);
 loadBankSoal();

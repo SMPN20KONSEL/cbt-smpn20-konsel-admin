@@ -478,12 +478,22 @@ window.simpanSoal = async ()=>{
     [currentJenis]: dataBank[currentJenis]
   });
 
-  alert("✅ Berhasil diupdate");
+  tampilkanToast("✅ Berhasil diupdate");
 
   tutupModalSoal();
   loadSoal();
 };
+function tampilkanToast(pesan) {
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = pesan;
 
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 // ================= CLOSE =================
 window.tutupModalSoal = ()=>{
   document.getElementById("modalSoal").style.display="none";
