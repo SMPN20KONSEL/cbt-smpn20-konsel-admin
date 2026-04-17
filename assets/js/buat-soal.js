@@ -122,7 +122,7 @@ function renderSoal(data){
       kunci.appendChild(opt);
     });
 
-    kunci.value = data.jawabanBenar[0] || "";
+    kunci.value = data.jawabanBenar || "";
   }
 
   // ===== MCMA =====
@@ -131,9 +131,9 @@ function renderSoal(data){
     box.innerHTML = "";
 
     Object.entries(data.opsi).forEach(([key,val])=>{
-      const checked = data.jawabanBenar
-        .map(x => x.trim().toUpperCase())
-        .includes(key.toUpperCase());
+const checked = (data.jawabanBenar || [])
+  .map(x => x.trim().toUpperCase())
+  .includes(key.toUpperCase());
 
       const row = document.createElement("div");
       row.className = "opsi-row";
@@ -167,7 +167,7 @@ function renderSoal(data){
     `;
 
     data.pernyataan.forEach((p,i)=>{
-      const name = "kat_"+Date.now()+"_"+i;
+      const name = "kat_"+data.id+"_"+i;
 
       const tr = document.createElement("tr");
 
@@ -293,7 +293,7 @@ window.simpanSemua = async ()=>{
       const tipe = card.querySelector(".tipe-soal").value;
       const pertanyaan = card.querySelector(".pertanyaan").innerText.trim();
 
-      if(!pertanyaan) return;
+      if(!pertanyaan) throw new Error("Pertanyaan tidak boleh kosong");
 
       // ===== PG =====
       if(tipe==="pg"){
