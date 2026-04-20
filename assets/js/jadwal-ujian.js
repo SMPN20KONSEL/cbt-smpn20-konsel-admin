@@ -1,4 +1,5 @@
 import { db } from "./firebase.js";
+import { auth } from "./firebase.js";
 import {
   collection,
   getDocs,
@@ -73,16 +74,19 @@ if (!cek.empty) {
     const kode = generateKode();
 
     // SIMPAN JADWAL
-    await setDoc(doc(db, "jadwal_ujian", kode), {
-      bankSoalId,
-      judul: s.judul,
-      mapel: s.mapel,
-      kelas: s.kelas,
-      kode,
-      durasi,
-      aktif: true,
-      createdAt: serverTimestamp()
-    });
+await setDoc(doc(db, "jadwal_ujian", kode), {
+  bankSoalId,
+  judul: s.judul,
+  mapel: s.mapel,
+  kelas: s.kelas,
+  kode,
+  durasi,
+  aktif: true,
+
+  guruId: auth.currentUser.uid, // 🔥 TAMBAHAN PENTING
+
+  createdAt: serverTimestamp()
+});
 
     tampilkanToast(`✅ Ujian dibuat | Kode: ${kode}`);
     loadJadwal();

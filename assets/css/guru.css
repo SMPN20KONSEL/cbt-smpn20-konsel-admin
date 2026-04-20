@@ -1,50 +1,41 @@
-/* ===============================
-   HALAMAN DATA GURU
-================================ */
-
-.content {
-  flex: 1;
-  padding: 30px;
-  background: #eef6ff;
-  min-height: 100vh;
-}
-
-/* ===============================
-   JUDUL
-================================ */
-
+/* =====================================================
+   HALAMAN GURU (AMAN - TANPA BENTROK)
+===================================================== */
+/* HEADER DALAM CONTENT (CENTER) */
 .content h1 {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #1f3c88;
+
   display: flex;
   align-items: center;
+  justify-content: center; /* 🔥 ini kuncinya */
+
   gap: 10px;
+  text-align: center;
 }
 
-.subtitle {
-  color: #6b7280;
-  margin-bottom: 25px;
-}
-
-/* ===============================
+/* =====================================================
    CARD
-================================ */
-
+===================================================== */
 .card {
   background: #ffffff;
   border-radius: 14px;
-  padding: 22px;
-  margin-bottom: 25px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .card h3 {
-  margin-bottom: 18px;
   font-size: 18px;
   color: #1f3c88;
   font-weight: 600;
 }
+
 .total-guru {
   display: inline-block;
   background: #3b82f6;
@@ -52,12 +43,11 @@
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
-  margin-bottom: 8px;
 }
-/* ===============================
-   FORM TAMBAH GURU
-================================ */
 
+/* =====================================================
+   FORM
+===================================================== */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -69,7 +59,6 @@
   border-radius: 10px;
   border: 1px solid #d1d5db;
   font-size: 14px;
-  transition: 0.2s;
 }
 
 .form-grid input:focus {
@@ -78,62 +67,47 @@
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
-/* ===============================
-   BUTTON UMUM
-================================ */
-
+/* =====================================================
+   BUTTON
+===================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+
   padding: 10px 16px;
   border-radius: 10px;
+
   font-size: 13px;
   font-weight: 600;
+
   cursor: pointer;
   border: none;
-  transition: 0.25s;
 }
 
-.btn-icon {
-  font-size: 15px;
-}
-
-/* tambah */
 .btn.secondary {
   background: #2563eb;
-  color: #ffffff;
+  color: #fff;
 }
 
 .btn.secondary:hover {
   background: #1e40af;
 }
 
-/* aktifkan */
 .btn.success {
   background: #16a34a;
-  color: #ffffff;
+  color: #fff;
 }
 
-.btn.success:hover {
-  background: #15803d;
-}
-
-/* nonaktifkan */
 .btn.danger {
   background: #dc2626;
-  color: #ffffff;
+  color: #fff;
 }
 
-.btn.danger:hover {
-  background: #b91c1c;
-}
-
-/* ===============================
+/* =====================================================
    TABLE
-================================ */
-
+===================================================== */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -147,7 +121,7 @@
 
 .table th,
 .table td {
-  padding: 12px 14px;
+  padding: 12px;
   text-align: left;
   vertical-align: middle;
 }
@@ -160,10 +134,14 @@
   background: #f1f5f9;
 }
 
-/* ===============================
-   STATUS BADGE
-================================ */
+/* tombol tidak turun */
+.table td:last-child {
+  white-space: nowrap;
+}
 
+/* =====================================================
+   BADGE
+===================================================== */
 .badge {
   display: inline-block;
   padding: 4px 10px;
@@ -182,35 +160,23 @@
   color: #991b1b;
 }
 
-/* ===============================
-   AKSI
-================================ */
-
-.table td:last-child {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* ===============================
+/* =====================================================
    RESPONSIVE
-================================ */
-
+===================================================== */
 @media (max-width: 768px) {
-  .content {
-    padding: 20px;
+
+  .content h1 {
+    font-size: 20px;
   }
 
   .form-grid {
     grid-template-columns: 1fr;
   }
 
-  .content h1 {
-    font-size: 22px;
-  }
-
   .table td:last-child {
+    white-space: normal;
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
+    gap: 6px;
   }
 }

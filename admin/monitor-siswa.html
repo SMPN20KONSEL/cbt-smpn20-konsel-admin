@@ -5,66 +5,94 @@
   <title>Monitor Siswa</title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="../assets/css/dasbor.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    body {
-      font-family: Arial;
-      background: #f5f5f5;
-    }
+    /* =====================================================
+   CONTENT (JANGAN RUSAK ADMIN)
+===================================================== */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 🔥 center semua isi */
+  padding: 30px;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+/* =====================================================
+   WRAPPER TABLE (BIAR TENGAH & LEBAR)
+===================================================== */
+.table-wrap {
+  width: 100%;
+  max-width: 1100px; /* 🔥 atur lebar */
+  overflow-x: auto;  /* 🔥 scroll kalau kepanjangan */
+}
 
-    .content {
-      margin-left: 260px;
-      padding: 20px;
-    }
+/* =====================================================
+   TABLE
+===================================================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      text-align: center;
-    }
+/* header */
+th {
+  background: #0b48ac;
+  color: white;
+}
 
-    th {
-      background: #0b48ac;
-      color: white;
-    }
+/* cell */
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-size: 14px;
+}
 
-    tr:hover {
-      background: #f1f1f1;
-    }
+/* hover */
+tr:hover {
+  background: #f1f5f9;
+}
 
-    .online { color: orange; }
-    .kerja { color: blue; font-weight: bold; }
-    .selesai { color: green; font-weight: bold; }
-    .offline { color: red; }
+/* =====================================================
+   STATUS WARNA
+===================================================== */
+.online { color: orange; }
+.kerja { color: blue; font-weight: bold; }
+.selesai { color: green; font-weight: bold; }
+.offline { color: red; }
 
-    button {
-      padding: 5px 10px;
-      border: none;
-      border-radius: 6px;
-      background: #0b48ac;
-      color: white;
-      cursor: pointer;
-    }
+/* =====================================================
+   BUTTON
+===================================================== */
+button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
 
-    button:hover {
-      background: #08337a;
-    }
+button:hover {
+  background: #1e40af;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 768px) {
+  .content {
+    padding: 20px;
+  }
+}
   </style>
 </head>
 <body>
@@ -164,33 +192,39 @@ onSnapshot(collection(db, "peserta"), (snapshot) => {
 
   docs.forEach(data => {
 
-    let statusBadge = "🔴 Offline";
-    let statusClass = "offline";
+const lastOnline = data.lastOnline;
 
-    const lastOnline = data.lastOnline;
+let isOnline = false;
 
-    if (lastOnline && (Date.now() - lastOnline.toDate().getTime()) <= 60000) {
-
-      if (data.status === "login") {
-  statusBadge = "🟡 Login";
-  statusClass = "online";
+if (lastOnline && lastOnline.toDate) {
+  const selisih = Date.now() - lastOnline.toDate().getTime();
+  isOnline = selisih <= 60000;
 }
 
-if (data.status === "belum_mulai") {
-  statusBadge = "🟣 Belum Mulai";
-  statusClass = "online";
-}
+let statusBadge = "🔴 Offline";
+let statusClass = "offline";
 
-if (data.status === "mengerjakan") {
-  statusBadge = "🔵 Sedang Ujian";
-  statusClass = "kerja";
-}
+if (isOnline) {
+  if (data.status === "login") {
+    statusBadge = "🟡 Login";
+    statusClass = "online";
+  }
 
-if (data.status === "selesai") {
-  statusBadge = "🟢 Selesai";
-  statusClass = "selesai";
+  if (data.status === "belum_mulai") {
+    statusBadge = "🟣 Belum Mulai";
+    statusClass = "online";
+  }
+
+  if (data.status === "mengerjakan") {
+    statusBadge = "🔵 Sedang Ujian";
+    statusClass = "kerja";
+  }
+
+  if (data.status === "selesai") {
+    statusBadge = "🟢 Selesai";
+    statusClass = "selesai";
+  }
 }
-    }
 
 const uid = data.id;
 tableBody.innerHTML += `

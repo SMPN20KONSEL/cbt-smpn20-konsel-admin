@@ -1,42 +1,169 @@
-.split-card {
+/* =====================================================
+   CONTENT (AMAN DARI ADMIN.CSS)
+===================================================== */
+.content {
   display: flex;
-  gap: 20px;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 25px;
 }
-.card {
-  position: relative;
+/* ===============================
+   JUDUL CONTENT (CENTER)
+================================ */
+.content h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 🔥 bikin ke tengah */
+
+  gap: 10px;
+  text-align: center;
+
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f3c88;
+}
+/* =====================================================
+   SPLIT CARD (FORM KIRI KANAN)
+===================================================== */
+.split-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
 }
 
-.total-siswa {
-  position: absolute;
-  top: 15px;
-  left: 20px;
-  font-size: 12px;
-}
+/* masing-masing sisi */
 .split-card .left,
 .split-card .right {
-  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.split-card input {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
+/* judul */
+.split-card h3 {
+  margin-bottom: 5px;
+  color: #1f3c88;
 }
+
+/* ===============================
+   INPUT
+================================ */
+.split-card input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.split-card input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* file input biar rapi */
+.split-card input[type="file"] {
+  padding: 10px;
+  background: #fff;
+}
+
+/* ===============================
+   BUTTON
+================================ */
+.split-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* ===============================
+   TEXT KECIL
+================================ */
+.split-card small {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* =====================================================
+   TOTAL SISWA
+===================================================== */
 .total-siswa {
-  display: block;
   font-size: 13px;
   color: #555;
   margin-bottom: 5px;
 }
-/* Responsive biar HP tetap bagus */
+
+/* =====================================================
+   TABLE SISWA
+===================================================== */
+.tabel-siswa {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* header */
+.tabel-siswa thead {
+  background: #2563eb;
+  color: #fff;
+}
+
+.tabel-siswa th {
+  padding: 12px;
+  text-align: left;
+}
+
+/* isi */
+.tabel-siswa td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* hover */
+.tabel-siswa tbody tr:hover {
+  background: #f1f5f9;
+}
+
+/* kolom aksi */
+.tabel-siswa td:last-child {
+  white-space: nowrap;
+}
+
+/* tombol aksi */
+.tabel-siswa button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* tombol aktif */
+.tabel-siswa button:first-child {
+  background: #16a34a;
+  color: #fff;
+}
+
+/* tombol nonaktif */
+.tabel-siswa button:last-child {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 @media (max-width: 768px) {
   .split-card {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
-  .split-card .left,
-  .split-card .right {
-    width: 100%;
+  .tabel-siswa td:last-child {
+    white-space: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 }

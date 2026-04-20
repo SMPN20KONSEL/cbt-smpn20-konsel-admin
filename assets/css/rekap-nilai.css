@@ -10,114 +10,32 @@
   --radius-md: 8px;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: var(--bg-soft);
-}
-
-.dashboard {
-  display: flex;
-  min-height: 100vh;
-}
-
 /* =====================================================
-   SIDEBAR
+   CONTENT (FIX CENTER)
 ===================================================== */
-.sidebar {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 260px;
-  height: calc(100vh - 60px);
-
-  background: #fff;
-  padding: 25px 15px;
+.content {
+  margin-left: 260px;
+  padding: 30px;
 
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-
-  box-shadow: 2px 0 6px rgba(0,0,0,0.08);
-  z-index: 900;
-}
-
-.sidebar h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: var(--text-dark);
-  font-size: 1.1rem;
-}
-
-/* MENU */
-.menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex: 1;
-}
-
-.menu li {
-  margin-bottom: 10px;
-}
-
-.menu a {
-  display: flex;
-  align-items: center;
-
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-
-  color: var(--text-dark);
-  text-decoration: none;
-  font-size: 0.95rem;
-
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.menu a i {
-  margin-right: 12px;
-  width: 18px;
-  text-align: center;
-}
-
-.menu a:hover,
-.menu a.active {
-  background: #f3f4f6;
-}
-
-/* LOGOUT */
-.logout {
-  background: var(--danger);
-  border: none;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.logout:hover {
-  opacity: 0.9;
-}
-
-/* =====================================================
-   CONTENT
-===================================================== */
-.content {
-  margin-left: 260px;   /* ⬅️ penting karena sidebar fixed */
-  padding: 30px;
-  flex: 1;
+  align-items: center; /* 🔥 bikin tengah */
 }
 
 /* =====================================================
    CARD & TOOLBAR
 ===================================================== */
 .card {
+  width: 100%;
+  max-width: 1200px; /* 🔥 biar rapi & tidak kepanjangan */
+
   background: #fff;
   padding: 20px;
   border-radius: 10px;
+
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+  overflow-x: auto; /* 🔥 scroll kalau tabel panjang */
 }
 
 .toolbar {
@@ -148,13 +66,14 @@ button {
 button:hover {
   background-color: #15803d;
 }
-/* ============================
+
+/* =====================================================
    TABLE NILAI SISWA
-============================ */
+===================================================== */
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* WAJIB */
+  table-layout: fixed;
 }
 
 /* HEADER & ISI */
@@ -177,9 +96,9 @@ th {
   font-weight: bold;
 }
 
-/* ============================
-   UKURAN KOLOM (PROPORSIONAL)
-============================ */
+/* =====================================================
+   UKURAN KOLOM
+===================================================== */
 th:nth-child(1),
 td:nth-child(1) {
   width: 80px;
@@ -188,22 +107,22 @@ td:nth-child(1) {
 
 th:nth-child(2),
 td:nth-child(2) {
-  width: 300px; /* Nama */
+  width: 280px;
 }
 
 th:nth-child(3),
 td:nth-child(3) {
-  width: 130px; /* Kelas */
+  width: 120px;
 }
 
 th:nth-child(4),
 td:nth-child(4) {
-  width: 140px; /* Mapel */
+  width: 140px;
 }
 
 th:nth-child(5),
 td:nth-child(5) {
-  width: 130px; /* Ujian */
+  width: 140px;
 }
 
 th:nth-child(6),
@@ -212,35 +131,28 @@ th:nth-child(7),
 td:nth-child(7),
 th:nth-child(8),
 td:nth-child(8) {
-  width: 130px;
+  width: 120px;
   text-align: center;
 }
 
-/* ============================
-   RESPONSIF (AMAN)
-============================ */
-.card {
-  overflow-x: auto;
+/* =====================================================
+   HOVER TABLE (BIAR HIDUP)
+===================================================== */
+tr:hover {
+  background: #f9fafb;
 }
-/* =====================
-   TABLET & HP BESAR
-===================== */
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
     width: 100%;
-    border-radius: 0;
     padding: 20px;
-  }
-
-  .form-row {
-    flex-direction: column;
   }
 }
 
-/* =====================
-   HP NORMAL
-===================== */
 @media (max-width: 576px) {
   .content {
     padding: 16px;
@@ -255,9 +167,6 @@ td:nth-child(8) {
   }
 }
 
-/* =====================
-   HP KECIL
-===================== */
 @media (max-width: 360px) {
   .content {
     padding: 12px;

@@ -163,23 +163,51 @@
 
 <!-- FIREBASE DASHBOARD INFO -->
 <script type="module">
-import { db } from "../assets/js/firebase.js";
+import { db, auth } from "../assets/js/firebase.js";
 import {
   collection,
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-async function loadDashboardInfo() {
-  const snap = await getDocs(collection(db, "jawaban_siswa"));
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    console.log("Belum login");
+    return;
+  }
+
+  loadDashboardInfo(user);
+});
+
+async function loadDashboardInfo(user) {
+
+  const jadwalSnap = await getDocs(collection(db, "jadwal_ujian"));
+
+  const kodeGuru = new Set();
+
+  jadwalSnap.forEach(doc => {
+    const d = doc.data();
+    if (d.guruId === user.uid) {
+      kodeGuru.add(d.kode);
+    }
+  });
+
+  const jawabanSnap = await getDocs(collection(db, "jawaban_siswa"));
 
   const siswaSet = new Set();
   const ujianSet = new Set();
   let belum = 0;
 
-  snap.forEach(doc => {
+  jawabanSnap.forEach(doc => {
     const d = doc.data();
+
+    if (!kodeGuru.has(d.kode)) return;
+
     if (d.siswaUid) siswaSet.add(d.siswaUid);
-    if (d.ujianId) ujianSet.add(d.ujianId);
+    if (d.kode) ujianSet.add(d.kode);
     if (d.statusKoreksi !== "sudah") belum++;
   });
 
@@ -187,8 +215,6 @@ async function loadDashboardInfo() {
   document.getElementById("totalUjian").textContent = ujianSet.size;
   document.getElementById("belumKoreksi").textContent = belum;
 }
-
-loadDashboardInfo();
 </script>
 
 <!-- LOGOUT -->

@@ -13,6 +13,24 @@
 .card.card-perkelas  { order: 2; }
 
 /* =====================================================
+   CONTENT FIX (ANTI KETIMPA SIDEBAR)
+===================================================== */
+.content {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  padding: 30px;
+  box-sizing: border-box;
+}
+.content h1 {
+  width: 100%;              /* 🔥 wajib */
+  display: flex;
+  justify-content: center;  /* tengah horizontal */
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+/* =====================================================
    CARD INPUT
 ===================================================== */
 .card {
@@ -22,7 +40,6 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
 .card label {
@@ -39,7 +56,6 @@
   font-size: 0.9rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box;
 }
 
 /* =====================================================
@@ -80,13 +96,14 @@
 .btn.secondary { background: #6c757d; color: #fff; }
 
 /* =====================================================
-   KONTAINER HASIL / PREVIEW
+   KONTAINER HASIL / PREVIEW (FIX GRID)
 ===================================================== */
 #hasil {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4mm;
-  padding: 5mm;
+  grid-template-columns: repeat(2, 100mm); /* 🔥 FIX ukuran */
+  justify-content: center; /* 🔥 tengah */
+  gap: 6mm;
+  padding: 10px;
   box-sizing: border-box;
 }
 
@@ -99,12 +116,13 @@
   padding: 2mm;
   background: #fff;
   border: 1px solid #000;
-  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
   position: relative;
+
   page-break-inside: avoid;
+  overflow: hidden; /* 🔥 anti keluar */
 }
 
 /* Garis potong */
@@ -166,7 +184,7 @@
 
 .body-content {
   display: flex;
-  justify-content: space-between; /* teks kiri - QR kanan */
+  justify-content: space-between;
   align-items: flex-start;
 }
 
@@ -190,15 +208,21 @@
 
   background: #fff;
   border: 2px solid #000;
-  box-sizing: border-box;
 
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+/* 🔥 FIX QR BIAR PAS */
+.ruang-qr canvas,
+.ruang-qr img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* =====================================================
-   PRINT (F4)
+   PRINT (F4 FIX)
 ===================================================== */
 @media print {
   body {
@@ -208,13 +232,26 @@
   #hasil {
     width: 210mm;
     height: 330mm;
-    grid-template-rows: repeat(5, 1fr);
-    page-break-after: always;
+
+    display: grid;
+    grid-template-columns: repeat(2, 100mm);
+    grid-template-rows: repeat(5, 60.8mm);
+
+    justify-content: center;
+    align-content: start;
+    gap: 4mm;
   }
 
   .kartu {
     box-shadow: none;
   }
+}
+
+/* =====================================================
+   GLOBAL FIX
+===================================================== */
+body {
+  overflow-x: hidden; /* 🔥 anti geser kanan */
 }
 
 /* =====================================================
@@ -231,14 +268,9 @@
   }
 
   .content {
-    width: 100%;
     margin-left: 0;
-    border-radius: 0;
+    width: 100%;
     padding: 20px;
-  }
-
-  .form-row {
-    flex-direction: column;
   }
 }
 
