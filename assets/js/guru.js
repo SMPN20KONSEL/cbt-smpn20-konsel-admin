@@ -36,7 +36,51 @@ const secondaryAuth = getAuth(secondaryApp);
 const namaInput  = document.getElementById("nama");
 const mapelInput = document.getElementById("mapel");
 const list       = document.getElementById("list");
+/* ===============================
+   LIST MAPEL SMP
+================================ */
+const daftarMapelSMP = [
+  "Pendidikan Agama Islam",
+  "Pendidikan Agama Kristen",
+  "Pendidikan Agama Katolik",
+  "Pendidikan Agama Hindu",
+  "Pendidikan Agama Buddha",
+  "Pendidikan Agama Konghucu",
 
+  "PPKn",
+  "Bahasa Indonesia",
+  "Matematika",
+  "IPA",
+  "IPS",
+  "Bahasa Inggris",
+
+  "Seni Budaya",
+  "Pendidikan Jasmani, Olahraga, dan Kesehatan (PJOK)",
+  "Prakarya",
+  "Informatika",
+
+  "Bahasa Daerah",
+  "Muatan Lokal"
+];
+
+/* ===============================
+   INIT DROPDOWN MAPEL
+================================ */
+function initMapel() {
+  mapelInput.innerHTML = "";
+
+  const defaultOpt = document.createElement("option");
+  defaultOpt.value = "";
+  defaultOpt.textContent = "-- Pilih Mapel --";
+  mapelInput.appendChild(defaultOpt);
+
+  daftarMapelSMP.forEach(mapel => {
+    const opt = document.createElement("option");
+    opt.value = mapel;
+    opt.textContent = mapel;
+    mapelInput.appendChild(opt);
+  });
+}
 /* ===============================
    LOADING HELPER
 ================================ */
@@ -51,16 +95,6 @@ function setLoading(btn, state) {
     : 'Tambah Guru';
 }
 
-/* ===============================
-   FORMAT MAPEL
-================================ */
-function formatMapel(text) {
-  return text
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/(^|\s)([a-z])/g, (m, p1, p2) => p1 + p2.toUpperCase());
-}
 
 /* ===============================
    PARSE NAMA (GELAR)
@@ -117,7 +151,7 @@ window.tambahGuru = async () => {
     return alert("Lengkapi data guru");
 
   const parsed = parseNama(namaInput.value);
-  const mapel  = formatMapel(mapelInput.value);
+  const mapel = mapelInput.value;
   const akun   = generateAkun(parsed.nama);
 
   await setDoc(doc(db, "guru", akun.email), {
@@ -270,4 +304,5 @@ async function loadGuru() {
 /* ===============================
    INIT
 ================================ */
+initMapel();
 loadGuru();

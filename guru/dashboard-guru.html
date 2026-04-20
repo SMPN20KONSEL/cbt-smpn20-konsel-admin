@@ -12,38 +12,93 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    /* ===== TITLE ===== */
+    .content h1{
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* ===== GRID MENU ===== */
     .card-menu{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-      gap:20px;
-      margin-top:25px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
     }
+
+    /* ===== CARD ===== */
     .menu-card{
-      background:#fff;
-      padding:25px;
-      border-radius:12px;
-      text-decoration:none;
-      color:#111827;
-      box-shadow:0 6px 15px rgba(0,0,0,.08);
-      transition:.3s;
-      display:block;
+      background: #fff;
+      padding: 22px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #111827;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      transition: all 0.25s ease;
+
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
+
     .menu-card:hover{
-      transform:translateY(-5px);
-      box-shadow:0 10px 25px rgba(0,0,0,.12);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12);
     }
+
     .menu-card i{
-      font-size:38px;
-      color:#2563eb;
-      margin-bottom:10px;
+      font-size: 36px;
+      color: #2563eb;
+      background: #eaf1ff;
+      padding: 12px;
+      border-radius: 12px;
+      width: fit-content;
     }
+
     .menu-card h3{
-      margin:10px 0 5px;
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
     }
+
     .menu-card p{
-      color:#6b7280;
-      font-size:14px;
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.4;
     }
+.table-wrap{
+  width: 100%;
+  max-width: 1100px;
+  overflow-x: auto;
+  margin: 30px auto 0;
+}
+
+table{
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+th{
+  background: #0b48ac;
+  color: white;
+}
+
+th, td{
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* hover biar enak dilihat */
+tr:hover{
+  background: #f1f5f9;
+}
   </style>
 
   <!-- PROTECT LOGIN -->
@@ -70,31 +125,11 @@
     <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
 
     <ul class="menu">
-      <li>
-        <a href="dashboard-guru.html" class="active">
-          <i class="fa fa-home"></i> Dashboard
-        </a>
-      </li>
-      <li>
-        <a href="buat-soal.html">
-          <i class="fa fa-pen"></i> Buat Soal
-        </a>
-      </li>
-      <li>
-        <a href="bank-soal.html">
-          <i class="fa fa-book"></i> Bank Soal
-        </a>
-      </li>
-      <li>
-        <a href="koreksi-essay.html">
-          <i class="fa fa-book"></i> Koreksi Essay
-        </a>
-      </li>
-      <li>
-        <a href="rekap-nilai.html">
-          <i class="fa fa-chart-column"></i> Rekap Nilai
-        </a>
-      </li>
+      <li><a href="dashboard-guru.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+      <li><a href="koreksi-essay.html"><i class="fa fa-book"></i> Koreksi Essay</a></li>
+      <li><a href="rekap-nilai.html"><i class="fa fa-chart-column"></i> Rekap Nilai</a></li>
     </ul>
 
     <button class="logout" id="logout">
@@ -104,30 +139,7 @@
 
   <!-- CONTENT -->
   <main class="content">
-    <p class="subtitle">Dashboard</p>
     <h1>Dashboard Guru</h1>
-
-    <!-- STATISTIK -->
-    <div class="card-menu">
-      <div class="menu-card">
-        <i class="fa fa-users"></i>
-        <h3 id="totalSiswa">0</h3>
-        <p>Total Siswa Mengikuti Ujian</p>
-      </div>
-
-      <div class="menu-card">
-        <i class="fa fa-file-lines"></i>
-        <h3 id="totalUjian">0</h3>
-        <p>Total Ujian</p>
-      </div>
-      
-      <div class="menu-card">
-        <i class="fa fa-pen-to-square"></i>
-        <h3 id="belumKoreksi">0</h3>
-        <p>Essay Belum Dikoreksi</p>
-      </div>
-
-    </div>
 
     <!-- MENU UTAMA -->
     <div class="card-menu">
@@ -157,66 +169,130 @@
       </a>
 
     </div>
+    <section class="monitor-section">
+  <h2 style="text-align:center; margin: 30px 0 15px;">
+    📊 Monitoring Siswa Ujian
+  </h2>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>Email</th>
+          <th>Kelas</th>
+          <th>Kode Ujian</th>
+          <th>Status</th>
+          <th>Login</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</section>
   </main>
 
 </div>
-
-<!-- FIREBASE DASHBOARD INFO -->
 <script type="module">
-import { db, auth } from "../assets/js/firebase.js";
+import { db } from "../assets/js/firebase.js";
 import {
   collection,
-  getDocs
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+const tableBody = document.getElementById("table-body");
 
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    console.log("Belum login");
-    return;
+if (!tableBody) {
+  console.warn("table-body tidak ditemukan");
+}
+
+// 🔥 cek offline (tidak aktif > 1 menit)
+function isOffline(lastActive) {
+  if (!lastActive) return true;
+  return (Date.now() - lastActive.toDate().getTime()) > 60000;
+}
+
+onSnapshot(collection(db, "peserta"), (snapshot) => {
+
+  tableBody.innerHTML = "";
+  let no = 1;
+
+  const docs = [];
+  snapshot.forEach(doc => {
+    docs.push({ id: doc.id, ...doc.data() });
+  });
+
+  docs.sort((a, b) => {
+    const order = {
+      mengerjakan: 1,
+      mulai: 1,
+      online: 2,
+      selesai: 3
+    };
+    return (order[a.status] || 4) - (order[b.status] || 4);
+  });
+
+  docs.forEach(data => {
+
+const lastOnline = data.lastOnline;
+
+let isOnline = false;
+
+if (lastOnline && lastOnline.toDate) {
+  const selisih = Date.now() - lastOnline.toDate().getTime();
+  isOnline = selisih <= 60000;
+}
+
+let statusBadge = "🔴 Offline";
+let statusClass = "offline";
+
+if (isOnline) {
+  if (data.status === "login") {
+    statusBadge = "🟡 Login";
+    statusClass = "online";
   }
 
-  loadDashboardInfo(user);
+  if (data.status === "belum_mulai") {
+    statusBadge = "🟣 Belum Mulai";
+    statusClass = "online";
+  }
+
+  if (data.status === "mengerjakan") {
+    statusBadge = "🔵 Sedang Ujian";
+    statusClass = "kerja";
+  }
+
+  if (data.status === "selesai") {
+    statusBadge = "🟢 Selesai";
+    statusClass = "selesai";
+  }
+}
+
+const uid = data.id;
+tableBody.innerHTML += `
+  <tr>
+    <td>${no++}</td>
+    <td>${data.nama || "-"}</td>
+    <td>${data.email || "-"}</td>
+    <td>${data.kelas || "-"}</td>
+    <td>${data.kodeUjian || "-"}</td>
+    <td class="${statusClass}">${statusBadge}</td>
+    <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
+    <td>
+      <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(uid)}'">
+        Lihat
+      </button>
+    </td>
+  </tr>
+
+    `;
+  });
+
 });
 
-async function loadDashboardInfo(user) {
-
-  const jadwalSnap = await getDocs(collection(db, "jadwal_ujian"));
-
-  const kodeGuru = new Set();
-
-  jadwalSnap.forEach(doc => {
-    const d = doc.data();
-    if (d.guruId === user.uid) {
-      kodeGuru.add(d.kode);
-    }
-  });
-
-  const jawabanSnap = await getDocs(collection(db, "jawaban_siswa"));
-
-  const siswaSet = new Set();
-  const ujianSet = new Set();
-  let belum = 0;
-
-  jawabanSnap.forEach(doc => {
-    const d = doc.data();
-
-    if (!kodeGuru.has(d.kode)) return;
-
-    if (d.siswaUid) siswaSet.add(d.siswaUid);
-    if (d.kode) ujianSet.add(d.kode);
-    if (d.statusKoreksi !== "sudah") belum++;
-  });
-
-  document.getElementById("totalSiswa").textContent = siswaSet.size;
-  document.getElementById("totalUjian").textContent = ujianSet.size;
-  document.getElementById("belumKoreksi").textContent = belum;
-}
 </script>
-
 <!-- LOGOUT -->
 <script type="module" src="../assets/js/logout.js"></script>
 

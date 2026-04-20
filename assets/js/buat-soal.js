@@ -5,6 +5,7 @@ import { db, auth } from "./firebase.js"; // 🔥 tambah auth
 import {
   doc,
   setDoc,
+  getDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
@@ -97,34 +98,59 @@ window.downloadTemplate = async () => {
 
   const { Document, Packer, Paragraph } = window.docx;
 
+  // helper spacing 1.5
+  const sp15 = {
+    spacing: { line: 360 } // 1.5 line (240 = 1.0)
+  };
+
   const docFile = new Document({
-  sections: [{
-    children: [
+    sections: [{
+      children: [
 
-      new Paragraph("SOAL PG"),
-      new Paragraph("1. 2 + 2?"),
-      new Paragraph("A. 1"),
-      new Paragraph("B. 2"),
-      new Paragraph("C. 4"),
-      new Paragraph("D. 5"),
-      new Paragraph("KUNCI: C"),
+        // ================= PG =================
+        new Paragraph({ text: "SOAL PG", alignment: window.docx.AlignmentType.CENTER,
+  ...sp15
+}),
+        new Paragraph({ text: "1. 2 + 2?", ...sp15 }),
+        new Paragraph({ text: "A. 1", ...sp15 }),
+        new Paragraph({ text: "B. 2", ...sp15 }),
+        new Paragraph({ text: "C. 4", ...sp15 }),
+        new Paragraph({ text: "D. 5", ...sp15 }),
+        new Paragraph({ text: "KUNCI: C", ...sp15 }),
 
-      new Paragraph("SOAL MCMA"),
-      new Paragraph("2. Pilih yang benar"),
-      new Paragraph("A. 2 genap"),
-      new Paragraph("B. 3 genap"),
-      new Paragraph("C. 4 genap"),
-      new Paragraph("D. 5 genap"),
-      new Paragraph("KUNCI: A, C"),
+        new Paragraph({ text: "", ...sp15 }),
 
-      new Paragraph("SOAL KATEGORI"),
-      new Paragraph("3. Tentukan benar/salah"),
-      new Paragraph("a. 2+2=4 (Benar)"),
-      new Paragraph("b. 5x2=20 (Salah)"),
-      
-      new Paragraph("SOAL ESAI"),
-      new Paragraph("4. Jelaskan..."),
-     ]
+        // ================= MCMA =================
+        new Paragraph({ text: "SOAL MCMA", alignment: window.docx.AlignmentType.CENTER,
+  ...sp15
+}),
+        new Paragraph({ text: "2. Pilih yang benar", ...sp15 }),
+        new Paragraph({ text: "A. 2 genap", ...sp15 }),
+        new Paragraph({ text: "B. 3 genap", ...sp15 }),
+        new Paragraph({ text: "C. 4 genap", ...sp15 }),
+        new Paragraph({ text: "D. 5 genap", ...sp15 }),
+        new Paragraph({ text: "KUNCI: A, C", ...sp15 }),
+
+        new Paragraph({ text: "", ...sp15 }),
+
+// ================= KATEGORI =================
+new Paragraph({
+  text: "SOAL KATEGORI",
+  alignment: window.docx.AlignmentType.CENTER,
+  ...sp15
+}),
+
+new Paragraph({ text: "3. Tentukan benar/salah", ...sp15 }),
+
+new Paragraph({ text: "a. 2+2=4   (Benar)", ...sp15 }),
+new Paragraph({ text: "b. 5x2=20   (Salah)", ...sp15 }),
+new Paragraph({ text: "", ...sp15 }),
+
+        // ================= ESAI =================
+        new Paragraph({ text: "SOAL ESAI", alignment: window.docx.AlignmentType.CENTER,...sp15}),
+        new Paragraph({ text: "4. Jelaskan...", ...sp15 }),
+
+      ]
     }]
   });
 
@@ -133,7 +159,7 @@ window.downloadTemplate = async () => {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "Template_Soal.docx";
+  a.download = "Template_Soal_Rapi.docx";
   a.click();
 
   URL.revokeObjectURL(url);
@@ -534,11 +560,28 @@ window.tambahSoal = () => {
 // ======================================================
 window.simpanSemua = async ()=>{
   try{
-    const user = auth.currentUser;
+const user = auth.currentUser;
 
-     if (!user) {
-     throw new Error("User belum login");
-    }
+if (!user) {
+  throw new Error("User belum login");
+}
+
+// 🔥 ambil dari collection users (PALING BENAR)
+const userRef = doc(db, "users", user.uid);
+const userSnap = await getDoc(userRef);
+
+if (!userSnap.exists()) {
+  throw new Error("Data user tidak ditemukan");
+}
+
+const dataUser = userSnap.data();
+
+if (!dataUser.nama) {
+  throw new Error("Nama guru tidak ditemukan");
+}
+
+const namaGuru = dataUser.nama;
+
     // ===== JUDUL =====
 let judul = "";
 
@@ -638,12 +681,24 @@ await setDoc(doc(db,"bank_soal",docId),{
   soalEssay,
 
   guruId: user.uid,
-  namaGuru: user.email, // 👍 biar bisa tampil nanti
+  namaGuru: namaGuru, // 👍 biar bisa tampil nanti
 
   dibuat: serverTimestamp()
 });
 
-    toast("✅ Berhasil simpan");
+toast("✅ Berhasil simpan");
+
+// 🔥 HAPUS SEMUA SOAL (TAPI TOMBOL TETAP ADA)
+daftarSoal.innerHTML = "";
+
+// reset semua input atas
+judulSelect.value = "";
+judulManual.value = "";
+mapelInput.value = "";
+kelasInput.value = "";
+
+// sembunyikan judul manual
+judulManual.style.display = "none";
 
   }catch(err){
     toast("❌ "+err.message,"error");
