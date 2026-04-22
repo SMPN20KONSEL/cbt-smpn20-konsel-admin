@@ -13,7 +13,9 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  query,
+  where
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 import {
@@ -40,13 +42,45 @@ const list = document.getElementById("list");
 ================================ */
 function setLoading(el, state) {
   if (!el) return;
+
+  if (!el.dataset.label) {
+    el.dataset.label = el.innerText;
+  }
+
   el.disabled = state;
   el.innerHTML = state ? "⏳ Proses..." : el.dataset.label;
 }
+
 function updateTotalSiswa(data) {
   document.getElementById("totalSiswa").innerText =
     "Total: " + data.length + " siswa";
 }
+
+/* ===============================
+   UPDATE UI TANPA RELOAD
+================================ */
+function updateUI(nis, aktif) {
+  const row = document.getElementById(`row-${nis}`);
+  if (!row) return;
+
+  const statusCell = row.querySelector(".status");
+  const aksiCell   = row.querySelector(".aksi");
+
+  // update status
+  statusCell.innerHTML = aktif ? "✅ Aktif" : "❌ Nonaktif";
+
+  // update tombol
+  aksiCell.innerHTML = aktif
+    ? `<button data-label="Nonaktifkan"
+          onclick="nonaktifkanAkun('${nis}', this)">
+          Nonaktifkan
+       </button>`
+    : `<button data-label="Aktifkan"
+          onclick="aktifkanAkun('${nis}', this)">
+          Aktifkan
+       </button>`;
+}
+
 /* ===============================
    AKTIFKAN AKUN SISWA
 ================================ */
@@ -81,17 +115,20 @@ window.aktifkanAkun = async (nis, btn) => {
 
     // 3️⃣ UPDATE siswa
     await updateDoc(siswaRef, {
-      aktif: true,
-      deletedAt: null
+      aktif: true
     });
 
     await signOut(secondaryAuth);
 
     alert("Akun siswa berhasil diaktifkan ✅");
-    load();
+
+    // 🔥 UPDATE UI TANPA RELOAD
+    updateUI(nis, true);
 
   } catch (err) {
     alert("Gagal aktivasi ❌\n" + err);
+  } finally {
+    setLoading(btn, false);
   }
 };
 
@@ -121,33 +158,36 @@ window.nonaktifkanAkun = async (nis, btn) => {
     // 2️⃣ HAPUS AUTH
     await deleteUser(cred.user);
 
-    // 3️⃣ HAPUS akun_siswa
-    const akunSnap = await getDocs(collection(db, "akun_siswa"));
+    // 3️⃣ HAPUS akun_siswa (LEBIH CEPAT)
+    const q = query(collection(db, "akun_siswa"), where("nis", "==", nis));
+    const akunSnap = await getDocs(q);
+
     akunSnap.forEach(async d => {
-      if (d.data().nis === nis) {
-        await deleteDoc(d.ref);
-      }
+      await deleteDoc(d.ref);
     });
 
-    // 4️⃣ UPDATE siswa (SOFT DELETE)
+    // 4️⃣ UPDATE siswa
     await updateDoc(siswaRef, {
-      aktif: false,
-      deletedAt: new Date()
+      aktif: false
     });
 
     await signOut(secondaryAuth);
 
     alert("Akun siswa dinonaktifkan 🗑️");
-    load();
+
+    // 🔥 UPDATE UI TANPA RELOAD
+    updateUI(nis, false);
 
   } catch (err) {
     console.error(err);
     alert("Gagal nonaktif ❌\n" + err.message);
+  } finally {
+    setLoading(btn, false);
   }
 };
 
 /* ===============================
-   IMPORT CSV SISWA (TETAP)
+   IMPORT CSV SISWA
 ================================ */
 window.importSiswa = async () => {
   const file = document.getElementById("fileImport").files[0];
@@ -167,8 +207,7 @@ window.importSiswa = async () => {
       email: `${namaDepan}${nis}@smp.belajar.id`,
       password: `${namaDepan.slice(0,2)}${nis}`,
       aktif: false,
-      createdAt: new Date(),
-      deletedAt: null
+      createdAt: new Date()
     });
   }
 
@@ -181,24 +220,21 @@ window.importSiswa = async () => {
 function tampilkanSiswa(data) {
   list.innerHTML = "";
 
-  const filtered = data
-    .filter(s => !s.deletedAt || s.aktif)
-    .sort((a, b) => a.nama.localeCompare(b.nama));
+  const sorted = data.sort((a, b) => a.nama.localeCompare(b.nama));
 
-  // 🔥 UPDATE TOTAL
-  updateTotalSiswa(filtered);
+  updateTotalSiswa(sorted);
 
-  filtered.forEach((s, i) => {
+  sorted.forEach((s, i) => {
     list.innerHTML += `
-      <tr>
+      <tr id="row-${s.nis}">
         <td>${i + 1}</td>
         <td>${s.nama}</td>
         <td>${s.nis}</td>
         <td>${s.kelas}</td>
         <td>${s.email}</td>
         <td>${s.password}</td>
-        <td>${s.aktif ? "✅ Aktif" : "❌ Nonaktif"}</td>
-        <td>
+        <td class="status">${s.aktif ? "✅ Aktif" : "❌ Nonaktif"}</td>
+        <td class="aksi">
           ${
             s.aktif
             ? `<button data-label="Nonaktifkan"
