@@ -1,0 +1,170 @@
+/* ================= CONTAINER ================= */
+.card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ================= HEADER SISWA ================= */
+.header-siswa {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.info-siswa {
+  text-align: left;
+}
+
+.info-siswa h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.info-siswa p {
+  margin: 4px 0 0;
+  color: #777;
+}
+
+/* ================= NILAI PG ================= */
+.nilai-pg {
+  text-align: center;
+  background: #f1f8ff;
+  padding: 10px 18px;
+  border-radius: 10px;
+}
+
+.nilai-pg span {
+  display: block;
+  font-size: 12px;
+  color: #555;
+}
+
+.nilai-pg strong {
+  font-size: 22px;
+  color: #3498db;
+}
+
+/* ================= JUDUL SECTION ================= */
+h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  text-align: left;
+  padding-left: 10px;
+  border-left: 5px solid #3498db;
+  font-size: 16px;
+  color: #333;
+}
+
+/* ================= GRID PG / MCMA / KATEGORI ================= */
+#pgContainer,
+#mcmaContainer,
+#kategoriContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px; /* ✅ jarak biar tidak nempel */
+}
+
+/* ================= ESSAY FULL WIDTH ================= */
+#essayContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ================= BOX JAWABAN ================= */
+.essay-box {
+  background: #fafafa;
+  border: 1px solid #eaeaea;
+  border-left: 5px solid #3498db;
+  padding: 12px 15px;
+  border-radius: 10px;
+  transition: 0.2s;
+  text-align: left;
+}
+
+.essay-box:hover {
+  background: #f4faff;
+}
+
+/* ================= TEXT ================= */
+.essay-box b {
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.essay-box p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ================= LIST KATEGORI ================= */
+.essay-box ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+.essay-box li {
+  margin-bottom: 4px;
+}
+
+/* ================= WARNA STATUS ================= */
+.benar {
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.salah {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* ================= BUTTON ================= */
+.btn-simpan {
+  margin-top: 25px;
+  margin-left: auto; /* ✅ dorong ke kanan */
+  display: block;
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.btn-simpan:hover {
+  background: #2c80b4;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+  #pgContainer,
+  #mcmaContainer,
+  #kategoriContainer {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  #pgContainer,
+  #mcmaContainer,
+  #kategoriContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header-siswa {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nilai-pg {
+    align-self: flex-end;
+  }
+}

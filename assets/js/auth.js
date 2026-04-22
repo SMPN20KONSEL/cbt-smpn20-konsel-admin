@@ -1,12 +1,11 @@
 import { auth, db } from "./firebase.js";
 import { signInWithEmailAndPassword } 
   from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { doc, getDoc, setDoc, serverTimestamp } 
+import { doc, getDoc } 
   from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
-const roleSelect = document.getElementById("role");
 const error = document.getElementById("error");
 const loginBtn = document.getElementById("loginBtn");
 
@@ -16,7 +15,6 @@ loginBtn.onclick = async () => {
   try {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
-    const roleDipilih = roleSelect.value;
 
     if (!email || !password) {
       error.innerText = "Email dan password wajib diisi";
@@ -31,30 +29,25 @@ loginBtn.onclick = async () => {
     const userRef = doc(db, "users", uid);
     const snap = await getDoc(userRef);
 
-    // 3️⃣ AUTO CREATE JIKA BELUM ADA
+    // ❌ JIKA USER BELUM TERDAFTAR
     if (!snap.exists()) {
-      await setDoc(userRef, {
-        email: userCred.user.email,
-        role: roleDipilih,
-        createdAt: serverTimestamp()
-      });
-    }
-
-    const roleDB = snap.exists()
-      ? snap.data().role
-      : roleDipilih;
-
-    // 4️⃣ VALIDASI ROLE
-    if (roleDB !== roleDipilih) {
-      error.innerText = "Role tidak sesuai";
+      error.innerText = "User belum terdaftar, hubungi admin";
       return;
     }
 
-    // 5️⃣ SIMPAN SESSION
-    sessionStorage.setItem("uid", uid);
-    sessionStorage.setItem("role", roleDB);
+    const roleDB = snap.data().role;
 
-    // 6️⃣ REDIRECT
+    // ❌ VALIDASI ROLE
+    if (!roleDB) {
+      error.innerText = "Role tidak ditemukan";
+      return;
+    }
+
+    // 3️⃣ SIMPAN SESSION (FIX)
+    localStorage.setItem("uid", uid);
+    localStorage.setItem("role", roleDB);
+
+    // 4️⃣ REDIRECT SESUAI ROLE
     if (roleDB === "admin") {
       window.location.href = "admin/dashboard.html";
     } else if (roleDB === "guru") {

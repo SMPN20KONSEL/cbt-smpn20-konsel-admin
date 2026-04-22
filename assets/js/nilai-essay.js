@@ -2,18 +2,13 @@ import { db } from "./firebase.js";
 import {
   doc,
   getDoc,
-  updateDoc,
-  collection,
-  query,
-  where,
-  getDocs
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // ================= PARAM URL =================
 const params = new URLSearchParams(window.location.search);
 const docId  = params.get("docId");
 const back   = params.get("return") || "koreksi-essay.html";
-const mapel  = params.get("mapel");
 const kelas  = params.get("kelas");
 
 // ================= VALIDASI =================
@@ -33,88 +28,108 @@ const btnSimpan      = document.getElementById("btnSimpan");
 // ================= DATA =================
 let jawabanRef;
 let nilaiEssayDetail = {};
+let mapelAktif = "";
+let bankSoalId = "";
 
-// ================= AMBIL BANK SOAL =================
-async function ambilSoalEssay(mapel) {
-  const q = query(
-    collection(db, "bank_soal"),
-    where("mapel", "==", mapel)
-  );
+// ================= AMBIL BANK SOAL (FIX UTAMA) =================
+async function ambilSoalEssayById(id) {
+  if (!id) return [];
 
-  const snap = await getDocs(q);
-  if (snap.empty) return [];
+  const snap = await getDoc(doc(db, "bank_soal", id));
 
-  return snap.docs[0].data().soalEssay || [];
+  if (!snap.exists()) return [];
+
+  return snap.data().soalEssay || [];
 }
 
 // ================= LOAD DATA =================
 async function loadData() {
-  jawabanRef = doc(db, "jawaban_siswa", docId);
-  const snap = await getDoc(jawabanRef);
+  try {
+    jawabanRef = doc(db, "jawaban_siswa", docId);
+    const snap = await getDoc(jawabanRef);
 
-  if (!snap.exists()) {
-    alert("Data tidak ditemukan");
-    window.location.href = back;
-    return;
-  }
+    if (!snap.exists()) {
+      alert("Data tidak ditemukan");
+      window.location.href = back;
+      return;
+    }
 
-  const d = snap.data();
+    const d = snap.data();
 
-  // ===== HEADER =====
-  namaSiswaEl.textContent = d.namaSiswa || "-";
-  infoUjianEl.textContent = `${d.mapel} · ${d.kelas}`;
-  nilaiPGEl.textContent  = d.nilaiPG || 0;
+    // ✅ AMBIL DATA PENTING
+    mapelAktif = d.mapel || "";
+    bankSoalId = d.bankSoalId || "";
 
-  // ===== ESSAY =====
-  essayContainer.innerHTML = "";
-  nilaiEssayDetail = d.nilaiEssayDetail || {};
+    // ===== HEADER =====
+    namaSiswaEl.textContent = d.namaSiswa || "-";
+    infoUjianEl.textContent = `${d.mapel || "-"} · ${d.kelas || "-"}`;
+    nilaiPGEl.textContent   = d.nilaiPG || 0;
 
-  const jawabanEssay = d.jawabanEssay || {};
-  const soalEssay    = await ambilSoalEssay(d.mapel);
+    // ===== DATA JAWABAN =====
+    const jawabanEssay = d.jawabanEssay || {};
+    nilaiEssayDetail   = d.nilaiEssayDetail || {};
 
-  if (soalEssay.length === 0) {
-    essayContainer.innerHTML = `<p><i>Tidak ada soal essay</i></p>`;
-    return;
-  }
+    // ===== AMBIL SOAL (FIX UTAMA) =====
+    const soalEssay = await ambilSoalEssayById(bankSoalId);
 
-  soalEssay.forEach((soal, i) => {
-    const jawaban = jawabanEssay[soal.id] || "-";
-    const nilai   = nilaiEssayDetail[soal.id] ?? 0;
+    essayContainer.innerHTML = "";
 
-    essayContainer.innerHTML += `
-      <div class="essay-box">
-        <div class="baris-soal">
-          <div class="soal">Soal ${i + 1}</div>
-          <div class="input-nilai">
-            <label>Nilai</label>
-            <input type="number"
-                   min="0"
-                   max="${soal.skorMax}"
-                   value="${nilai}"
-                   data-id="${soal.id}">
+    if (soalEssay.length === 0) {
+      essayContainer.innerHTML = `<p><i>Tidak ada soal essay</i></p>`;
+      return;
+    }
+
+    // ===== RENDER =====
+    soalEssay.forEach((soal, i) => {
+
+      // 🔥 FIX BESAR: fallback kalau ID tidak cocok
+      const jawaban =
+        jawabanEssay[soal.id] ??
+        jawabanEssay[`essay_${i}`] ??
+        "-";
+
+      const rawNilai = nilaiEssayDetail[soal.id];
+      const nilai = (!isNaN(rawNilai) && rawNilai !== undefined)
+        ? rawNilai
+        : "";
+
+      essayContainer.innerHTML += `
+        <div class="essay-box">
+          <div class="baris-soal">
+            <div class="soal">Soal ${i + 1}</div>
+
+            <div class="input-nilai">
+              <label>Nilai (max 20)</label>
+              <input type="number"
+                     min="0"
+                     max="20"
+                     value="${nilai}"
+                     data-id="${soal.id}"
+                     placeholder="0 - 20">
+            </div>
+          </div>
+
+          <div class="blok-teks">
+            <b>Pertanyaan:</b>
+            <p>${soal.pertanyaan || "-"}</p>
+          </div>
+
+          <div class="blok-teks">
+            <b>Jawaban:</b>
+            <p>${jawaban}</p>
           </div>
         </div>
+      `;
+    });
 
-        <div class="blok-teks">
-          <b>Pertanyaan:</b>
-          <p>${soal.pertanyaan}</p>
-        </div>
+    // ===== STATUS BUTTON =====
+    if (d.statusNilai === "sudah_dinilai") {
+      btnSimpan.textContent = "Update Nilai";
+    }
 
-        <div class="blok-teks">
-          <b>Jawaban:</b>
-          <p>${jawaban}</p>
-        </div>
-      </div>
-    `;
-  });
-
-  // ===== KUNCI JIKA SUDAH DINILAI =====
-  if (d.statusNilai === "sudah_dinilai") {
-    btnSimpan.disabled = true;
-    btnSimpan.textContent = "Sudah Dinilai";
-    essayContainer
-      .querySelectorAll("input")
-      .forEach(i => i.disabled = true);
+  } catch (err) {
+    console.error(err);
+    alert("❌ Gagal memuat data");
   }
 }
 
@@ -122,33 +137,60 @@ async function loadData() {
 btnSimpan.onclick = async () => {
   try {
     let totalEssay = 0;
+    nilaiEssayDetail = {};
 
+    // ===== AMBIL INPUT NILAI =====
     document.querySelectorAll("input[data-id]").forEach(input => {
-      const id    = input.dataset.id;
-      const nilai = Number(input.value) || 0;
+      const id = input.dataset.id;
+      if (!id) return;
+
+      let nilai = parseFloat(input.value);
+      if (isNaN(nilai)) nilai = 0;
+
+      nilai = Math.max(0, Math.min(20, nilai));
 
       nilaiEssayDetail[id] = nilai;
       totalEssay += nilai;
     });
 
-    const nilaiPG    = Number(nilaiPGEl.textContent) || 0;
-    const nilaiTotal = nilaiPG + totalEssay;
+    // ===== AMBIL SOAL LAGI =====
+    const soalEssay = await ambilSoalEssayById(bankSoalId);
 
+    if (soalEssay.length === 0) {
+      alert("Soal essay tidak ditemukan!");
+      return;
+    }
+
+    const maxEssay = soalEssay.length * 20;
+
+    const nilaiEssayNormal =
+      maxEssay > 0 ? (totalEssay / maxEssay) * 100 : 0;
+
+    const nilaiPG = parseFloat(nilaiPGEl.textContent) || 0;
+
+    const nilaiTotal = (nilaiPG + nilaiEssayNormal) / 2;
+
+    // ===== UPDATE FIRESTORE =====
     await updateDoc(jawabanRef, {
       nilaiEssayDetail,
-      nilaiEssay: totalEssay,
-      nilaiTotal,
-      statusNilai: "sudah_dinilai"
+      nilaiEssay: Number(totalEssay.toFixed(2)),
+      nilaiEssayNormal: Number(nilaiEssayNormal.toFixed(2)),
+      nilaiTotal: Number(nilaiTotal.toFixed(2)),
+      statusNilai: "sudah_dinilai",
+
+      // hapus field lama
+      totalNilai: null
     });
 
-    btnSimpan.textContent = "Tersimpan ✓";
-    btnSimpan.disabled = true;
+    btnSimpan.textContent = "✔ Tersimpan (bisa diedit lagi)";
 
     setTimeout(() => {
       let url = back;
-      if (mapel && kelas) {
-        url += `?mapel=${encodeURIComponent(mapel)}&kelas=${encodeURIComponent(kelas)}`;
+
+      if (mapelAktif && kelas) {
+        url += `?mapel=${encodeURIComponent(mapelAktif)}&kelas=${encodeURIComponent(kelas)}`;
       }
+
       window.location.href = url;
     }, 800);
 

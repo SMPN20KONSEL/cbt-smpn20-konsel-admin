@@ -1,7 +1,21 @@
 import { db } from "./firebase.js";
-import { collection, getDocs }
-  from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// ================= SESSION =================
+const guruUid = sessionStorage.getItem("uid");
+const role = sessionStorage.getItem("role");
+
+if (!guruUid || role !== "guru") {
+  alert("Akses ditolak / session habis");
+  location.href = "../login.html";
+}
+
+// ================= ELEMENT =================
 const list = document.getElementById("list");
 const filterMapel = document.getElementById("filterMapel");
 const filterJudul = document.getElementById("filterJudul");
@@ -13,6 +27,12 @@ const infoRekap = document.getElementById("infoRekap");
 
 let semuaNilai = [];
 
+// ================= FORMAT NILAI =================
+const formatNilai = (n) => {
+  if (isNaN(n)) return 0;
+  return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
+};
+
 // ================= LOAD DATA =================
 async function loadNilai() {
   semuaNilai = [];
@@ -22,7 +42,13 @@ async function loadNilai() {
   filterKelas.innerHTML = `<option value="">Semua Kelas</option>`;
   filterJudul.innerHTML = `<option value="">Semua Judul</option>`;
 
-  const snap = await getDocs(collection(db, "jawaban_siswa"));
+  // 🔥 FILTER BERDASARKAN GURU LOGIN
+  const q = query(
+    collection(db, "jawaban_siswa"),
+    where("guruId", "==", guruUid)
+  );
+
+  const snap = await getDocs(q);
 
   const mapelSet = new Set();
   const kelasSet = new Set();
@@ -38,6 +64,7 @@ async function loadNilai() {
     if (d.judulUjian) judulSet.add(d.judulUjian);
   });
 
+  // isi filter
   mapelSet.forEach(m => {
     filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
   });
@@ -63,11 +90,8 @@ function tampilkan(data) {
       <tr><td colspan="8" style="text-align:center">Data tidak ditemukan</td></tr>`;
     return;
   }
-const formatNilai = (n) => {
-  if (isNaN(n)) return 0;
-  return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
-};
-  // SORT berdasarkan waktu terbaru
+
+  // SORT terbaru
   data.sort((a, b) => {
     if (!a.waktu_mulai || !b.waktu_mulai) return 0;
     return b.waktu_mulai.seconds - a.waktu_mulai.seconds;
@@ -81,20 +105,19 @@ const formatNilai = (n) => {
 
   data.forEach((n, i) => {
 
-    // ===== AMBIL NILAI (FIX UTAMA) =====
     const pg = Math.round(Number(n.nilaiPG || 0));
 
-    const essay = Math.round(Number(
+    const essay = Number(
       n.nilaiEssayNormal ??
       n.nilaiEssay ??
       0
-    ));
+    );
 
-    const totalNilai = Math.round(Number(
+    const totalNilai = Number(
       n.nilaiTotal ??
       n.totalNilai ??
       0
-    ));
+    );
 
     totalSemua += totalNilai;
 
@@ -116,7 +139,6 @@ const formatNilai = (n) => {
 
       isToday = tglOnly.getTime() === today.getTime();
 
-      // header tanggal
       if (!isToday && lastTanggal !== formatTanggal) {
         list.innerHTML += `
           <tr>
@@ -129,7 +151,7 @@ const formatNilai = (n) => {
       }
     }
 
-    // ===== RENDER ROW =====
+    // ===== RENDER =====
     list.innerHTML += `
       <tr>
         <td>${i + 1}</td>
@@ -145,7 +167,7 @@ const formatNilai = (n) => {
   });
 
   const rata =
-    data.length > 0 ? (totalSemua / data.length).toFixed(2) : 0;
+    data.length > 0 ? formatNilai(totalSemua / data.length) : 0;
 
   infoRekap.textContent =
     `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
@@ -174,7 +196,7 @@ btnReset.onclick = () => {
   tampilkan(semuaNilai);
 };
 
-// ================= EXPORT EXCEL =================
+// ================= EXPORT =================
 btnExport.onclick = () => {
   const mapel = filterMapel.value;
   if (!mapel) return alert("Pilih mapel terlebih dahulu");
@@ -182,26 +204,14 @@ btnExport.onclick = () => {
   const data = semuaNilai
     .filter(n => n.mapel === mapel)
     .map((n, i) => ({
-
       No: i + 1,
       Nama: n.namaSiswa,
       Kelas: n.kelas,
       Mapel: n.mapel,
       Ujian: n.judulUjian,
-
-      PG: Number(n.nilaiPG || 0),
-
-      Essay: Number(
-        n.nilaiEssayNormal ??
-        n.nilaiEssay ??
-        0
-      ),
-
-      Total: Number(
-        n.nilaiTotal ??
-        n.totalNilai ??
-        0
-      )
+      PG: Math.round(Number(n.nilaiPG || 0)),
+      Essay: formatNilai(Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0)),
+      Total: formatNilai(Number(n.nilaiTotal ?? n.totalNilai ?? 0))
     }));
 
   const ws = XLSX.utils.json_to_sheet(data);

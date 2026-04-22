@@ -65,22 +65,6 @@
     </div>
   </div>
 
-  <!-- Script Loading Button -->
-  <script>
-    const loginBtn = document.getElementById("loginBtn");
-
-    loginBtn.addEventListener("click", () => {
-      loginBtn.classList.add("loading");
-      loginBtn.disabled = true;
-
-      // SIMULASI LOGIN (hapus jika sudah pakai Firebase)
-      setTimeout(() => {
-        loginBtn.classList.remove("loading");
-        loginBtn.disabled = false;
-      }, 2000);
-    });
-  </script>
-
   <!-- Auth Firebase -->
   <script type="module" src="assets/js/auth.js"></script>
 </body>
