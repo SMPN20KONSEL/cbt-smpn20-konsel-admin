@@ -70,10 +70,9 @@ if (!cek.empty) {
       return;
     }
 
-    const s = soalSnap.data();
-    const kode = generateKode();
+const s = soalSnap.data();
+const kode = generateKode();
 
-    // SIMPAN JADWAL
 await setDoc(doc(db, "jadwal_ujian", kode), {
   bankSoalId,
   judul: s.judul,
@@ -83,7 +82,8 @@ await setDoc(doc(db, "jadwal_ujian", kode), {
   durasi,
   aktif: true,
 
-  guruId: auth.currentUser.uid, // 🔥 TAMBAHAN PENTING
+  // ✅ AMBIL DARI BANK SOAL
+  guruId: s.guruId || "",
 
   createdAt: serverTimestamp()
 });

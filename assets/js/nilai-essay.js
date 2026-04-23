@@ -31,15 +31,39 @@ let nilaiEssayDetail = {};
 let mapelAktif = "";
 let bankSoalId = "";
 
-// ================= AMBIL BANK SOAL (FIX UTAMA) =================
-async function ambilSoalEssayById(id) {
-  if (!id) return [];
-
-  const snap = await getDoc(doc(db, "bank_soal", id));
-
+// ======================================================
+// 🔥 AMBIL SEMUA SOAL + BUAT ID GLOBAL (WAJIB)
+// ======================================================
+async function ambilSemuaSoal(bankSoalId) {
+  const snap = await getDoc(doc(db, "bank_soal", bankSoalId));
   if (!snap.exists()) return [];
 
-  return snap.data().soalEssay || [];
+  const bank = snap.data();
+
+  let counter = 0;
+
+  const soalPG = (bank.soalPG || []).map(s => ({
+    tipe: "pg",
+    id: counter++
+  }));
+
+  const soalMCMA = (bank.soalMCMA || []).map(s => ({
+    tipe: "mcma",
+    id: counter++
+  }));
+
+  const soalKategori = (bank.soalKategori || []).map(s => ({
+    tipe: "kategori",
+    id: counter++
+  }));
+
+  const soalEssay = (bank.soalEssay || []).map(s => ({
+    ...s,
+    tipe: "essay",
+    id: counter++
+  }));
+
+  return [...soalPG, ...soalMCMA, ...soalKategori, ...soalEssay];
 }
 
 // ================= LOAD DATA =================
@@ -56,7 +80,6 @@ async function loadData() {
 
     const d = snap.data();
 
-    // ✅ AMBIL DATA PENTING
     mapelAktif = d.mapel || "";
     bankSoalId = d.bankSoalId || "";
 
@@ -65,12 +88,13 @@ async function loadData() {
     infoUjianEl.textContent = `${d.mapel || "-"} · ${d.kelas || "-"}`;
     nilaiPGEl.textContent   = d.nilaiPG || 0;
 
-    // ===== DATA JAWABAN =====
     const jawabanEssay = d.jawabanEssay || {};
     nilaiEssayDetail   = d.nilaiEssayDetail || {};
 
-    // ===== AMBIL SOAL (FIX UTAMA) =====
-    const soalEssay = await ambilSoalEssayById(bankSoalId);
+    // 🔥 AMBIL SEMUA SOAL (SUDAH ADA ID GLOBAL)
+    const semuaSoal = await ambilSemuaSoal(bankSoalId);
+
+    const soalEssay = semuaSoal.filter(s => s.tipe === "essay");
 
     essayContainer.innerHTML = "";
 
@@ -79,22 +103,20 @@ async function loadData() {
       return;
     }
 
-    // ===== RENDER =====
+    // ================= RENDER =================
     soalEssay.forEach((soal, i) => {
+      const key = String(soal.id); // ✅ ID GLOBAL
 
-      // 🔥 FIX BESAR: fallback kalau ID tidak cocok
-      const jawaban =
-        jawabanEssay[soal.id] ??
-        jawabanEssay[`essay_${i}`] ??
-        "-";
+      const jawaban = jawabanEssay?.[key] ?? "-";
 
-      const rawNilai = nilaiEssayDetail[soal.id];
+      const rawNilai = nilaiEssayDetail?.[key];
       const nilai = (!isNaN(rawNilai) && rawNilai !== undefined)
         ? rawNilai
         : "";
 
       essayContainer.innerHTML += `
         <div class="essay-box">
+          
           <div class="baris-soal">
             <div class="soal">Soal ${i + 1}</div>
 
@@ -104,25 +126,25 @@ async function loadData() {
                      min="0"
                      max="20"
                      value="${nilai}"
-                     data-id="${soal.id}"
+                     data-id="${key}"
                      placeholder="0 - 20">
             </div>
           </div>
 
           <div class="blok-teks">
             <b>Pertanyaan:</b>
-            <p>${soal.pertanyaan || "-"}</p>
+            <p>${soal?.pertanyaan || "-"}</p>
           </div>
 
           <div class="blok-teks">
             <b>Jawaban:</b>
             <p>${jawaban}</p>
           </div>
+
         </div>
       `;
     });
 
-    // ===== STATUS BUTTON =====
     if (d.statusNilai === "sudah_dinilai") {
       btnSimpan.textContent = "Update Nilai";
     }
@@ -139,7 +161,6 @@ btnSimpan.onclick = async () => {
     let totalEssay = 0;
     nilaiEssayDetail = {};
 
-    // ===== AMBIL INPUT NILAI =====
     document.querySelectorAll("input[data-id]").forEach(input => {
       const id = input.dataset.id;
       if (!id) return;
@@ -153,13 +174,8 @@ btnSimpan.onclick = async () => {
       totalEssay += nilai;
     });
 
-    // ===== AMBIL SOAL LAGI =====
-    const soalEssay = await ambilSoalEssayById(bankSoalId);
-
-    if (soalEssay.length === 0) {
-      alert("Soal essay tidak ditemukan!");
-      return;
-    }
+    const semuaSoal = await ambilSemuaSoal(bankSoalId);
+    const soalEssay = semuaSoal.filter(s => s.tipe === "essay");
 
     const maxEssay = soalEssay.length * 20;
 
@@ -170,15 +186,12 @@ btnSimpan.onclick = async () => {
 
     const nilaiTotal = (nilaiPG + nilaiEssayNormal) / 2;
 
-    // ===== UPDATE FIRESTORE =====
     await updateDoc(jawabanRef, {
       nilaiEssayDetail,
       nilaiEssay: Number(totalEssay.toFixed(2)),
       nilaiEssayNormal: Number(nilaiEssayNormal.toFixed(2)),
       nilaiTotal: Number(nilaiTotal.toFixed(2)),
       statusNilai: "sudah_dinilai",
-
-      // hapus field lama
       totalNilai: null
     });
 

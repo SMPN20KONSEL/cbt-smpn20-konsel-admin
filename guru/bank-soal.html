@@ -363,158 +363,206 @@ import {
   doc,
   where,
   query,
-  getDoc,       // ✅ tambahkan
-  updateDoc     // ✅ tambahkan
+  getDoc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
 import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
+// ================= ELEMENT =================
 const list = document.getElementById("list");
 let currentUser = null;
-// AUTH
-onAuthStateChanged(auth, user => {
+let currentId = "";
+
+// ================= AUTH + ROLE =================
+onAuthStateChanged(auth, async user => {
   if (!user) {
     location.href = "../login.html";
     return;
   }
 
-  currentUser = user; // ✅ simpan
-  loadBankSoal(user);
+  try {
+    const snap = await getDoc(doc(db, "users", user.uid));
+
+    if (!snap.exists() || snap.data().role !== "guru") {
+      alert("Akses khusus guru");
+      location.href = "../login.html";
+      return;
+    }
+
+    currentUser = user;
+    loadBankSoal(user);
+
+  } catch (err) {
+    console.error(err);
+    location.href = "../login.html";
+  }
 });
 
-// LOAD BANK SOAL
+// ================= LOAD BANK SOAL =================
 async function loadBankSoal(user) {
-  list.innerHTML = "<p>Memuat data...</p>";
+  try {
+    list.innerHTML = "<p>Memuat data...</p>";
 
-  const q = query(
-  collection(db, "bank_soal"),
-  where("guruId", "==", user.uid) // 🔥 FILTER GURU LOGIN
-);
+    const q = query(
+      collection(db, "bank_soal"),
+      where("guruId", "==", user.uid)
+    );
 
-const snap = await getDocs(q);
+    const snap = await getDocs(q);
 
-  if (snap.empty) {
-    list.innerHTML = "<p>Belum ada bank soal</p>";
-    return;
-  }
+    if (snap.empty) {
+      list.innerHTML = "<p>Belum ada bank soal</p>";
+      return;
+    }
 
-  list.innerHTML = "";
+    const labelMap = {
+      soalPG: "Pilihan Ganda",
+      soalMCMA: "PG Kompleks",
+      soalKategori: "Kategori",
+      soalEssay: "Esai"
+    };
 
-  const labelMap = {
-    soalPG: "Pilihan Ganda",
-    soalMCMA: "PG Kompleks",
-    soalKategori: "Kategori",
-    soalEssay: "Esai"
-  };
+    let html = "";
 
-  snap.forEach(docSnap => {
-    const s = docSnap.data();
+    const docs = [];
+    snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
 
-    let total = 0;
-    let infoHTML = "";
-
-    Object.keys(labelMap).forEach(key => {
-      const arr = s[key];
-
-      if (Array.isArray(arr) && arr.length > 0) {
-        total += arr.length;
-
-        infoHTML += `
-          <div>
-            <i class="fa fa-list"></i>
-            ${labelMap[key]}: <b>${arr.length}</b>
-          </div>
-        `;
-      }
+    // 🔥 SORT TERBARU
+    docs.sort((a, b) => {
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
     });
 
-    list.innerHTML += `
-      <div class="bank-card" onclick="lihatSoal('${docSnap.id}')">
-        <div class="bank-header">
-          <span class="badge">${s.mapel} • Kelas ${s.kelas}</span>
+    docs.forEach(s => {
 
-          <div class="actions" onclick="event.stopPropagation()">
-            <button class="edit" onclick="editBankSoal('${docSnap.id}')">
-              <i class="fa fa-edit"></i>
-            </button>
+      let total = 0;
+      let infoHTML = "";
 
-            <button class="hapus" onclick="hapusBankSoal('${docSnap.id}')">
-              <i class="fa fa-trash"></i>
-            </button>
+      Object.keys(labelMap).forEach(key => {
+        const arr = s[key];
+
+        if (Array.isArray(arr) && arr.length > 0) {
+          total += arr.length;
+
+          infoHTML += `
+            <div>
+              <i class="fa fa-list"></i>
+              ${labelMap[key]}: <b>${arr.length}</b>
+            </div>
+          `;
+        }
+      });
+
+      html += `
+        <div class="bank-card" onclick="lihatSoal('${s.id}')">
+          <div class="bank-header">
+            <span class="badge">${s.mapel} • Kelas ${s.kelas}</span>
+
+            <div class="actions" onclick="event.stopPropagation()">
+              <button class="edit" onclick="editBankSoal('${s.id}')">
+                <i class="fa fa-edit"></i>
+              </button>
+
+              <button class="hapus" onclick="hapusBankSoal('${s.id}')">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <h3>${s.judul}</h3>
+
+          <p style="font-size:12px;color:#666;">
+            Dibuat oleh guru: ${s.namaGuru || "-"}
+          </p>
+
+          <div class="soal-info">
+            ${infoHTML || "<i>Tidak ada soal</i>"}
+          </div>
+
+          <div class="total">
+            Total Soal: ${total}
           </div>
         </div>
+      `;
+    });
 
-        <h3>${s.judul}</h3>
-<p style="font-size:12px;color:#666;">
-  Dibuat oleh guru: ${s.namaGuru || "-"}
-</p>
-        <div class="soal-info">
-          ${infoHTML || "<i>Tidak ada soal</i>"}
-        </div>
+    list.innerHTML = html;
 
-        <div class="total">
-          Total Soal: ${total}
-        </div>
-      </div>
-    `;
-  });
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = "<p>Gagal memuat data</p>";
+  }
 }
-window.toggleFolder = (id) => {
-  const el = document.getElementById("group-" + id);
-  el.parentElement.classList.toggle("folder-open");
-};
 
-// NAVIGASI
+// ================= NAVIGASI =================
 window.lihatSoal = id => {
   location.href = `lihat-soal.html?id=${id}`;
 };
 
-// HAPUS
+// ================= HAPUS =================
 window.hapusBankSoal = async id => {
-  if (!confirm("Hapus bank soal ini?")) return;
+  if (!confirm("Yakin ingin menghapus bank soal ini? Data tidak bisa dikembalikan!")) return;
 
-  list.innerHTML = "<p>Menghapus...</p>"; // optional loading
+  try {
+    list.innerHTML = "<p>Menghapus...</p>";
 
-  await deleteDoc(doc(db, "bank_soal", id));
-  loadBankSoal(currentUser); // ✅ BENAR
+    await deleteDoc(doc(db, "bank_soal", id));
+
+    loadBankSoal(currentUser);
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal menghapus");
+  }
 };
-let currentId = "";
 
-// BUKA MODAL
+// ================= EDIT =================
 window.editBankSoal = async (id) => {
   currentId = id;
 
-  const ref = doc(db, "bank_soal", id);
-  const snap = await getDoc(ref);
-  const data = snap.data();
+  try {
+    const ref = doc(db, "bank_soal", id);
+    const snap = await getDoc(ref);
+    const data = snap.data();
 
-  document.getElementById("editJudul").value = data.judul || "";
-  document.getElementById("editMapel").value = data.mapel || "";
-  document.getElementById("editKelas").value = data.kelas || "";
+    document.getElementById("editJudul").value = data.judul || "";
+    document.getElementById("editMapel").value = data.mapel || "";
+    document.getElementById("editKelas").value = data.kelas || "";
 
-  document.getElementById("modalEdit").style.display = "flex";
+    document.getElementById("modalEdit").style.display = "flex";
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal membuka data");
+  }
 };
 
-// TUTUP MODAL
+// ================= TUTUP MODAL =================
 window.tutupModal = () => {
   document.getElementById("modalEdit").style.display = "none";
 };
 
-// SIMPAN
+// ================= SIMPAN EDIT =================
 window.simpanEdit = async () => {
-  await updateDoc(doc(db, "bank_soal", currentId), {
-    judul: document.getElementById("editJudul").value,
-    mapel: document.getElementById("editMapel").value,
-    kelas: document.getElementById("editKelas").value
-  });
+  try {
+    await updateDoc(doc(db, "bank_soal", currentId), {
+      judul: document.getElementById("editJudul").value,
+      mapel: document.getElementById("editMapel").value,
+      kelas: document.getElementById("editKelas").value
+    });
 
-  alert("Berhasil diupdate");
+    alert("Berhasil diupdate");
 
-  tutupModal();
-  loadBankSoal(currentUser);
+    tutupModal();
+    loadBankSoal(currentUser);
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal update");
+  }
 };
-
 </script>
 
 <script type="module" src="../assets/js/logout.js"></script>

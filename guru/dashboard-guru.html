@@ -208,15 +208,16 @@ if (!tableBody) {
   console.warn("table-body tidak ditemukan");
 }
 
-// 🔥 cek offline (tidak aktif > 1 menit)
-function isOffline(lastActive) {
-  if (!lastActive) return true;
-  return (Date.now() - lastActive.toDate().getTime()) > 60000;
+// 🔒 optional guard
+const uid = localStorage.getItem("uid");
+if (!uid) {
+  location.href = "../login.html";
 }
 
+// 🔥 realtime monitor
 onSnapshot(collection(db, "peserta"), (snapshot) => {
 
-  tableBody.innerHTML = "";
+  let html = "";
   let no = 1;
 
   const docs = [];
@@ -224,6 +225,7 @@ onSnapshot(collection(db, "peserta"), (snapshot) => {
     docs.push({ id: doc.id, ...doc.data() });
   });
 
+  // 🔥 sorting status
   docs.sort((a, b) => {
     const order = {
       mengerjakan: 1,
@@ -236,62 +238,56 @@ onSnapshot(collection(db, "peserta"), (snapshot) => {
 
   docs.forEach(data => {
 
-const lastOnline = data.lastOnline;
+    const lastOnline = data.lastOnline;
 
-let isOnline = false;
+    let isOnline = false;
+    if (lastOnline && lastOnline.toDate) {
+      const selisih = Date.now() - lastOnline.toDate().getTime();
+      isOnline = selisih <= 60000;
+    }
 
-if (lastOnline && lastOnline.toDate) {
-  const selisih = Date.now() - lastOnline.toDate().getTime();
-  isOnline = selisih <= 60000;
-}
+    let statusBadge = "🔴 Offline";
+    let statusClass = "offline";
 
-let statusBadge = "🔴 Offline";
-let statusClass = "offline";
+    if (isOnline) {
+      if (data.status === "login") {
+        statusBadge = "🟡 Login";
+        statusClass = "online";
+      } 
+      else if (data.status === "belum_mulai") {
+        statusBadge = "🟣 Belum Mulai";
+        statusClass = "online";
+      } 
+      else if (data.status === "mengerjakan") {
+        statusBadge = "🔵 Sedang Ujian";
+        statusClass = "kerja";
+      } 
+      else if (data.status === "selesai") {
+        statusBadge = "🟢 Selesai";
+        statusClass = "selesai";
+      }
+    }
 
-if (isOnline) {
-  if (data.status === "login") {
-    statusBadge = "🟡 Login";
-    statusClass = "online";
-  }
-
-  if (data.status === "belum_mulai") {
-    statusBadge = "🟣 Belum Mulai";
-    statusClass = "online";
-  }
-
-  if (data.status === "mengerjakan") {
-    statusBadge = "🔵 Sedang Ujian";
-    statusClass = "kerja";
-  }
-
-  if (data.status === "selesai") {
-    statusBadge = "🟢 Selesai";
-    statusClass = "selesai";
-  }
-}
-
-const uid = data.id;
-tableBody.innerHTML += `
-  <tr>
-    <td>${no++}</td>
-    <td>${data.nama || "-"}</td>
-    <td>${data.email || "-"}</td>
-    <td>${data.kelas || "-"}</td>
-    <td>${data.kodeUjian || "-"}</td>
-    <td class="${statusClass}">${statusBadge}</td>
-    <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
-    <td>
-      <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(uid)}'">
-        Lihat
-      </button>
-    </td>
-  </tr>
-
+    html += `
+      <tr>
+        <td>${no++}</td>
+        <td>${data.nama || "-"}</td>
+        <td>${data.email || "-"}</td>
+        <td>${data.kelas || "-"}</td>
+        <td>${data.kodeUjian || "-"}</td>
+        <td class="${statusClass}">${statusBadge}</td>
+        <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
+        <td>
+          <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(data.id)}'">
+            Lihat
+          </button>
+        </td>
+      </tr>
     `;
   });
 
+  tableBody.innerHTML = html;
 });
-
 </script>
 <!-- LOGOUT -->
 <script type="module" src="../assets/js/logout.js"></script>

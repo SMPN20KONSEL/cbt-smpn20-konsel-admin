@@ -1,4 +1,7 @@
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
 import {
   collection,
   getDocs,
@@ -6,14 +9,6 @@ import {
   where
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// ================= SESSION =================
-const guruUid = sessionStorage.getItem("uid");
-const role = sessionStorage.getItem("role");
-
-if (!guruUid || role !== "guru") {
-  alert("Akses ditolak / session habis");
-  location.href = "../login.html";
-}
 
 // ================= ELEMENT =================
 const list = document.getElementById("list");
@@ -26,6 +21,32 @@ const btnExport = document.getElementById("btnExport");
 const infoRekap = document.getElementById("infoRekap");
 
 let semuaNilai = [];
+let currentGuruUid = null;
+
+
+// ================= AUTH GUARD =================
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    alert("Session login hilang, silakan login ulang");
+    location.href = "../login.html";
+    return;
+  }
+
+  const role = localStorage.getItem("role");
+
+  if (role !== "guru") {
+    alert("Akun ini bukan guru");
+    location.href = "../login.html";
+    return;
+  }
+
+  currentGuruUid = user.uid;
+
+  // 🔥 LOAD DATA SETELAH LOGIN SIAP
+  await loadNilai(currentGuruUid);
+});
+
 
 // ================= FORMAT NILAI =================
 const formatNilai = (n) => {
@@ -33,125 +54,102 @@ const formatNilai = (n) => {
   return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
 };
 
+
 // ================= LOAD DATA =================
-async function loadNilai() {
+async function loadNilai(guruUid) {
+
   semuaNilai = [];
-  list.innerHTML = "";
+  list.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
 
   filterMapel.innerHTML = `<option value="">Semua Mapel</option>`;
   filterKelas.innerHTML = `<option value="">Semua Kelas</option>`;
   filterJudul.innerHTML = `<option value="">Semua Judul</option>`;
 
-  // 🔥 FILTER BERDASARKAN GURU LOGIN
-  const q = query(
-    collection(db, "jawaban_siswa"),
-    where("guruId", "==", guruUid)
-  );
+  try {
 
-  const snap = await getDocs(q);
+    const q = query(
+      collection(db, "jawaban_siswa"),
+      where("guruId", "==", guruUid)
+    );
 
-  const mapelSet = new Set();
-  const kelasSet = new Set();
-  const judulSet = new Set();
+    const snap = await getDocs(q);
 
-  snap.forEach(docSnap => {
-    const d = docSnap.data();
+    // ❗ DEBUG PENTING
+    console.log("Total data:", snap.size);
 
-    semuaNilai.push(d);
+    if (snap.empty) {
+      list.innerHTML = `
+        <tr><td colspan="8" style="text-align:center">
+          ❌ Tidak ada data untuk guru ini
+        </td></tr>`;
+      return;
+    }
 
-    if (d.mapel) mapelSet.add(d.mapel);
-    if (d.kelas) kelasSet.add(d.kelas);
-    if (d.judulUjian) judulSet.add(d.judulUjian);
-  });
+    const mapelSet = new Set();
+    const kelasSet = new Set();
+    const judulSet = new Set();
 
-  // isi filter
-  mapelSet.forEach(m => {
-    filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
-  });
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
 
-  kelasSet.forEach(k => {
-    filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
-  });
+      semuaNilai.push(d);
 
-  judulSet.forEach(j => {
-    filterJudul.innerHTML += `<option value="${j}">${j}</option>`;
-  });
+      if (d.mapel) mapelSet.add(d.mapel);
+      if (d.kelas) kelasSet.add(d.kelas);
+      if (d.judulUjian) judulSet.add(d.judulUjian);
+    });
 
-  tampilkan(semuaNilai);
+    // isi filter
+    mapelSet.forEach(m => {
+      filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+
+    kelasSet.forEach(k => {
+      filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+
+    judulSet.forEach(j => {
+      filterJudul.innerHTML += `<option value="${j}">${j}</option>`;
+    });
+
+    tampilkan(semuaNilai);
+
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = `<tr><td colspan="8">❌ Error load data</td></tr>`;
+  }
 }
+
 
 // ================= TAMPILKAN =================
 function tampilkan(data) {
+
   list.innerHTML = "";
   infoRekap.textContent = "";
 
-  if (!data || data.length === 0) {
+  if (!data.length) {
     list.innerHTML = `
-      <tr><td colspan="8" style="text-align:center">Data tidak ditemukan</td></tr>`;
+      <tr><td colspan="8" style="text-align:center">
+        Data tidak ditemukan
+      </td></tr>`;
     return;
   }
 
-  // SORT terbaru
   data.sort((a, b) => {
     if (!a.waktu_mulai || !b.waktu_mulai) return 0;
     return b.waktu_mulai.seconds - a.waktu_mulai.seconds;
   });
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  let lastTanggal = "";
   let totalSemua = 0;
 
   data.forEach((n, i) => {
 
     const pg = Math.round(Number(n.nilaiPG || 0));
+    const essay = Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0);
+    const total = Number(n.nilaiTotal ?? n.totalNilai ?? 0);
 
-    const essay = Number(
-      n.nilaiEssayNormal ??
-      n.nilaiEssay ??
-      0
-    );
+    totalSemua += total;
 
-    const totalNilai = Number(
-      n.nilaiTotal ??
-      n.totalNilai ??
-      0
-    );
-
-    totalSemua += totalNilai;
-
-    // ===== FORMAT TANGGAL =====
-    let formatTanggal = "-";
-    let isToday = false;
-
-    if (n.waktu_mulai) {
-      const tgl = n.waktu_mulai.toDate();
-
-      const tglOnly = new Date(tgl);
-      tglOnly.setHours(0,0,0,0);
-
-      formatTanggal = tglOnly.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
-
-      isToday = tglOnly.getTime() === today.getTime();
-
-      if (!isToday && lastTanggal !== formatTanggal) {
-        list.innerHTML += `
-          <tr>
-            <td colspan="8" style="font-weight:bold; background:#f5f5f5;">
-              ${formatTanggal}
-            </td>
-          </tr>
-        `;
-        lastTanggal = formatTanggal;
-      }
-    }
-
-    // ===== RENDER =====
     list.innerHTML += `
       <tr>
         <td>${i + 1}</td>
@@ -161,32 +159,30 @@ function tampilkan(data) {
         <td>${n.judulUjian || "-"}</td>
         <td>${pg}</td>
         <td>${formatNilai(essay)}</td>
-        <td><b>${formatNilai(totalNilai)}</b></td>
+        <td><b>${formatNilai(total)}</b></td>
       </tr>
     `;
   });
 
-  const rata =
-    data.length > 0 ? formatNilai(totalSemua / data.length) : 0;
+  const rata = formatNilai(totalSemua / data.length);
 
   infoRekap.textContent =
     `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
 }
 
+
 // ================= FILTER =================
 btnFilter.onclick = () => {
-  const mapel = filterMapel.value;
-  const kelas = filterKelas.value;
-  const judul = filterJudul.value;
 
   const hasil = semuaNilai.filter(n =>
-    (!mapel || n.mapel === mapel) &&
-    (!kelas || n.kelas === kelas) &&
-    (!judul || n.judulUjian === judul)
+    (!filterMapel.value || n.mapel === filterMapel.value) &&
+    (!filterKelas.value || n.kelas === filterKelas.value) &&
+    (!filterJudul.value || n.judulUjian === filterJudul.value)
   );
 
   tampilkan(hasil);
 };
+
 
 // ================= RESET =================
 btnReset.onclick = () => {
@@ -196,13 +192,15 @@ btnReset.onclick = () => {
   tampilkan(semuaNilai);
 };
 
+
 // ================= EXPORT =================
 btnExport.onclick = () => {
-  const mapel = filterMapel.value;
-  if (!mapel) return alert("Pilih mapel terlebih dahulu");
+
+  if (!filterMapel.value)
+    return alert("Pilih mapel terlebih dahulu");
 
   const data = semuaNilai
-    .filter(n => n.mapel === mapel)
+    .filter(n => n.mapel === filterMapel.value)
     .map((n, i) => ({
       No: i + 1,
       Nama: n.namaSiswa,
@@ -218,8 +216,5 @@ btnExport.onclick = () => {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
 
-  XLSX.writeFile(wb, `Rekap_Nilai_${mapel}.xlsx`);
+  XLSX.writeFile(wb, `Rekap_Nilai_${filterMapel.value}.xlsx`);
 };
-
-// ================= INIT =================
-loadNilai();

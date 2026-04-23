@@ -1,7 +1,10 @@
 import { db } from "./firebase.js";
-import { collection, getDocs }
-  from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
+// ================= ELEMENT =================
 const list = document.getElementById("list");
 const filterMapel = document.getElementById("filterMapel");
 const filterJudul = document.getElementById("filterJudul");
@@ -13,123 +16,104 @@ const infoRekap = document.getElementById("infoRekap");
 
 let semuaNilai = [];
 
+// ================= FORMAT NILAI =================
+const formatNilai = (n) => {
+  if (isNaN(n)) return 0;
+  return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
+};
+
 // ================= LOAD DATA =================
 async function loadNilai() {
+
   semuaNilai = [];
-  list.innerHTML = "";
+  list.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
 
   filterMapel.innerHTML = `<option value="">Semua Mapel</option>`;
   filterKelas.innerHTML = `<option value="">Semua Kelas</option>`;
   filterJudul.innerHTML = `<option value="">Semua Judul</option>`;
 
-  const snap = await getDocs(collection(db, "jawaban_siswa"));
+  try {
 
-  const mapelSet = new Set();
-  const kelasSet = new Set();
-  const judulSet = new Set();
+    const snap = await getDocs(collection(db, "jawaban_siswa"));
 
-  snap.forEach(docSnap => {
-    const d = docSnap.data();
+    console.log("TOTAL DATA:", snap.size);
 
-    semuaNilai.push(d);
+    if (snap.empty) {
+      list.innerHTML = `
+        <tr><td colspan="8" style="text-align:center">
+          ❌ Tidak ada data di Firestore
+        </td></tr>`;
+      return;
+    }
 
-    if (d.mapel) mapelSet.add(d.mapel);
-    if (d.kelas) kelasSet.add(d.kelas);
-    if (d.judulUjian) judulSet.add(d.judulUjian);
-  });
+    const mapelSet = new Set();
+    const kelasSet = new Set();
+    const judulSet = new Set();
 
-  mapelSet.forEach(m => {
-    filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
-  });
+    snap.forEach(docSnap => {
+      const d = docSnap.data();
 
-  kelasSet.forEach(k => {
-    filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
-  });
+      console.log("DATA:", d); // DEBUG
 
-  judulSet.forEach(j => {
-    filterJudul.innerHTML += `<option value="${j}">${j}</option>`;
-  });
+      semuaNilai.push(d);
 
-  tampilkan(semuaNilai);
+      if (d.mapel) mapelSet.add(d.mapel);
+      if (d.kelas) kelasSet.add(d.kelas);
+      if (d.judulUjian) judulSet.add(d.judulUjian);
+    });
+
+    // isi filter
+    mapelSet.forEach(m => {
+      filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+
+    kelasSet.forEach(k => {
+      filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
+    });
+
+    judulSet.forEach(j => {
+      filterJudul.innerHTML += `<option value="${j}">${j}</option>`;
+    });
+
+    tampilkan(semuaNilai);
+
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = `<tr><td colspan="8">❌ Error load data</td></tr>`;
+  }
 }
 
 // ================= TAMPILKAN =================
 function tampilkan(data) {
+
   list.innerHTML = "";
   infoRekap.textContent = "";
 
-  if (!data || data.length === 0) {
+  if (!data.length) {
     list.innerHTML = `
-      <tr><td colspan="8" style="text-align:center">Data tidak ditemukan</td></tr>`;
+      <tr><td colspan="8" style="text-align:center">
+        Data tidak ditemukan
+      </td></tr>`;
     return;
   }
-const formatNilai = (n) => {
-  if (isNaN(n)) return 0;
-  return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
-};
-  // SORT berdasarkan waktu terbaru
+
+  // SORT AMAN
   data.sort((a, b) => {
-    if (!a.waktu_mulai || !b.waktu_mulai) return 0;
-    return b.waktu_mulai.seconds - a.waktu_mulai.seconds;
+    const aTime = a.waktu_mulai?.seconds || 0;
+    const bTime = b.waktu_mulai?.seconds || 0;
+    return bTime - aTime;
   });
 
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  let lastTanggal = "";
   let totalSemua = 0;
 
   data.forEach((n, i) => {
 
-    // ===== AMBIL NILAI (FIX UTAMA) =====
     const pg = Math.round(Number(n.nilaiPG || 0));
+    const essay = Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0);
+    const total = Number(n.nilaiTotal ?? n.totalNilai ?? 0);
 
-    const essay = Math.round(Number(
-      n.nilaiEssayNormal ??
-      n.nilaiEssay ??
-      0
-    ));
+    totalSemua += total;
 
-    const totalNilai = Math.round(Number(
-      n.nilaiTotal ??
-      n.totalNilai ??
-      0
-    ));
-
-    totalSemua += totalNilai;
-
-    // ===== FORMAT TANGGAL =====
-    let formatTanggal = "-";
-    let isToday = false;
-
-    if (n.waktu_mulai) {
-      const tgl = n.waktu_mulai.toDate();
-
-      const tglOnly = new Date(tgl);
-      tglOnly.setHours(0,0,0,0);
-
-      formatTanggal = tglOnly.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
-
-      isToday = tglOnly.getTime() === today.getTime();
-
-      // header tanggal
-      if (!isToday && lastTanggal !== formatTanggal) {
-        list.innerHTML += `
-          <tr>
-            <td colspan="8" style="font-weight:bold; background:#f5f5f5;">
-              ${formatTanggal}
-            </td>
-          </tr>
-        `;
-        lastTanggal = formatTanggal;
-      }
-    }
-
-    // ===== RENDER ROW =====
     list.innerHTML += `
       <tr>
         <td>${i + 1}</td>
@@ -139,13 +123,12 @@ const formatNilai = (n) => {
         <td>${n.judulUjian || "-"}</td>
         <td>${pg}</td>
         <td>${formatNilai(essay)}</td>
-        <td><b>${formatNilai(totalNilai)}</b></td>
+        <td><b>${formatNilai(total)}</b></td>
       </tr>
     `;
   });
 
-  const rata =
-    data.length > 0 ? (totalSemua / data.length).toFixed(2) : 0;
+  const rata = formatNilai(totalSemua / data.length);
 
   infoRekap.textContent =
     `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
@@ -153,14 +136,10 @@ const formatNilai = (n) => {
 
 // ================= FILTER =================
 btnFilter.onclick = () => {
-  const mapel = filterMapel.value;
-  const kelas = filterKelas.value;
-  const judul = filterJudul.value;
-
   const hasil = semuaNilai.filter(n =>
-    (!mapel || n.mapel === mapel) &&
-    (!kelas || n.kelas === kelas) &&
-    (!judul || n.judulUjian === judul)
+    (!filterMapel.value || n.mapel === filterMapel.value) &&
+    (!filterKelas.value || n.kelas === filterKelas.value) &&
+    (!filterJudul.value || n.judulUjian === filterJudul.value)
   );
 
   tampilkan(hasil);
@@ -172,43 +151,6 @@ btnReset.onclick = () => {
   filterKelas.value = "";
   filterJudul.value = "";
   tampilkan(semuaNilai);
-};
-
-// ================= EXPORT EXCEL =================
-btnExport.onclick = () => {
-  const mapel = filterMapel.value;
-  if (!mapel) return alert("Pilih mapel terlebih dahulu");
-
-  const data = semuaNilai
-    .filter(n => n.mapel === mapel)
-    .map((n, i) => ({
-
-      No: i + 1,
-      Nama: n.namaSiswa,
-      Kelas: n.kelas,
-      Mapel: n.mapel,
-      Ujian: n.judulUjian,
-
-      PG: Number(n.nilaiPG || 0),
-
-      Essay: Number(
-        n.nilaiEssayNormal ??
-        n.nilaiEssay ??
-        0
-      ),
-
-      Total: Number(
-        n.nilaiTotal ??
-        n.totalNilai ??
-        0
-      )
-    }));
-
-  const ws = XLSX.utils.json_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
-
-  XLSX.writeFile(wb, `Rekap_Nilai_${mapel}.xlsx`);
 };
 
 // ================= INIT =================

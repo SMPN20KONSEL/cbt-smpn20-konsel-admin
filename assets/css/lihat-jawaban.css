@@ -16,10 +16,6 @@
   padding-bottom: 15px;
 }
 
-.info-siswa {
-  text-align: left;
-}
-
 .info-siswa h2 {
   margin: 0;
   font-size: 20px;
@@ -30,7 +26,7 @@
   color: #777;
 }
 
-/* ================= NILAI PG ================= */
+/* ================= NILAI ================= */
 .nilai-pg {
   text-align: center;
   background: #f1f8ff;
@@ -49,34 +45,33 @@
   color: #3498db;
 }
 
-/* ================= JUDUL SECTION ================= */
+/* ================= JUDUL ================= */
 h3 {
   margin-top: 30px;
   margin-bottom: 15px;
-  text-align: left;
   padding-left: 10px;
   border-left: 5px solid #3498db;
   font-size: 16px;
   color: #333;
 }
 
-/* ================= GRID PG / MCMA / KATEGORI ================= */
+/* ================= GRID ================= */
 #pgContainer,
 #mcmaContainer,
 #kategoriContainer {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 15px; /* ✅ jarak biar tidak nempel */
+  gap: 15px;
 }
 
-/* ================= ESSAY FULL WIDTH ================= */
+/* ================= ESSAY ================= */
 #essayContainer {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* ================= BOX JAWABAN ================= */
+/* ================= BOX ================= */
 .essay-box {
   background: #fafafa;
   border: 1px solid #eaeaea;
@@ -84,7 +79,6 @@ h3 {
   padding: 12px 15px;
   border-radius: 10px;
   transition: 0.2s;
-  text-align: left;
 }
 
 .essay-box:hover {
@@ -103,7 +97,7 @@ h3 {
   line-height: 1.5;
 }
 
-/* ================= LIST KATEGORI ================= */
+/* ================= LIST ================= */
 .essay-box ul {
   padding-left: 18px;
   margin: 0;
@@ -113,21 +107,23 @@ h3 {
   margin-bottom: 4px;
 }
 
-/* ================= WARNA STATUS ================= */
-.benar {
-  color: #27ae60;
-  font-weight: bold;
+/* ================= STATUS ================= */
+.essay-box.benar {
+  background-color: #d4edda;
+  border-left: 5px solid #27ae60;
+  color: #1e7e34;
 }
 
-.salah {
-  color: #e74c3c;
-  font-weight: bold;
+.essay-box.salah {
+  background-color: #f8d7da;
+  border-left: 5px solid #e74c3c;
+  color: #721c24;
 }
 
 /* ================= BUTTON ================= */
 .btn-simpan {
   margin-top: 25px;
-  margin-left: auto; /* ✅ dorong ke kanan */
+  margin-left: auto;
   display: block;
   background: #3498db;
   color: white;
@@ -167,4 +163,36 @@ h3 {
   .nilai-pg {
     align-self: flex-end;
   }
+}
+.essay-box {
+  text-align: left;
+}
+
+.essay-box p,
+.essay-box b,
+.essay-box li {
+  text-align: left;
+}
+.nilai-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.nilai-box {
+  text-align: center;
+  background: #f1f8ff;
+  padding: 10px 15px;
+  border-radius: 10px;
+  min-width: 90px;
+}
+
+.nilai-box span {
+  display: block;
+  font-size: 12px;
+  color: #555;
+}
+
+.nilai-box strong {
+  font-size: 20px;
+  color: #3498db;
 }
