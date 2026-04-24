@@ -409,16 +409,21 @@ row.innerHTML = `
     `;
 
     data.pernyataan.forEach((p,i)=>{
-      const name = "kat_"+Date.now()+"_"+i;
 
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
-        <td><span contenteditable>${p.teks}</span></td>
-        <td><input type="radio" name="${name}" value="true" ${p.jawabanBenar ? "checked":""}></td>
-        <td><input type="radio" name="${name}" value="false" ${!p.jawabanBenar ? "checked":""}></td>
-        <td></td>
-      `;
+  <td><span contenteditable>${p.teks}</span></td>
+
+  <td>
+    <select class="jawaban-kategori">
+      <option value="true" ${p.jawabanBenar ? "selected":""}>Benar</option>
+      <option value="false" ${!p.jawabanBenar ? "selected":""}>Salah</option>
+    </select>
+  </td>
+
+  <td><button class="hapus">✖</button></td>
+`;
 
       table.appendChild(tr);
     });
@@ -520,8 +525,10 @@ window.tambahSoal = () => {
 
     tr.innerHTML = `
       <td><span contenteditable></span></td>
-      <td><input type="radio" name="kat_${id}_${Date.now()}" value="true"></td>
-      <td><input type="radio" name="kat_${id}_${Date.now()}" value="false"></td>
+      <select class="jawaban-kategori">
+  <option value="true">Benar</option>
+  <option value="false">Salah</option>
+</select>
       <td><button>✖</button></td>
     `;
 
@@ -650,12 +657,12 @@ const kelas = kelasInput.value.trim().toUpperCase();
           if(i===0) return;
 
           const teks = row.querySelector("span")?.innerText.trim();
-          const checked = row.querySelector("input:checked");
+          const select = row.querySelector(".jawaban-kategori");
 
           if(teks){
             pernyataan.push({
               teks,
-              jawabanBenar: checked?.value === "true"
+              jawabanBenar: select?.value === "true"
             });
           }
         });
