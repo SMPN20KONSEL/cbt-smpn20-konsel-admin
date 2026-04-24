@@ -121,14 +121,20 @@ body {
 /* judul sidebar */
 .sidebar h2 {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 8px;
+  font-weight: 800;
+  font-size: 18px;
+  color: #000000;
 }
+
 .nama-guru {
-  margin: 5px 15px;
-  font-size: 14px;
-  color: #555;
-  font-weight: 500;
+  margin: 0 0 20px 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 800;
+  color: #2563eb;
 }
+
 /* menu */
 .menu {
   list-style: none;

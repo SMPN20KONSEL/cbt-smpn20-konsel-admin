@@ -120,25 +120,24 @@ tr:hover{
 
 <div class="dashboard">
 
- <aside class="sidebar">
+<aside class="sidebar">
   <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
-  
+
   <!-- Nama guru -->
   <p id="nama-guru" class="nama-guru">Memuat...</p>
+
+  <ul class="menu">
+    <li><a href="dashboard-guru.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+    <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
+    <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+    <li><a href="koreksi-essay.html"><i class="fa fa-book"></i> Koreksi Essay</a></li>
+    <li><a href="rekap-nilai.html"><i class="fa fa-chart-column"></i> Rekap Nilai</a></li>
+  </ul>
+
+  <button class="logout" id="logout">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
 </aside>
-
-    <ul class="menu">
-      <li><a href="dashboard-guru.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
-      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-      <li><a href="koreksi-essay.html"><i class="fa fa-book"></i> Koreksi Essay</a></li>
-      <li><a href="rekap-nilai.html"><i class="fa fa-chart-column"></i> Rekap Nilai</a></li>
-    </ul>
-
-    <button class="logout" id="logout">
-      <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
-  </aside>
 
   <!-- CONTENT -->
   <main class="content">
@@ -199,98 +198,118 @@ tr:hover{
 
 </div>
 <script type="module">
-import { db } from "../assets/js/firebase.js";
-import {
-  collection,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { auth, db } from "../assets/js/firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-const tableBody = document.getElementById("table-body");
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    location.href = "../login.html";
+    return;
+  }
 
-if (!tableBody) {
-  console.warn("table-body tidak ditemukan");
-}
+  try {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
 
-// 🔒 optional guard
-const uid = localStorage.getItem("uid");
-if (!uid) {
-  location.href = "../login.html";
-}
+    if (snap.exists()) {
+      const data = snap.data();
 
-// 🔥 realtime monitor
-onSnapshot(collection(db, "peserta"), (snapshot) => {
-
-  let html = "";
-  let no = 1;
-
-  const docs = [];
-  snapshot.forEach(doc => {
-    docs.push({ id: doc.id, ...doc.data() });
-  });
-
-  // 🔥 sorting status
-  docs.sort((a, b) => {
-    const order = {
-      mengerjakan: 1,
-      mulai: 1,
-      online: 2,
-      selesai: 3
-    };
-    return (order[a.status] || 4) - (order[b.status] || 4);
-  });
-
-  docs.forEach(data => {
-
-    const lastOnline = data.lastOnline;
-
-    let isOnline = false;
-    if (lastOnline && lastOnline.toDate) {
-      const selisih = Date.now() - lastOnline.toDate().getTime();
-      isOnline = selisih <= 60000;
+      document.getElementById("nama-guru").textContent =
+        data.nama || user.email;
+    } else {
+      document.getElementById("nama-guru").textContent = user.email;
     }
 
-    let statusBadge = "🔴 Offline";
-    let statusClass = "offline";
-
-    if (isOnline) {
-      if (data.status === "login") {
-        statusBadge = "🟡 Login";
-        statusClass = "online";
-      } 
-      else if (data.status === "belum_mulai") {
-        statusBadge = "🟣 Belum Mulai";
-        statusClass = "online";
-      } 
-      else if (data.status === "mengerjakan") {
-        statusBadge = "🔵 Sedang Ujian";
-        statusClass = "kerja";
-      } 
-      else if (data.status === "selesai") {
-        statusBadge = "🟢 Selesai";
-        statusClass = "selesai";
-      }
-    }
-
-    html += `
-      <tr>
-        <td>${no++}</td>
-        <td>${data.nama || "-"}</td>
-        <td>${data.email || "-"}</td>
-        <td>${data.kelas || "-"}</td>
-        <td>${data.kodeUjian || "-"}</td>
-        <td class="${statusClass}">${statusBadge}</td>
-        <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
-        <td>
-          <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(data.id)}'">
-            Lihat
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  tableBody.innerHTML = html;
+  } catch (err) {
+    console.error(err);
+    document.getElementById("nama-guru").textContent = user.email;
+  }
 });
+
+// ======================= MONITOR SISWA =======================
+function loadMonitor() {
+
+  if (!tableBody) {
+    console.warn("table-body tidak ditemukan");
+    return;
+  }
+
+  onSnapshot(collection(db, "peserta"), (snapshot) => {
+
+    let html = "";
+    let no = 1;
+
+    const docs = [];
+
+    snapshot.forEach(d => {
+      docs.push({ id: d.id, ...d.data() });
+    });
+
+    // SORT STATUS
+    docs.sort((a, b) => {
+      const order = {
+        mengerjakan: 1,
+        mulai: 1,
+        login: 2,
+        selesai: 3
+      };
+      return (order[a.status] || 4) - (order[b.status] || 4);
+    });
+
+    docs.forEach(data => {
+
+      const lastOnline = data.lastOnline;
+
+      let isOnline = false;
+      if (lastOnline && lastOnline.toDate) {
+        const selisih = Date.now() - lastOnline.toDate().getTime();
+        isOnline = selisih <= 60000;
+      }
+
+      let statusBadge = "🔴 Offline";
+      let statusClass = "offline";
+
+      if (isOnline) {
+        if (data.status === "login") {
+          statusBadge = "🟡 Login";
+          statusClass = "online";
+        } 
+        else if (data.status === "belum_mulai") {
+          statusBadge = "🟣 Belum Mulai";
+          statusClass = "online";
+        } 
+        else if (data.status === "mengerjakan") {
+          statusBadge = "🔵 Sedang Ujian";
+          statusClass = "kerja";
+        } 
+        else if (data.status === "selesai") {
+          statusBadge = "🟢 Selesai";
+          statusClass = "selesai";
+        }
+      }
+
+      html += `
+        <tr>
+          <td>${no++}</td>
+          <td>${data.nama || "-"}</td>
+          <td>${data.email || "-"}</td>
+          <td>${data.kelas || "-"}</td>
+          <td>${data.kodeUjian || "-"}</td>
+          <td class="${statusClass}">${statusBadge}</td>
+          <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
+          <td>
+            <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(data.id)}'">
+              Lihat
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    tableBody.innerHTML = html;
+  });
+}
 </script>
 <!-- LOGOUT -->
 <script type="module" src="../assets/js/logout.js"></script>
