@@ -99,27 +99,87 @@ function setLoading(btn, state) {
 /* ===============================
    PARSE NAMA (GELAR)
 ================================ */
-function parseNama(input) {
-  const raw = input
-    .replace(/[.,]/g, "")
+function parseNamaLengkap(input) {
+  let clean = input
     .toLowerCase()
+    .replace(/,/g, " , ")
+    .replace(/\./g, ". ")
+    .replace(/\s+/g, " ")
     .trim();
 
-  const parts = raw.split(/\s+/);
+  const parts = clean.split(" ");
 
+  const depan = [];
   const nama = [];
-  const gelarSet = new Set();
+  const belakang = [];
 
-  parts.forEach(p => {
-    if (p === "spd") gelarSet.add("S.Pd.");
-    else if (p === "gr") gelarSet.add("Gr");
-    else nama.push(p);
+  let mode = "nama";
+
+  parts.forEach((p, i) => {
+    const word = p.trim();
+    if (!word) return;
+
+    // ===== GELAR DEPAN =====
+    if (
+      ["dr", "drs", "h", "hj", "ir"].includes(word)
+    ) {
+      depan.push(formatGelar(word));
+      return;
+    }
+
+    // ===== GELAR BELAKANG =====
+    if (
+      word.includes(".") ||
+      ["spd","mpd","skom","mkom","gr"].includes(word)
+    ) {
+      belakang.push(formatGelar(word));
+      mode = "belakang";
+      return;
+    }
+
+    // ===== NAMA =====
+    if (mode === "nama") {
+      nama.push(word);
+    }
   });
 
+  const namaFix = nama
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
+  const depanFix = depan.join(" ");
+  const belakangFix = belakang.join(", ");
+
   return {
-    nama: nama.map(w => w[0].toUpperCase() + w.slice(1)).join(" "),
-    gelar: [...gelarSet].join(", ")
+    namaDepan: depanFix,
+    nama: namaFix,
+    namaBelakang: belakangFix,
+    full: [
+      depanFix,
+      namaFix,
+      belakangFix ? ", " + belakangFix : ""
+    ].join("").trim()
   };
+}
+
+// ================= FORMAT GELAR =================
+function formatGelar(g) {
+  g = g.replace(/\./g, "").toLowerCase();
+
+  const map = {
+    dr: "Dr.",
+    drs: "Drs.",
+    h: "H.",
+    hj: "Hj.",
+    ir: "Ir.",
+    spd: "S.Pd.",
+    mpd: "M.Pd.",
+    skom: "S.Kom.",
+    mkom: "M.Kom.",
+    gr: "Gr."
+  };
+
+  return map[g] || g.toUpperCase();
 }
 
 /* ===============================
