@@ -207,28 +207,35 @@ function updateTotalGuru(data) {
    TAMBAH GURU
 ================================ */
 window.tambahGuru = async () => {
-  if (!namaInput.value || !mapelInput.value)
-    return alert("Lengkapi data guru");
+  try {
+    if (!namaInput.value || !mapelInput.value)
+      return alert("Lengkapi data guru");
 
-  const parsed = parseNamaLengkap(namaInput.value); // ✅ FIX
-  const mapel = mapelInput.value;
+    const parsed = parseNamaLengkap(namaInput.value);
+    const mapel = mapelInput.value;
+    const akun = generateAkun(parsed.full);
 
-  const akun = generateAkun(parsed.full); // ✅ FIX
+    await setDoc(doc(db, "guru", akun.email), {
+      nama: parsed.full,
+      mapel,
+      email: akun.email,
+      password: akun.password,
+      aktif: false,
+      createdAt: new Date(),
+      deletedAt: null
+    });
 
-  await setDoc(doc(db, "guru", akun.email), {
-    nama: parsed.full,
-    mapel,
-    email: akun.email,
-    password: akun.password,
-    aktif: false,
-    createdAt: new Date(),
-    deletedAt: null
-  });
+    alert("Guru berhasil ditambahkan ✅");
 
-  namaInput.value = "";
-  mapelInput.value = "";
+    namaInput.value = "";
+    mapelInput.value = "";
 
-  loadGuru();
+    loadGuru();
+
+  } catch (err) {
+    alert("Error ❌\n" + err.message);
+    console.error(err);
+  }
 };
 
 /* ===============================
