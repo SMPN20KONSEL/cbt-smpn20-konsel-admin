@@ -87,7 +87,6 @@ const id = urlParams.get("id");
 
 const daftarSoal = document.getElementById("daftarSoal");
 const listEl = document.getElementById("soal-list");
-
 // ================= HELPER =================
 function huruf(i){
   return String.fromCharCode(65 + i);
@@ -95,7 +94,6 @@ function huruf(i){
 
 // ================= LOAD =================
 async function loadSoal(){
-
   const snap = await getDoc(doc(db, "bank_soal", id));
   if(!snap.exists()){
     listEl.innerHTML = "❌ Data tidak ditemukan";
@@ -108,8 +106,6 @@ async function loadSoal(){
   let html = "";
   let no = 1;
 
-  const getText = s => s.pertanyaan || "-";
-
   const getOpsi = (opsi)=>{
     if(!opsi) return [];
     return Object.entries(opsi)
@@ -117,29 +113,13 @@ async function loadSoal(){
       .map(([k,v])=>({key:k,val:v}));
   };
 
-  // ================= GABUNG SEMUA SOAL =================
   let semuaSoal = [];
 
-  (data.soalPG || []).forEach(s=>{
-    semuaSoal.push({ ...s, tipe:"pg" });
-  });
+  (data.soalPG || []).forEach(s=> semuaSoal.push({ ...s, tipe:"pg" }));
+  (data.soalMCMA || []).forEach(s=> semuaSoal.push({ ...s, tipe:"mcma" }));
+  (data.soalKategori || []).forEach(s=> semuaSoal.push({ ...s, tipe:"kategori" }));
+  (data.soalEssay || []).forEach(s=> semuaSoal.push({ ...s, tipe:"esai" }));
 
-  (data.soalMCMA || []).forEach(s=>{
-    semuaSoal.push({ ...s, tipe:"mcma" });
-  });
-
-  (data.soalKategori || []).forEach(s=>{
-    semuaSoal.push({ ...s, tipe:"kategori" });
-  });
-
-  (data.soalEssay || []).forEach(s=>{
-    semuaSoal.push({ ...s, tipe:"esai" });
-  });
-
-  // OPTIONAL: urutkan (boleh hapus kalau tidak mau)
-  // semuaSoal.sort((a,b)=> a.tipe.localeCompare(b.tipe));
-
-  // ================= RENDER =================
   semuaSoal.forEach(s => {
 
     const opsiList = getOpsi(s.opsi);
@@ -157,7 +137,7 @@ async function loadSoal(){
     if(s.tipe === "mcma"){
       isi = `
         <div class="opsi">
-          ${opsiList.map(o=>`<div>☑ ${o.key}. ${o.val}</div>`).join("")}
+          ${opsiList.map(o=>`<div>${o.key}. ${o.val}</div>`).join("")}
         </div>
         <div class="kunci">Jawaban: ${(s.jawabanBenar||[]).join(", ")}</div>
       `;
@@ -181,14 +161,13 @@ async function loadSoal(){
     html += `
     <div class="soal-item ${s.tipe}">
       <div class="label-jenis ${s.tipe}">${s.tipe.toUpperCase()}</div>
-      <div class="nomor">${no++}. ${getText(s)}</div>
+      <div class="nomor">${no++}. ${s.pertanyaan}</div>
       ${isi}
     </div>`;
   });
 
   listEl.innerHTML = html;
 
-  // ================= META =================
   document.getElementById("meta").innerHTML = `
     📚 ${data.mapel||"-"} |
     🎓 Kelas ${data.kelas||"-"} |
@@ -197,6 +176,8 @@ async function loadSoal(){
 }
 
 loadSoal();
+
+
 // ================= TAMBAH SOAL =================
 window.tambahSoal = () => {
 
@@ -370,11 +351,111 @@ function updateNomorKategori(){
 
   updateLabel();
 };
-// ================= SIMPAN =================
+
+// ================= SIMPAN (FIX TOTAL) =================
 window.simpanSemua = async ()=>{
-  alert("✅ Siap disimpan (logic sudah aman)");
-  location.reload();
+
+  const ref = doc(db, "bank_soal", id);
+  const snap = await getDoc(ref);
+  const dataLama = snap.data() || {};
+
+  let soalPG = dataLama.soalPG || [];
+  let soalMCMA = dataLama.soalMCMA || [];
+  let soalKategori = dataLama.soalKategori || [];
+  let soalEssay = dataLama.soalEssay || [];
+
+  const cards = document.querySelectorAll(".soal-card");
+
+  // ❗ kalau tidak ada input baru → jangan simpan
+  if(cards.length === 0){
+    alert("⚠️ Tidak ada soal baru");
+    return;
+  }
+
+  cards.forEach(card => {
+
+    const tipe = card.querySelector(".tipe-soal").value;
+    const pertanyaan = card.querySelector(".pertanyaan").innerText.trim();
+
+    if(!pertanyaan) return; // skip kosong
+
+    // PG
+    if(tipe === "pg"){
+      let opsi = {};
+      const rows = card.querySelectorAll(".pg-options .opsi-row");
+
+      rows.forEach((r,i)=>{
+        const key = String.fromCharCode(65+i);
+        const val = r.querySelector(".opsi-text").innerText;
+        if(val) opsi[key] = val;
+      });
+
+      const jawaban = card.querySelector(".jawaban").value;
+
+      soalPG.push({ pertanyaan, opsi, jawabanBenar: jawaban });
+    }
+
+    // MCMA
+    if(tipe === "mcma"){
+      let opsi = {};
+      let jawaban = [];
+
+      const rows = card.querySelectorAll(".mcma-options .opsi-row");
+
+      rows.forEach((r,i)=>{
+        const key = String.fromCharCode(65+i);
+        const val = r.querySelector(".opsi-text").innerText;
+        const cek = r.querySelector("input");
+
+        if(val) opsi[key] = val;
+        if(cek.checked) jawaban.push(key);
+      });
+
+      soalMCMA.push({ pertanyaan, opsi, jawabanBenar: jawaban });
+    }
+
+    // Kategori
+    if(tipe === "kategori"){
+      let pernyataan = [];
+
+      const rows = card.querySelectorAll(".kategori-table tr");
+
+      rows.forEach(r=>{
+        const teks = r.querySelector(".opsi-text").innerText;
+        const val = r.querySelector("select").value === "true";
+
+        if(teks){
+          pernyataan.push({ teks, jawabanBenar: val });
+        }
+      });
+
+      soalKategori.push({ pertanyaan, pernyataan });
+    }
+
+    // Esai
+    if(tipe === "esai"){
+      soalEssay.push({ pertanyaan });
+    }
+
+  });
+
+  try{
+    await updateDoc(ref, {
+      soalPG,
+      soalMCMA,
+      soalKategori,
+      soalEssay
+    });
+
+    alert("✅ Soal berhasil ditambahkan (tanpa menghapus yang lama)");
+    location.reload();
+
+  }catch(err){
+    console.error(err);
+    alert("❌ Gagal simpan");
+  }
 };
+
 
 // ================= MODAL =================
 window.bukaModalTambah = () => {
