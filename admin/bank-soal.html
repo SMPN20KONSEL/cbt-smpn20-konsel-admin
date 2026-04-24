@@ -4,22 +4,19 @@
 <meta charset="UTF-8">
 <title>Bank Soal</title>
 
-<!-- CSS -->
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/admin.css">
 <link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
- /* ===============================
-   JUDUL
-================================ */
+
+/* =============================== JUDUL ================================ */
 .content {
   max-width: 1200px;
   margin-right: auto;
 }
 
-/* biar isi tidak terlalu nempel */
 #list {
   width: 100%;
 }
@@ -32,9 +29,7 @@
   text-align: center;
 }
 
-/* ===============================
-   SUBTITLE & SEARCH
-================================ */
+/* =============================== SUBTITLE ============================= */
 .subtitle {
   text-align: center;
   color: #666;
@@ -51,18 +46,14 @@
   border: 1px solid #ccc;
 }
 
-/* ===============================
-   GRID
-================================ */
+/* =============================== GRID ================================ */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
 
-/* ===============================
-   CARD
-================================ */
+/* =============================== CARD ================================ */
 .bank-card {
   background: #fff;
   padding: 18px;
@@ -78,53 +69,28 @@
 }
 
 .bank-card h3 {
-  margin: 10px 0;
+  margin: 0;
   font-size: 16px;
 }
 
-/* ===============================
-   HEADER CARD
-================================ */
-.bank-header {
+/* header card sejajar */
+.bank-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
 }
 
-.badge {
+.mapel-badge {
   background: #2563eb;
   color: #fff;
-  padding: 5px 12px;
-  border-radius: 20px;
+  padding: 4px 10px;
+  border-radius: 12px;
   font-size: 12px;
+  white-space: nowrap;
 }
 
-/* ===============================
-   ACTION BUTTON
-================================ */
-.actions {
-  display: flex;
-  gap: 6px;
-}
-
-.actions button {
-  background: #f1f5f9;
-  border: none;
-  padding: 6px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.actions button:hover {
-  background: #e2e8f0;
-}
-
-.edit { color: #2563eb; }
-.hapus { color: #dc2626; }
-
-/* ===============================
-   INFO SOAL
-================================ */
+/* =============================== INFO ================================ */
 .soal-info {
   margin-top: 10px;
   font-size: 14px;
@@ -145,9 +111,7 @@
   font-weight: bold;
 }
 
-/* ===============================
-   FOLDER
-================================ */
+/* =============================== FOLDER =============================== */
 .folder {
   margin-bottom: 20px;
   border-radius: 12px;
@@ -164,437 +128,256 @@
   color: #fff;
 }
 
-/* warna folder (FIX target) */
+/* warna folder */
 .folder.sas .folder-header { background: #2563eb; }
 .folder.sts .folder-header { background: #16a34a; }
 .folder.sh  .folder-header { background: #f59e0b; }
 .folder.lain .folder-header { background: #6b7280; }
 
-.folder-content {
+/* folder collapse system */
+.folder.collapsed .folder-content {
   display: none;
+}
+
+.folder-content {
   padding: 15px;
 }
 
-.folder-open .folder-content {
-  display: grid;
-}
-
-/* ===============================
-   MODAL
-================================ */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 350px;
-  max-width: 90%;
-  animation: scaleIn 0.2s ease;
-}
-
-.modal-content input {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.save {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.batal {
-  background: #dc2626;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* ===============================
-   TOAST
-================================ */
-.toast {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #16a34a;
-  color: #fff;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  z-index: 9999;
-  box-shadow: 0 10px 25px rgba(0,0,0,.25);
-  animation: fadeIn 0.3s ease;
+/* =============================== SEARCH ============================== */
+.search-box {
   text-align: center;
-  min-width: 250px;
+  margin-bottom: 10px;
 }
 
-/* ===============================
-   ANIMATION
-================================ */
-@keyframes scaleIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
+/* =============================== ANIMATION =========================== */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
+
 </style>
 </head>
 
 <body>
+
 <header class="topbar">
-    <div class="brand">
-      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
-      <div class="brand-text">
-        <strong>SMPN 20 KONAWE SELATAN</strong>
-        <small>CBT Application</small>
-      </div>
-    </div>
-  </header>
+<div class="brand">
+<img src="../assets/img/logo-sekolah.png" class="brand-logo">
+
+<div class="brand-text">
+<strong>SMPN 20 KONAWE SELATAN</strong>
+<small>CBT Application</small>
+</div>
+</div>
+</header>
+
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
-  <h2><i class="fas fa-user-shield"></i> Admin</h2>
-  <ul class="menu">
-      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
-      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
-      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
-      <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian  </a></li>
-      <li><a href="nilai.html"> <i class="fa fa-graduation-cap"></i> Nilai</a></li>
-  </ul>
-  <button class="logout" id="logout">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
+<h2><i class="fas fa-user-shield"></i> Admin</h2>
+
+<ul class="menu">
+<li><a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
+<li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+<li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+<li><a href="bank-soal.html" class="active"><i class="fa fa-book"></i> Bank Soal</a></li>
+<li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+<li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
+<li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
+<li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+</ul>
+
+<button class="logout" id="logout">
+<i class="fas fa-sign-out-alt"></i> Logout
+</button>
 </aside>
 
-<!-- CONTENT -->
 <main class="content">
-  <h1><i class="fa fa-book"></i> Bank Soal</h1>
-  <p class="subtitle">Daftar seluruh bank soal</p>
-  <input 
-  type="text" 
-  id="searchInput" 
-  placeholder="🔍 Cari bank soal..." 
-  style="padding:10px;width:100%;max-width:400px;border-radius:8px;border:1px solid #ccc;margin-bottom:15px;">
-  <div id="list"></div>
+
+<div class="page-top">
+<h1><i class="fa fa-book"></i> Bank Soal</h1>
+<p class="subtitle">Daftar seluruh bank soal</p>
+</div>
+
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="🔍 Cari judul, mapel, kelas...">
+</div>
+
+<div id="list"></div>
+
 </main>
-<!-- MODAL EDIT -->
-<div id="modalEdit" class="modal">
-  <div class="modal-content">
-    <h3>Edit Bank Soal</h3>
-
-    <label>Judul</label>
-    <input id="editJudul">
-
-    <label>Mapel</label>
-    <input id="editMapel">
-
-    <label>Kelas</label>
-    <input id="editKelas">
-
-    <br><br>
-
-    <button onclick="simpanEdit()" class="save">💾 Simpan</button>
-    <button onclick="tutupModal()" class="batal">Batal</button>
-  </div>
-</div>
-<div id="modalHapus" class="modal">
-  <div class="modal-content">
-    <h3>Konfirmasi Hapus</h3>
-    <p>Yakin ingin menghapus bank soal ini?</p>
-
-    <br>
-    <button id="btnHapusOk" class="save">🗑️ Hapus</button>
-    <button id="btnHapusBatal" class="batal">Batal</button>
-  </div>
-</div>
 </div>
 
-<!-- JS -->
 <script type="module">
 import { db, auth } from "../assets/js/firebase.js";
 import {
-  onAuthStateChanged
+onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
 import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc
+collection,
+getDocs
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
 const list = document.getElementById("list");
 
-// AUTH
 onAuthStateChanged(auth, user => {
-  if (!user) location.href = "../login.html";
-  loadBankSoal();
+if (!user) {
+location.href = "../login.html";
+return;
+}
+loadBankSoal();
 });
 
-// LOAD BANK SOAL
 async function loadBankSoal() {
-  list.innerHTML = "<p>Memuat data...</p>";
 
-  const snap = await getDocs(collection(db, "bank_soal"));
+list.innerHTML = "<p>Memuat data...</p>";
 
-  if (snap.empty) {
-    list.innerHTML = "<p>Belum ada bank soal</p>";
-    return;
-  }
+const snap = await getDocs(collection(db, "bank_soal"));
 
-  list.innerHTML = "";
+if (snap.empty) {
+list.innerHTML = "<p>Belum ada bank soal</p>";
+return;
+}
 
-  const kelompok = {
-    "Sumatif Akhir Semester": [],
-    "Sumatif Tengah Semester": [],
-    "Sumatif Harian": [],
-    "Lainnya": []
-  };
+list.innerHTML = "";
 
-  snap.forEach(docSnap => {
-    const s = docSnap.data() || {};
-    const data = { id: docSnap.id, ...s };
+const kelompok = {
+"Sumatif Akhir Semester": [],
+"Sumatif Tengah Semester": [],
+"Sumatif Harian": [],
+"Lainnya": []
+};
 
-    const judul = (s.judul || "").toLowerCase();
+snap.forEach(d => {
+const s = d.data();
+const data = { id: d.id, ...s };
 
-    if (judul.includes("sumatif akhir semester")) {
-      kelompok["Sumatif Akhir Semester"].push(data);
-    }
-    else if (judul.includes("sumatif tengah semester")) {
-      kelompok["Sumatif Tengah Semester"].push(data);
-    }
-    else if (judul.includes("sumatif harian")) {
-      kelompok["Sumatif Harian"].push(data);
-    }
-    else {
-      kelompok["Lainnya"].push(data);
-    }
-  });
+const judul = (s.judul || "").toLowerCase();
 
-  const labelMap = {
-    soalPG: "Pilihan Ganda",
-    soalMCMA: "PG Kompleks",
-    soalKategori: "Kategori",
-    soalEssay: "Esai"
-  };
+if (judul.includes("sumatif akhir semester")) {
+kelompok["Sumatif Akhir Semester"].push(data);
+}
+else if (judul.includes("sumatif tengah semester")) {
+kelompok["Sumatif Tengah Semester"].push(data);
+}
+else if (judul.includes("sumatif harian")) {
+kelompok["Sumatif Harian"].push(data);
+}
+else {
+kelompok["Lainnya"].push(data);
+}
+});
 
-  Object.keys(kelompok).forEach(nama => {
+const labelMap = {
+soalPG: "Pilihan Ganda",
+soalMCMA: "PG Kompleks",
+soalKategori: "Kategori",
+soalEssay: "Esai"
+};
 
-  const dataList = kelompok[nama];
-  if (dataList.length === 0) return;
+Object.keys(kelompok).forEach(nama => {
 
-  let classWarna = "lain";
-  if (nama === "Sumatif Akhir Semester") classWarna = "sas";
-  else if (nama === "Sumatif Tengah Semester") classWarna = "sts";
-  else if (nama === "Sumatif Harian") classWarna = "sh";
+const dataList = kelompok[nama];
+if (!dataList.length) return;
 
-  const idGroup = nama.replace(/\s+/g, '_');
+let warna = "lain";
+if (nama === "Sumatif Akhir Semester") warna = "sas";
+else if (nama === "Sumatif Tengah Semester") warna = "sts";
+else if (nama === "Sumatif Harian") warna = "sh";
 
-  list.innerHTML += `
-    <div class="folder ${classWarna}">
-      
-      <div class="folder-header ${classWarna}" onclick="toggleFolder('${idGroup}')">
-        <span>📂 ${nama} (${dataList.length})</span>
-        <span>▼</span>
-      </div>
+const id = nama.replace(/\s+/g, "_");
 
-      <div class="folder-content cards-grid" id="group-${idGroup}">
-      </div>
+list.innerHTML += `
+<div class="folder ${warna} collapsed">
+<div class="folder-header" onclick="toggleFolder('${id}')">
+<span>📂 ${nama} (${dataList.length})</span>
+<span>▼</span>
+</div>
 
-    </div>
-  `;
+<div id="group-${id}" class="folder-content cards-grid"></div>
+</div>
+`;
 
-  const container = document.getElementById(`group-${idGroup}`);
+const container = document.getElementById(`group-${id}`);
 
-  dataList.forEach(s => {
+dataList.forEach(s => {
 
-    let total = 0;
-    let infoHTML = "";
+let total = 0;
+let infoHTML = "";
 
-    Object.keys(labelMap).forEach(key => {
-      const arr = s[key];
+Object.keys(labelMap).forEach(key => {
+const arr = s[key];
+if (Array.isArray(arr) && arr.length) {
+total += arr.length;
+infoHTML += `
+<div>
+<i class="fa fa-list"></i>
+${labelMap[key]}: <b>${arr.length}</b>
+</div>`;
+}
+});
 
-      if (Array.isArray(arr) && arr.length > 0) {
-        total += arr.length;
+const card = document.createElement("div");
+card.className = "bank-card";
+card.onclick = () => lihatSoal(s.id);
 
-        infoHTML += `
-          <div>
-            <i class="fa fa-list"></i>
-            ${labelMap[key]}: <b>${arr.length}</b>
-          </div>
-        `;
-      }
-    });
+card.innerHTML = `
+<div class="bank-title-row">
+<h3>${s.judul || "-"}</h3>
+<span class="mapel-badge">${s.mapel || "-"}</span>
+</div>
 
-    container.innerHTML += `
-      <div class="bank-card" data-judul="${(s.judul || '').toLowerCase()}">
-        <div onclick="lihatSoal('${s.id}')">
+<p>Kelas : ${s.kelas || "-"}</p>
+<p>Dibuat oleh : ${s.namaGuru || "-"}</p>
 
-          <div class="bank-header">
-            <span class="badge">${s.mapel} • Kelas ${s.kelas}</span>
+<div class="soal-info">${infoHTML}</div>
 
-            <div class="actions" onclick="event.stopPropagation()">
-              <button class="edit" onclick="editBankSoal('${s.id}')">
-                <i class="fa fa-edit"></i>
-              </button>
+<div class="total">Total Soal : ${total}</div>
+`;
 
-              <button class="hapus" onclick="hapusBankSoal('${s.id}')">
-                <i class="fa fa-trash"></i>
-              </button>
-            </div>
-          </div>
-
-          <h3>${s.judul}</h3>
-
-<p style="font-size:12px;color:#666;">
-  Dibuat oleh guru: ${s.namaGuru || "-"}
-</p>
-
-          <div class="soal-info">
-            ${infoHTML || "<i>Tidak ada soal</i>"}
-          </div>
-
-          <div class="total">
-            Total Soal: ${total}
-          </div>
-
-        </div>
-      </div>
-    `;
-  });
+container.appendChild(card);
 
 });
+});
+}
+
+/* TOGGLE FOLDER */
 window.toggleFolder = (id) => {
-  const el = document.getElementById("group-" + id);
-  el.parentElement.classList.toggle("folder-open");
+document.getElementById("group-" + id)
+.parentElement
+.classList.toggle("collapsed");
 };
+
+/* SEARCH */
+document.getElementById("searchInput").addEventListener("input", function () {
+
+const keyword = this.value.toLowerCase();
+
+document.querySelectorAll(".folder").forEach(folder => {
+
+let visible = 0;
+
+folder.querySelectorAll(".bank-card").forEach(card => {
+const txt = card.innerText.toLowerCase();
+
+if (txt.includes(keyword)) {
+card.style.display = "block";
+visible++;
+} else {
+card.style.display = "none";
 }
-document.getElementById("searchInput").addEventListener("input", function(){
-  const keyword = this.value.toLowerCase();
-
-  document.querySelectorAll(".bank-card").forEach(card=>{
-    const judul = card.dataset.judul + " " + card.innerText.toLowerCase();
-
-    if(judul.includes(keyword)){
-      card.style.display = "block";
-    }else{
-      card.style.display = "none";
-    }
-  });
 });
 
-// NAVIGASI
-window.lihatSoal = id => {
-  location.href = `lihat-soal.html?id=${id}`;
+folder.style.display = visible ? "block" : "none";
+
+});
+});
+
+window.lihatSoal = (id) => {
+location.href = `lihat-soal.html?id=${id}`;
 };
 
-// HAPUS
-let idYangAkanDihapus = null;
-
-// Klik tombol hapus
-window.hapusBankSoal = (id) => {
-  idYangAkanDihapus = id;
-  document.getElementById("modalHapus").style.display = "flex";
-};
-
-// Tombol batal
-document.getElementById("btnHapusBatal").onclick = () => {
-  document.getElementById("modalHapus").style.display = "none";
-  idYangAkanDihapus = null;
-};
-
-// Tombol OK hapus
-document.getElementById("btnHapusOk").onclick = async () => {
-  if (!idYangAkanDihapus) return;
-
-  tampilkanToast("⏳ Menghapus...");
-
-  await deleteDoc(doc(db, "bank_soal", idYangAkanDihapus));
-
-  tampilkanToast("🗑️ Berhasil dihapus");
-
-  document.getElementById("modalHapus").style.display = "none";
-
-  idYangAkanDihapus = null;
-  loadBankSoal();
-};
-let currentId = "";
-
-// BUKA MODAL
-window.editBankSoal = async (id) => {
-  currentId = id;
-
-  const ref = doc(db, "bank_soal", id);
-  const snap = await getDoc(ref);
-  const data = snap.data();
-
-  document.getElementById("editJudul").value = data.judul || "";
-  document.getElementById("editMapel").value = data.mapel || "";
-  document.getElementById("editKelas").value = data.kelas || "";
-
-  document.getElementById("modalEdit").style.display = "flex";
-};
-
-// TUTUP MODAL
-window.tutupModal = () => {
-  document.getElementById("modalEdit").style.display = "none";
-};
-
-// SIMPAN
-window.simpanEdit = async () => {
-  await updateDoc(doc(db, "bank_soal", currentId), {
-    judul: document.getElementById("editJudul").value,
-    mapel: document.getElementById("editMapel").value,
-    kelas: document.getElementById("editKelas").value
-  });
-
-  tampilkanToast("✅ Berhasil diupdate");
-
-  tutupModal();
-  loadBankSoal();
-};
-function tampilkanToast(pesan) {
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = pesan;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
 </script>
 
 <script type="module" src="../assets/js/logout.js"></script>

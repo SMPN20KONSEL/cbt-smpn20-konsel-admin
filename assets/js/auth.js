@@ -9,6 +9,7 @@ const passwordInput = document.getElementById("password");
 const error = document.getElementById("error");
 const loginBtn = document.getElementById("loginBtn");
 
+// ================= LOGIN =================
 loginBtn.onclick = async () => {
   error.innerText = "";
 
@@ -29,7 +30,6 @@ loginBtn.onclick = async () => {
     const userRef = doc(db, "users", uid);
     const snap = await getDoc(userRef);
 
-    // ❌ JIKA USER BELUM TERDAFTAR
     if (!snap.exists()) {
       error.innerText = "User belum terdaftar, hubungi admin";
       return;
@@ -37,17 +37,16 @@ loginBtn.onclick = async () => {
 
     const roleDB = snap.data().role;
 
-    // ❌ VALIDASI ROLE
     if (!roleDB) {
       error.innerText = "Role tidak ditemukan";
       return;
     }
 
-    // 3️⃣ SIMPAN SESSION (FIX)
+    // ================= 3️⃣ SESSION =================
     localStorage.setItem("uid", uid);
     localStorage.setItem("role", roleDB);
 
-    // 4️⃣ REDIRECT SESUAI ROLE
+    // ================= 4️⃣ REDIRECT =================
     if (roleDB === "admin") {
       window.location.href = "admin/dashboard.html";
     } else if (roleDB === "guru") {
@@ -70,3 +69,21 @@ loginBtn.onclick = async () => {
     }
   }
 };
+
+// ================= 👁️ TOGGLE PASSWORD =================
+const togglePassword = document.getElementById("togglePassword");
+
+if (togglePassword) {
+  togglePassword.addEventListener("click", () => {
+    const type =
+      passwordInput.getAttribute("type") === "password"
+        ? "text"
+        : "password";
+
+    passwordInput.setAttribute("type", type);
+
+    // Ganti icon
+    togglePassword.classList.toggle("fa-eye");
+    togglePassword.classList.toggle("fa-eye-slash");
+  });
+}
