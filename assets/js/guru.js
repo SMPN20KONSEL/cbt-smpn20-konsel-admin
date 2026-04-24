@@ -210,19 +210,20 @@ window.tambahGuru = async () => {
   if (!namaInput.value || !mapelInput.value)
     return alert("Lengkapi data guru");
 
-  const parsed = parseNama(namaInput.value);
+  const parsed = parseNamaLengkap(namaInput.value); // ✅ FIX
   const mapel = mapelInput.value;
-  const akun   = generateAkun(parsed.nama);
 
-await setDoc(doc(db, "guru", akun.email), {
-  nama: parsed.full,   // 🔥 langsung format standar sekolah
-  mapel,
-  email: akun.email,
-  password: akun.password,
-  aktif: false,
-  createdAt: new Date(),
-  deletedAt: null
-});
+  const akun = generateAkun(parsed.full); // ✅ FIX
+
+  await setDoc(doc(db, "guru", akun.email), {
+    nama: parsed.full,
+    mapel,
+    email: akun.email,
+    password: akun.password,
+    aktif: false,
+    createdAt: new Date(),
+    deletedAt: null
+  });
 
   namaInput.value = "";
   mapelInput.value = "";
