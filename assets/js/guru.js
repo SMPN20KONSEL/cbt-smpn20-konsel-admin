@@ -100,60 +100,44 @@ function setLoading(btn, state) {
    PARSE NAMA (GELAR)
 ================================ */
 function parseNamaLengkap(input) {
-  let clean = input
-    .toLowerCase()
-    .replace(/,/g, " , ")
-    .replace(/\./g, ". ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const parts = clean.split(" ");
+  let words = input
+    .replace(/,/g, " ")
+    .split(/\s+/)
+    .filter(w => w);
 
   const depan = [];
   const nama = [];
   const belakang = [];
 
-  let mode = "nama";
+  words.forEach(word => {
+    const clean = word.replace(/\./g, "").toLowerCase();
 
-  parts.forEach((p, i) => {
-    const word = p.trim();
-    if (!word) return;
-
-    // ===== GELAR DEPAN =====
-    if (
-      ["dr", "drs", "h", "hj", "ir"].includes(word)
-    ) {
-      depan.push(formatGelar(word));
+    // GELAR DEPAN
+    if (["dr","drs","dra","h","hj","ir"].includes(clean)) {
+      depan.push(formatGelar(clean));
       return;
     }
 
-    // ===== GELAR BELAKANG =====
-    if (
-      word.includes(".") ||
-      ["spd","mpd","skom","mkom","gr"].includes(word)
-    ) {
-      belakang.push(formatGelar(word));
-      mode = "belakang";
+    // GELAR BELAKANG
+    if ([
+      "spd","spdi","sag","skom","si","se","sh","spsi",
+      "mpd","mpdi","mag","mkom","msi","me","mh","gr"
+    ].includes(clean)) {
+      belakang.push(formatGelar(clean));
       return;
     }
 
-    // ===== NAMA =====
-    if (mode === "nama") {
-      nama.push(word);
-    }
+    // NAMA
+    nama.push(
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    );
   });
 
-  const namaFix = nama
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
   const depanFix = depan.join(" ");
+  const namaFix = nama.join(" ");
   const belakangFix = belakang.join(", ");
 
   return {
-    namaDepan: depanFix,
-    nama: namaFix,
-    namaBelakang: belakangFix,
     full: [
       depanFix,
       namaFix,
@@ -164,19 +148,43 @@ function parseNamaLengkap(input) {
 
 // ================= FORMAT GELAR =================
 function formatGelar(g) {
-  g = g.replace(/\./g, "").toLowerCase();
+  g = g.toLowerCase().replace(/\./g, "").trim();
 
   const map = {
-    dr: "Dr.",
-    drs: "Drs.",
-    h: "H.",
-    hj: "Hj.",
-    ir: "Ir.",
-    spd: "S.Pd.",
-    mpd: "M.Pd.",
-    skom: "S.Kom.",
-    mkom: "M.Kom.",
-    gr: "Gr."
+    // depan
+    "dr": "Dr.",
+    "drs": "Drs.",
+    "dra": "Dra.",
+    "h": "H.",
+    "hj": "Hj.",
+    "ir": "Ir.",
+
+    // pendidikan umum
+    "sd": "S.D.",
+    "smp": "S.M.P.",
+    "sma": "S.M.A.",
+
+    // sarjana
+    "spd": "S.Pd.",
+    "spdi": "S.Pd.I.",
+    "sag": "S.Ag.",
+    "skom": "S.Kom.",
+    "si": "S.I.",
+    "se": "S.E.",
+    "sh": "S.H.",
+    "spsi": "S.Psi.",
+
+    // magister
+    "mpd": "M.Pd.",
+    "mpdi": "M.Pd.I.",
+    "mag": "M.Ag.",
+    "mkom": "M.Kom.",
+    "msi": "M.Si.",
+    "me": "M.E.",
+    "mh": "M.H.",
+
+    // tambahan
+    "gr": "Gr."
   };
 
   return map[g] || g.toUpperCase();
