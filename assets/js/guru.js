@@ -214,16 +214,15 @@ window.tambahGuru = async () => {
   const mapel = mapelInput.value;
   const akun   = generateAkun(parsed.nama);
 
-  await setDoc(doc(db, "guru", akun.email), {
-    nama: parsed.nama,
-    gelar: parsed.gelar,
-    mapel,
-    email: akun.email,
-    password: akun.password,
-    aktif: false,
-    createdAt: new Date(),
-    deletedAt: null
-  });
+await setDoc(doc(db, "guru", akun.email), {
+  nama: parsed.full,   // 🔥 langsung format standar sekolah
+  mapel,
+  email: akun.email,
+  password: akun.password,
+  aktif: false,
+  createdAt: new Date(),
+  deletedAt: null
+});
 
   namaInput.value = "";
   mapelInput.value = "";
@@ -370,26 +369,7 @@ window.hapusGuru = async (id, btn) => {
     if (!snap.exists()) throw "Data guru tidak ditemukan";
     const g = snap.data();
 
-    // =========================
-    // 🔥 1. HAPUS AUTH (LOGIN DULU)
-    // =========================
-    try {
-      const cred = await signInWithEmailAndPassword(
-        secondaryAuth,
-        g.email,
-        g.password
-      );
-
-      await deleteUser(cred.user);
-      await signOut(secondaryAuth);
-
-    } catch (e) {
-      console.warn("User Auth mungkin sudah tidak ada");
-    }
-
-    // =========================
-    // 🔥 2. HAPUS USERS COLLECTION
-    // =========================
+    // 🔥 HAPUS USERS COLLECTION
     const usersSnap = await getDocs(collection(db, "users"));
 
     for (const d of usersSnap.docs) {
@@ -398,12 +378,10 @@ window.hapusGuru = async (id, btn) => {
       }
     }
 
-    // =========================
-    // 🔥 3. HAPUS DATA GURU
-    // =========================
+    // 🔥 HAPUS DATA GURU
     await deleteDoc(ref);
 
-    alert("Guru berhasil dihapus permanen 🗑️");
+    alert("Guru berhasil dihapus (tanpa Auth)");
 
     loadGuru();
 
