@@ -344,23 +344,75 @@ async function loadGuru() {
         <td>${g.password ?? "-"}</td>
         <td>${g.aktif ? "✅ Aktif" : "❌ Nonaktif"}</td>
         <td>
-          ${
-            g.aktif
-              ? `<button data-label="Nonaktifkan"
-                   onclick="nonaktifkanGuru('${g.id}', this)">
-                   Nonaktifkan
-                 </button>`
-              : `<button data-label="Aktifkan"
-                   onclick="aktifkanGuru('${g.id}', this)">
-                   Aktifkan
-                 </button>`
-          }
-        </td>
+  ${
+    g.aktif
+      ? `<button onclick="nonaktifkanGuru('${g.id}', this)">Nonaktifkan</button>`
+      : `<button onclick="aktifkanGuru('${g.id}', this)">Aktifkan</button>`
+  }
+  <button style="background:red;color:white"
+    onclick="hapusGuru('${g.id}', this)">
+    Hapus
+  </button>
+</td>
       </tr>
     `;
   });
 }
+window.hapusGuru = async (id, btn) => {
+  if (!confirm("Hapus guru ini permanen?")) return;
 
+  setLoading(btn, true);
+
+  try {
+    const ref = doc(db, "guru", id);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) throw "Data guru tidak ditemukan";
+    const g = snap.data();
+
+    // =========================
+    // 🔥 1. HAPUS AUTH (LOGIN DULU)
+    // =========================
+    try {
+      const cred = await signInWithEmailAndPassword(
+        secondaryAuth,
+        g.email,
+        g.password
+      );
+
+      await deleteUser(cred.user);
+      await signOut(secondaryAuth);
+
+    } catch (e) {
+      console.warn("User Auth mungkin sudah tidak ada");
+    }
+
+    // =========================
+    // 🔥 2. HAPUS USERS COLLECTION
+    // =========================
+    const usersSnap = await getDocs(collection(db, "users"));
+
+    for (const d of usersSnap.docs) {
+      if (d.data().email === g.email) {
+        await deleteDoc(d.ref);
+      }
+    }
+
+    // =========================
+    // 🔥 3. HAPUS DATA GURU
+    // =========================
+    await deleteDoc(ref);
+
+    alert("Guru berhasil dihapus permanen 🗑️");
+
+    loadGuru();
+
+  } catch (err) {
+    alert("Gagal hapus ❌\n" + err.message);
+  }
+
+  setLoading(btn, false);
+};
 /* ===============================
    INIT
 ================================ */
