@@ -357,8 +357,9 @@ button:hover {
 /* =====================================================
    KATEGORI (TABEL - FINAL FIX)
 ===================================================== */
-
-/* container */
+/* =====================================================
+   KATEGORI WRAPPER
+===================================================== */
 .kategori-options {
   margin-top: 12px;
   border: 1px solid #e5e7eb;
@@ -367,11 +368,13 @@ button:hover {
   background: #fff;
 }
 
-/* table */
+/* =====================================================
+   TABLE BASE
+===================================================== */
 .kategori-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 10px; /* 🔥 jarak antar baris */
+  border-spacing: 0 10px;
 }
 
 /* header */
@@ -383,57 +386,99 @@ button:hover {
   padding-bottom: 6px;
 }
 
-/* baris */
+/* =====================================================
+   ROW FIX (INI PENTING - BIAR TIDAK TABRAKAN)
+===================================================== */
 .kategori-table tr {
   background: transparent;
 }
 
-/* ===== KOLOM TEKS ===== */
+/* ❌ jangan pakai hover td langsung (ini bikin select/radio rusak)
+   ✔ pakai hover per cell */
+.kategori-table tr:hover td {
+  background: transparent;
+}
+
+.kategori-table tr:hover td:first-child span {
+  background: #f9fafb;
+}
+
+/* =====================================================
+   CELL GENERAL
+===================================================== */
+.kategori-table td {
+  padding: 6px;
+  vertical-align: middle;
+}
+
+/* =====================================================
+   KOLOM TEKS
+===================================================== */
 .kategori-table td:first-child {
   width: 100%;
-  padding-right: 12px; /* 🔥 JARAK DARI RADIO */
+  padding-right: 12px;
 }
 
 .kategori-table td:first-child span {
   display: block;
   width: 100%;
-
-  min-height: 32px;       /* 🔥 tinggi kecil */
-  padding: 6px 10px;      /* 🔥 tidak terlalu tinggi */
+  min-height: 32px;
+  padding: 6px 10px;
 
   border: 1px solid #d1d5db;
   border-radius: var(--radius-md);
   background: #fff;
+
+  word-break: break-word;
 }
 
-/* ===== KOLOM RADIO ===== */
+/* =====================================================
+   SELECT (INI PENGGANTI RADIO - JAUH LEBIH STABIL)
+===================================================== */
+.kategori-table td select.jawaban-kategori {
+  width: 100%;
+  min-width: 90px;
+
+  padding: 8px 10px;
+
+  border-radius: 8px;
+  border: 2px solid #cbd5e1;
+
+  background: #fff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #111;
+  cursor: pointer;
+
+  appearance: auto; /* penting biar tidak aneh di beberapa browser */
+}
+
+/* =====================================================
+   KOLOM CENTER (TRUE/FALSE)
+===================================================== */
 .kategori-table td:nth-child(2),
 .kategori-table td:nth-child(3) {
-  width: 80px;            /* 🔥 lebih lega */
+  width: 80px;
   text-align: center;
-  padding-left: 10px;     /* 🔥 tidak mepet */
 }
 
+/* kalau masih pakai radio (legacy support) */
 .kategori-table input[type="radio"] {
   transform: scale(1.2);
   cursor: pointer;
 }
 
-/* ===== HEADER RADIO ===== */
-.kategori-table th:nth-child(2),
-.kategori-table th:nth-child(3) {
-  padding-left: 10px;
-}
-
-/* ===== KOLOM TOMBOL ===== */
+/* =====================================================
+   KOLOM HAPUS
+===================================================== */
 .kategori-table td:last-child {
   width: 60px;
   text-align: right;
-  padding-left: 10px;   /* 🔥 jarak dari radio */
-  padding-right: 8px;   /* 🔥 jarak dari pinggir kanan */
+  padding-right: 8px;
 }
 
-/* tombol hapus */
 .kategori-table button {
   background: #2a5298;
   color: #fff;
@@ -441,18 +486,11 @@ button:hover {
   padding: 6px 10px;
   border: none;
   cursor: pointer;
-  margin-left: 6px;     /* 🔥 biar gak nempel */
 }
 
 .kategori-table button:hover {
   background: #1e3c72;
 }
-
-/* hover efek */
-.kategori-table tr:hover td:first-child span {
-  background: #f9fafb;
-}
-
 /* =====================================================
    BUTTON TAMBAH
 ===================================================== */

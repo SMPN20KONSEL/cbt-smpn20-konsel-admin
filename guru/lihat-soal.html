@@ -127,50 +127,43 @@ async function loadSoal(){
 
   semuaSoal.forEach(s => {
 
-    const opsiList = getOpsi(s.opsi);
-    let isi = "";
-
-    if(s.tipe === "pg"){
-      isi = `
-        <div class="opsi">
-          ${opsiList.map(o=>`<div>${o.key}. ${o.val}</div>`).join("")}
-        </div>
-        <div class="kunci">Jawaban: ${s.jawabanBenar||"-"}</div>
-      `;
-    }
-
-    if(s.tipe === "mcma"){
-      isi = `
-        <div class="opsi">
-          ${opsiList.map(o=>`<div>${o.key}. ${o.val}</div>`).join("")}
-        </div>
-        <div class="kunci">Jawaban: ${(s.jawabanBenar||[]).join(", ")}</div>
-      `;
-    }
-
-    if(s.tipe === "kategori"){
-      isi = `
-        <div class="opsi">
-          ${(s.pernyataan||[]).map((p,i)=>`
-            <div>${i+1}. ${p.teks}
-            <b>(${p.jawabanBenar?"Benar":"Salah"})</b></div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    if(s.tipe === "esai"){
-      isi = `<div class="kunci">Jawaban: (Essay)</div>`;
-    }
-
     html += `
     <div class="soal-item ${s.tipe}">
-      <div class="label-jenis ${s.tipe}">${s.tipe.toUpperCase()}</div>
-      <div class="nomor">${no++}. ${s.pertanyaan}</div>
-      ${isi}
+
+      <div class="soal-content">
+        <div class="label-jenis ${s.tipe}">${s.tipe.toUpperCase()}</div>
+        <div class="nomor">${no++}. ${s.pertanyaan}</div>
+
+        ${s.tipe !== "esai" ? `
+          <div class="opsi">
+            ${
+              s.tipe === "kategori"
+              ? (s.pernyataan||[]).map((p,i)=>`
+                  <div>${i+1}. ${p.teks}
+                  <b>(${p.jawabanBenar?"Benar":"Salah"})</b></div>
+                `).join("")
+              : getOpsi(s.opsi).map(o=>`<div>${o.key}. ${o.val}</div>`).join("")
+            }
+          </div>
+        ` : ""}
+      </div>
+
+      <div class="soal-footer">
+        ${
+          s.tipe === "pg"
+            ? `<div class="kunci">Jawaban: ${s.jawabanBenar||"-"}</div>`
+          : s.tipe === "mcma"
+            ? `<div class="kunci">Jawaban: ${(s.jawabanBenar||[]).join(", ")}</div>`
+          : s.tipe === "esai"
+            ? `<div class="kunci">Jawaban: (Essay)</div>`
+          : ``
+        }
+      </div>
+
     </div>`;
   });
 
+  // 🔥 RENDER SEKALI SAJA
   listEl.innerHTML = html;
 
   document.getElementById("meta").innerHTML = `

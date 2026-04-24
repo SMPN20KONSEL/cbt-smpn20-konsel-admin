@@ -24,12 +24,14 @@
 
 
 /* =====================================================
-   2. GRID LIST SOAL (TAMPILAN USER)
+   2. GRID LIST SOAL (FIX SEJAJAR)
 ===================================================== */
 #soal-list{
   display:grid;
   grid-template-columns: repeat(3,1fr);
   gap:20px;
+
+  align-items:stretch; /* 🔥 bikin tinggi card sama */
 }
 
 @media(max-width:1200px){
@@ -54,15 +56,14 @@
   margin-bottom:8px;
 }
 
-/* TIPE */
-.label-jenis.pg{ background:#3b82f6; }       /* PG */
-.label-jenis.mcma{ background:#f59e0b; }     /* MCMA */
-.label-jenis.kategori{ background:#8b5cf6; } /* Kategori */
-.label-jenis.esai{ background:#16a34a; }     /* Essay */
+.label-jenis.pg{ background:#3b82f6; }
+.label-jenis.mcma{ background:#f59e0b; }
+.label-jenis.kategori{ background:#8b5cf6; }
+.label-jenis.esai{ background:#16a34a; }
 
 
 /* =====================================================
-   4. CARD SOAL (TAMPILAN)
+   4. CARD SOAL
 ===================================================== */
 .soal-item{
   background:#fff;
@@ -72,10 +73,11 @@
 
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
 
   position:relative;
   transition:.25s;
+
+  height:100%; /* 🔥 penting */
 }
 
 .soal-item:hover{
@@ -83,7 +85,7 @@
   box-shadow:0 20px 45px rgba(0,0,0,0.12);
 }
 
-/* GARIS WARNA KIRI */
+/* garis kiri */
 .soal-item::before{
   content:"";
   position:absolute;
@@ -101,7 +103,19 @@
 
 
 /* =====================================================
-   5. ISI SOAL (SEMUA TIPE)
+   5. STRUKTUR DALAM CARD
+===================================================== */
+.soal-content{
+  flex:1; /* 🔥 isi fleksibel */
+}
+
+.soal-footer{
+  margin-top:auto; /* 🔥 dorong ke bawah */
+}
+
+
+/* =====================================================
+   6. ISI SOAL
 ===================================================== */
 .nomor{
   font-weight:700;
@@ -126,7 +140,7 @@
 
 
 /* =====================================================
-   6. FORM EDIT (ADMIN)
+   7. FORM EDIT (ADMIN)
 ===================================================== */
 .soal-card{
   background:#fff;
@@ -145,7 +159,7 @@
 
 
 /* =====================================================
-   7. HEADER FORM
+   8. HEADER FORM
 ===================================================== */
 .soal-header{
   display:flex;
@@ -159,14 +173,16 @@
   padding:6px;
   border-radius:8px;
 }
+
 .soal-actions{
   display:flex;
-  justify-content:flex-end; /* 🔥 dorong ke kanan */
+  justify-content:flex-end;
   margin-top:12px;
 }
 
+
 /* =====================================================
-   8. INPUT PERTANYAAN (SEMUA TIPE)
+   9. INPUT PERTANYAAN
 ===================================================== */
 .pertanyaan{
   min-height:80px;
@@ -179,7 +195,7 @@
 
 
 /* =====================================================
-   9. OPSI (PG & MCMA)
+   10. OPSI (PG & MCMA)
 ===================================================== */
 .opsi-row{
   display:flex;
@@ -189,11 +205,14 @@
   padding:8px;
   border-radius:10px;
   transition:.2s;
-
   width:100%;
 }
 
-/* 🔥 PAKSA kiri & kanan */
+.opsi-row:hover{
+  background:#f3f4f6;
+}
+
+/* kiri */
 .opsi-kiri{
   flex:1;
   display:flex;
@@ -202,73 +221,45 @@
   min-width:0;
 }
 
-/* 🔥 INI KUNCI UTAMA */
-.opsi-kanan{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-left:auto;      /* dorong ke kanan */
-  flex-shrink:0;
-}
-
-/* 🔥 BACKUP kalau masih bandel */
-.opsi-row > .opsi-kanan{
-  margin-left:auto;
-}
-
-.opsi-row:hover{
-  background:#f3f4f6;
-}
-
-/* kiri (huruf + teks) */
-.opsi-kiri{
-  display:flex;
-  gap:10px;
-  flex:1;
-  align-items:center;
-  min-width:0; /* 🔥 penting */
-}
-
-/* teks opsi */
+/* teks */
 .opsi-text{
   flex:1;
-  min-width:0; /* 🔥 penting */
+  min-width:0;
   padding:10px;
   border:1px solid #e5e7eb;
   border-radius:10px;
   background:#fff;
 }
 
-/* kanan (checkbox/hapus) */
+/* kanan */
 .opsi-kanan{
   display:flex;
   align-items:center;
   gap:10px;
-  margin-left:auto;    /* 🔥 dorong ke kanan */
+  margin-left:auto;
   flex-shrink:0;
-  justify-content:flex-end;   /* 🔥 tambahan penting */
-  min-width:80px; 
+  justify-content:flex-end;
+  min-width:80px;
 }
+
 .opsi-kanan input{
   width:18px;
   height:18px;
+  transform:scale(1.2);
+  cursor:pointer;
 }
 
 .hapus-opsi{
   width:34px;
   height:34px;
   border-radius:8px;
-}
-
-/* checkbox MCMA */
-.opsi-kanan input{
-  transform:scale(1.2);
-  cursor:pointer;
+  background:#ef4444;
+  color:#fff;
 }
 
 
 /* =====================================================
-   10. KHUSUS KATEGORI
+   11. KATEGORI
 ===================================================== */
 .kategori-table{
   width:100%;
@@ -283,7 +274,6 @@
   text-align:center;
 }
 
-/* ukuran kolom */
 .kategori-table td:nth-child(1){ width:40px; }
 .kategori-table td:nth-child(2){ width:100%; text-align:left; }
 .kategori-table td:nth-child(3){ width:120px; }
@@ -291,7 +281,7 @@
 
 
 /* =====================================================
-   11. BUTTON
+   12. BUTTON
 ===================================================== */
 button{
   border:none;
@@ -302,30 +292,18 @@ button{
   transition:.2s;
 }
 
-.btn-tambah{
-  background:#4f46e5;
-  color:#fff;
-}
+.btn-tambah{ background:#4f46e5; color:#fff; }
+.btn-add{ background:#2563eb; color:#fff; }
+.btn-simpan{ background:#16a34a; color:#fff; }
 
-.btn-add{
-  background:#2563eb;
-  color:#fff;
-}
-
-.btn-simpan{
-  background:#16a34a;
-  color:#fff;
-}
-
-.hapus,
-.hapus-opsi{
+.hapus{
   background:#ef4444;
   color:#fff;
 }
 
 
 /* =====================================================
-   12. MODAL
+   13. MODAL
 ===================================================== */
 .modal{
   display:none;
@@ -351,16 +329,18 @@ button{
   padding:22px;
   box-shadow:0 20px 40px rgba(0,0,0,0.15);
 }
+
 .modal-footer{
   display:flex;
-  justify-content:space-between; /* atau flex-start */
+  justify-content:space-between;
   align-items:center;
   gap:12px;
   margin-top:20px;
 }
 
+
 /* =====================================================
-   13. PLACEHOLDER EDITABLE
+   14. PLACEHOLDER
 ===================================================== */
 [contenteditable]:empty:before{
   content: attr(data-placeholder);

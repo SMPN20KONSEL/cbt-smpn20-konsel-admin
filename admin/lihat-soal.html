@@ -6,249 +6,459 @@
 
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/admin.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<style>
-
-/* ================= HEADER SOAL ================= */
-.soal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:8px;
-}
-
-.btn-edit{
-  background:none;
-  border:none;
-  cursor:pointer;
-  font-size:18px;
-  color:#2563eb;
-}
-
-.soal-box{
-  background:#fff;
-  padding:18px;
-  border-radius:12px;
-  margin-bottom:16px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.05);
-}
-
-/* ================= LABEL JENIS ================= */
-.jenis{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  color:#fff;
-  font-weight:600;
-}
-
-.pg{background:#3b82f6;}
-.mcma{background:#f59e0b;}
-.kategori{background:#8b5cf6;}
-.esai{background:#16a34a;}
-
-/* ================= MODAL ================= */
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-
-/* SATU VERSION SAJA (hapus duplikat sebelumnya) */
-.modal-content{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  width:800px;
-  max-width:95%;
-  max-height:90vh;
-  overflow-y:auto;
-  box-shadow:0 10px 30px rgba(0,0,0,.2);
-}
-
-/* ================= BUTTON ================= */
-.save{
-  background:#2563eb;
-  color:#fff;
-  padding:10px 14px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.batal{
-  background:#dc2626;
-  color:#fff;
-  padding:10px 14px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-/* ================= CARD EDIT ================= */
-.soal-card{
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:16px;
-  margin-top:12px;
-  background:#f9fafb;
-}
-
-/* ================= LABEL TIPE EDIT ================= */
-.tipe-label{
-  display:inline-block;
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:12px;
-  color:#fff;
-  font-weight:600;
-  margin-bottom:10px;
-}
-
-/* ================= PERTANYAAN ================= */
-.pertanyaan{
-  min-height:80px;
-  border:1px solid #ddd;
-  padding:10px;
-  border-radius:8px;
-  margin:10px 0;
-  background:#fff;
-}
-
-/* ================= OPSI ================= */
-.opsi-row{
-  display:grid;
-  grid-template-columns: 30px 1fr 50px;
-  align-items:center;
-  gap:10px;
-  padding:6px 0;
-}
-.opsi-row b{
-  text-align:right;
-}
-
-.opsi-text{
-  border:1px solid #ddd;
-  padding:6px 10px;
-  border-radius:6px;
-  background:#fff;
-  min-height:36px;
-  display:flex;
-  align-items:center;
-}
-
-.opsi-kanan{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-.opsi-kiri{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex:1;
-}
-
-.opsi-text{
-  flex:1;
-  border:1px solid #ddd;
-  padding:6px;
-  border-radius:6px;
-  background:#fff;
-  min-height:36px;
-  display:flex;
-  align-items:center;
-  word-break: break-word;
-}
-
-/* checkbox / radio kanan */
-.opsi-kanan{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  min-width:60px;
-  justify-content:flex-end;
-}
-
-/* ================= KATEGORI ================= */
-.kategori-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-
-.kategori-table td,
-.kategori-table th{
-  border:1px solid #ddd;
-  padding:8px;
-  text-align:center;
-}
-
-/* ================= SELECT (kalau dipakai nanti) ================= */
-.tipe-soal{
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-
-</style>
+<link rel="stylesheet" href="../assets/css/lihat-soal.css">
 </head>
 
 <body>
 
 <header class="topbar">
-  <div class="brand">
-    <strong>SMPN 20 KONAWE SELATAN</strong>
-  </div>
+<div class="brand">
+<strong>SMPN 20 KONAWE SELATAN</strong>
+</div>
 </header>
 
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>Admin</h2>
-    <ul class="menu">
-      <li>
-        <a href="bank-soal.html">⬅ Kembali</a>
-      </li>
-    </ul>
-  </aside>
+<aside class="sidebar">
+<h2>Admin</h2>
 
-  <!-- CONTENT -->
-  <main class="content">
-    <h1 id="judul">Soal</h1>
-    <p id="info"></p>
+<ul class="menu">
+<li>
+<a href="bank-soal.html">
+⬅ Kembali
+</a>
+</li>
+</ul>
 
-    <div id="soal-list">
-      <!-- Soal dari Firestore -->
-    </div>
-  </main>
+</aside>
 
-<!-- MODAL -->
-<div id="modalSoal" class="modal">
-  <div class="modal-content">
-    <h3 id="judulModal">Edit Soal</h3>
+<main class="content">
 
-    <div id="editContainer"></div>
+<div class="page-header">
 
-    <br>
-    <button onclick="simpanSoal()" class="save">💾 Simpan</button>
-    <button onclick="tutupModalSoal()" class="batal">Batal</button>
+<div>
+<h1 id="judul">Bank Soal</h1>
+<p id="meta"></p>
+</div>
+
+<!-- SOAL TERSIMPAN -->
+<div id="soal-list"></div>
+
+
+<!-- SOAL BARU DITAMBAHKAN -->
+<div id="daftarSoal"></div>
+
+
+</main>
+
+</div>
+
+</div>
+<script type="module">
+import { db } from "../assets/js/firebase.js";
+import { doc, getDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get("id");
+
+const daftarSoal = document.getElementById("daftarSoal");
+const listEl = document.getElementById("soal-list");
+// ================= HELPER =================
+function huruf(i){
+  return String.fromCharCode(65 + i);
+}
+
+// ================= LOAD =================
+async function loadSoal(){
+  const snap = await getDoc(doc(db, "bank_soal", id));
+  if(!snap.exists()){
+    listEl.innerHTML = "❌ Data tidak ditemukan";
+    return;
+  }
+
+  const data = snap.data();
+  document.getElementById("judul").innerText = data.judul || "-";
+
+  let html = "";
+  let no = 1;
+
+  const getOpsi = (opsi)=>{
+    if(!opsi) return [];
+    return Object.entries(opsi)
+      .sort(([a],[b])=>a.localeCompare(b))
+      .map(([k,v])=>({key:k,val:v}));
+  };
+
+  let semuaSoal = [];
+
+  (data.soalPG || []).forEach(s=> semuaSoal.push({ ...s, tipe:"pg" }));
+  (data.soalMCMA || []).forEach(s=> semuaSoal.push({ ...s, tipe:"mcma" }));
+  (data.soalKategori || []).forEach(s=> semuaSoal.push({ ...s, tipe:"kategori" }));
+  (data.soalEssay || []).forEach(s=> semuaSoal.push({ ...s, tipe:"esai" }));
+
+  semuaSoal.forEach(s => {
+
+    html += `
+    <div class="soal-item ${s.tipe}">
+
+      <div class="soal-content">
+        <div class="label-jenis ${s.tipe}">${s.tipe.toUpperCase()}</div>
+        <div class="nomor">${no++}. ${s.pertanyaan}</div>
+
+        ${s.tipe !== "esai" ? `
+          <div class="opsi">
+            ${
+              s.tipe === "kategori"
+              ? (s.pernyataan||[]).map((p,i)=>`
+                  <div>${i+1}. ${p.teks}
+                  <b>(${p.jawabanBenar?"Benar":"Salah"})</b></div>
+                `).join("")
+              : getOpsi(s.opsi).map(o=>`<div>${o.key}. ${o.val}</div>`).join("")
+            }
+          </div>
+        ` : ""}
+      </div>
+
+      <div class="soal-footer">
+        ${
+          s.tipe === "pg"
+            ? `<div class="kunci">Jawaban: ${s.jawabanBenar||"-"}</div>`
+          : s.tipe === "mcma"
+            ? `<div class="kunci">Jawaban: ${(s.jawabanBenar||[]).join(", ")}</div>`
+          : s.tipe === "esai"
+            ? `<div class="kunci">Jawaban: (Essay)</div>`
+          : ``
+        }
+      </div>
+
+    </div>`;
+  });
+
+  // 🔥 RENDER SEKALI SAJA
+  listEl.innerHTML = html;
+
+  document.getElementById("meta").innerHTML = `
+    📚 ${data.mapel||"-"} |
+    🎓 Kelas ${data.kelas||"-"} |
+    📝 ${no-1} Soal
+  `;
+}
+
+loadSoal();
+
+
+// ================= TAMBAH SOAL =================
+window.tambahSoal = () => {
+
+  const id = Date.now();
+
+  const card = document.createElement("div");
+  card.className = "soal-card";
+
+  card.innerHTML = `
+<div class="soal-header">
+  <select class="tipe-soal">
+    <option value="pg">Pilihan Ganda</option>
+    <option value="mcma">PG Kompleks</option>
+    <option value="kategori">Kategori</option>
+    <option value="esai">Esai</option>
+  </select>
+
+  <span class="tipe-label tipe-pg">PG</span>
+</div>
+
+<div class="pertanyaan" contenteditable placeholder="Tulis soal..."></div>
+
+<!-- PG -->
+<div class="pg-options opsi-container"></div>
+<button class="btn-add btn-add-opsi">+ Opsi</button>
+<select class="jawaban"></select>
+
+<!-- MCMA -->
+<div class="mcma-options opsi-container" style="display:none"></div>
+<button class="btn-add btn-add-opsi-mcma" style="display:none">+ Opsi</button>
+
+<!-- KATEGORI -->
+<div class="kategori-options" style="display:none">
+  <table class="kategori-table"></table>
+</div>
+<button class="btn-add btn-add-kategori" style="display:none">+ Pernyataan</button>
+
+<div class="soal-actions">
+  <button class="hapus">Hapus</button>
+</div>
+`;
+
+  daftarSoal.appendChild(card);
+
+  const tipe = card.querySelector(".tipe-soal");
+  const label = card.querySelector(".tipe-label");
+
+  const pgBox = card.querySelector(".pg-options");
+  const mcmaBox = card.querySelector(".mcma-options");
+  const katBox = card.querySelector(".kategori-options");
+
+  const btnAddPG = card.querySelector(".btn-add-opsi");
+  const btnAddMCMA = card.querySelector(".btn-add-opsi-mcma");
+  const btnAddKat = card.querySelector(".btn-add-kategori");
+
+  const kunciSelect = card.querySelector(".jawaban");
+
+  function updateLabel(){
+    const t = tipe.value;
+
+    label.className = "tipe-label";
+
+    if(t==="pg"){
+      label.classList.add("tipe-pg");
+      label.innerText = "PG";
+    }
+    if(t==="mcma"){
+      label.classList.add("tipe-mcma");
+      label.innerText = "MCMA";
+    }
+    if(t==="kategori"){
+      label.classList.add("tipe-kategori");
+      label.innerText = "Kategori";
+    }
+    if(t==="esai"){
+      label.classList.add("tipe-esai");
+      label.innerText = "Esai";
+    }
+  }
+
+  function tambahOpsi(container, isMCMA=false){
+    const i = container.children.length;
+    const label = String.fromCharCode(65+i);
+
+    const row = document.createElement("div");
+    row.className = "opsi-row";
+
+row.innerHTML = `
+  <div class="opsi-kiri">
+    <b>${label}.</b>
+    <div class="opsi-text" contenteditable></div>
   </div>
-</div>
 
-</div>
+  <div class="opsi-kanan">
+    ${isMCMA ? `<input type="checkbox" value="${label}">` : ""}
+    <button class="hapus-opsi">✖</button>
+  </div>
+`;
 
-<script type="module" src="../assets/js/load-bank-soal.js"></script>
+    container.appendChild(row);
+
+    if(!isMCMA){
+      const opt = document.createElement("option");
+      opt.value = label;
+      opt.textContent = label;
+      kunciSelect.appendChild(opt);
+    }
+
+    row.querySelector(".hapus-opsi").onclick = ()=>row.remove();
+  }
+function tambahPernyataan(){
+  const table = card.querySelector(".kategori-table");
+  const i = table.rows.length + 1;
+
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+    <td>${i}.</td>
+    <td>
+      <div contenteditable class="opsi-text" placeholder="Tulis pernyataan..."></div>
+    </td>
+    <td>
+      <select>
+        <option value="true">Benar</option>
+        <option value="false">Salah</option>
+      </select>
+    </td>
+    <td>
+      <button class="hapus-opsi">✖</button>
+    </td>
+  `;
+
+  table.appendChild(row);
+
+  row.querySelector(".hapus-opsi").onclick = ()=>{
+    row.remove();
+    updateNomorKategori();
+  };
+}
+function updateNomorKategori(){
+  const rows = card.querySelectorAll(".kategori-table tr");
+  rows.forEach((r,i)=>{
+    r.children[0].innerText = (i+1)+".";
+  });
+}
+  // default opsi
+  for(let i=0;i<4;i++){
+    tambahOpsi(pgBox);
+    tambahOpsi(mcmaBox,true);
+  tambahPernyataan();
+  }
+
+  btnAddPG.onclick = ()=>tambahOpsi(pgBox);
+  btnAddMCMA.onclick = ()=>tambahOpsi(mcmaBox,true);
+  btnAddKat.onclick = tambahPernyataan;
+  card.querySelector(".hapus").onclick = ()=>card.remove();
+
+  tipe.onchange = ()=>{
+    updateLabel();
+
+    pgBox.style.display = tipe.value==="pg"?"block":"none";
+    mcmaBox.style.display = tipe.value==="mcma"?"block":"none";
+    katBox.style.display = tipe.value==="kategori"?"block":"none";
+
+    btnAddPG.style.display = tipe.value==="pg"?"inline":"none";
+    btnAddMCMA.style.display = tipe.value==="mcma"?"inline":"none";
+    btnAddKat.style.display = tipe.value==="kategori"?"inline":"none";
+
+    kunciSelect.style.display = tipe.value==="pg"?"block":"none";
+  };
+
+  updateLabel();
+};
+
+// ================= SIMPAN (FIX TOTAL) =================
+window.simpanSemua = async ()=>{
+
+  const ref = doc(db, "bank_soal", id);
+  const snap = await getDoc(ref);
+  const dataLama = snap.data() || {};
+
+  let soalPG = dataLama.soalPG || [];
+  let soalMCMA = dataLama.soalMCMA || [];
+  let soalKategori = dataLama.soalKategori || [];
+  let soalEssay = dataLama.soalEssay || [];
+
+  const cards = document.querySelectorAll(".soal-card");
+
+  // ❗ kalau tidak ada input baru → jangan simpan
+  if(cards.length === 0){
+    alert("⚠️ Tidak ada soal baru");
+    return;
+  }
+
+  cards.forEach(card => {
+
+    const tipe = card.querySelector(".tipe-soal").value;
+    const pertanyaan = card.querySelector(".pertanyaan").innerText.trim();
+
+    if(!pertanyaan) return; // skip kosong
+
+    // PG
+    if(tipe === "pg"){
+      let opsi = {};
+      const rows = card.querySelectorAll(".pg-options .opsi-row");
+
+      rows.forEach((r,i)=>{
+        const key = String.fromCharCode(65+i);
+        const val = r.querySelector(".opsi-text").innerText;
+        if(val) opsi[key] = val;
+      });
+
+      const jawaban = card.querySelector(".jawaban").value;
+
+      soalPG.push({ pertanyaan, opsi, jawabanBenar: jawaban });
+    }
+
+    // MCMA
+    if(tipe === "mcma"){
+      let opsi = {};
+      let jawaban = [];
+
+      const rows = card.querySelectorAll(".mcma-options .opsi-row");
+
+      rows.forEach((r,i)=>{
+        const key = String.fromCharCode(65+i);
+        const val = r.querySelector(".opsi-text").innerText;
+        const cek = r.querySelector("input");
+
+        if(val) opsi[key] = val;
+        if(cek.checked) jawaban.push(key);
+      });
+
+      soalMCMA.push({ pertanyaan, opsi, jawabanBenar: jawaban });
+    }
+
+    // Kategori
+    if(tipe === "kategori"){
+      let pernyataan = [];
+
+      const rows = card.querySelectorAll(".kategori-table tr");
+
+      rows.forEach(r=>{
+        const teks = r.querySelector(".opsi-text").innerText;
+        const val = r.querySelector("select").value === "true";
+
+        if(teks){
+          pernyataan.push({ teks, jawabanBenar: val });
+        }
+      });
+
+      soalKategori.push({ pertanyaan, pernyataan });
+    }
+
+    // Esai
+    if(tipe === "esai"){
+      soalEssay.push({ pertanyaan });
+    }
+
+  });
+
+  try{
+    await updateDoc(ref, {
+      soalPG,
+      soalMCMA,
+      soalKategori,
+      soalEssay
+    });
+
+    alert("✅ Soal berhasil ditambahkan (tanpa menghapus yang lama)");
+    location.reload();
+
+  }catch(err){
+    console.error(err);
+    alert("❌ Gagal simpan");
+  }
+};
+
+
+// ================= MODAL =================
+window.bukaModalTambah = () => {
+  const modal = document.getElementById("modalTambah");
+  modal.style.display = "flex";
+
+  setTimeout(() => {
+    modal.classList.add("show");
+  }, 10);
+};
+
+window.tutupModal = () => {
+  const modal = document.getElementById("modalTambah");
+  modal.classList.remove("show");
+
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 200);
+};
+
+window.onclick = (e)=>{
+  const modal = document.getElementById("modalTambah");
+
+  if(e.target === modal){
+    modal.classList.remove("show");
+
+    setTimeout(()=>{
+      modal.style.display = "none";
+    },200);
+  }
+};
+
+loadSoal();
+</script>
 </body>
 </html>
