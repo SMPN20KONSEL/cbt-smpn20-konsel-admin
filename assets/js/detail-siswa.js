@@ -25,7 +25,7 @@ function row(label, value) {
     <div class="info-row">
       <div class="info-label">${label}</div>
       <div class="info-separator">:</div>
-      <div class="info-value">${value || "-"}</div>
+      <div class="info-value">${value ?? "-"}</div>
     </div>
   `;
 }
@@ -34,16 +34,6 @@ function row(label, value) {
    LOAD
 ================================ */
 async function load() {
-
-  function row(label, value) {
-    return `
-      <div class="info-row">
-        <div class="info-label">${label}</div>
-        <div class="info-separator">:</div>
-        <div class="info-value">${value ?? "-"}</div>
-      </div>
-    `;
-  }
 
   if (!id) {
     info.innerHTML = "❌ ID tidak ditemukan";
@@ -92,9 +82,28 @@ async function load() {
     /* ===========================
        PELANGGARAN
     =========================== */
+    let terakhir = "-";
+
+    if (Array.isArray(d.catatanPelanggaran) && d.catatanPelanggaran.length > 0) {
+      const last = d.catatanPelanggaran[d.catatanPelanggaran.length - 1];
+
+      const waktu = last.waktu
+        ? new Date(last.waktu).toLocaleString("id-ID")
+        : "-";
+
+      terakhir = `
+        ${last.pesan || "-"} <br>
+        <small>${waktu}</small>
+      `;
+    }
+
+    const jumlah = d.jumlahPelanggaran || 0;
+    const warna = jumlah >= 3 ? "red" : "black";
+
     pelanggaran.innerHTML =
       `<h3>⚠ Pelanggaran</h3>` +
-      row("Catatan", d.pelanggaran || "Tidak ada pelanggaran");
+      row("Jumlah", `<span style="color:${warna}"><b>${jumlah}</b></span>`) +
+      row("Terakhir", terakhir);
 
   } catch (err) {
     console.error(err);
