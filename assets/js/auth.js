@@ -8,18 +8,22 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const error = document.getElementById("error");
 const loginBtn = document.getElementById("loginBtn");
+const roleSelect = document.getElementById("role");
 
 // ================= LOGIN =================
 loginBtn.onclick = async () => {
   error.innerText = "";
+
+  // 🔄 LOADING ON
+  loginBtn.classList.add("loading");
+  loginBtn.innerText = "Memproses...";
 
   try {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
 
     if (!email || !password) {
-      error.innerText = "Email dan password wajib diisi";
-      return;
+      throw new Error("Email dan password wajib diisi");
     }
 
     // 1️⃣ LOGIN AUTH
@@ -31,33 +35,39 @@ loginBtn.onclick = async () => {
     const snap = await getDoc(userRef);
 
     if (!snap.exists()) {
-      error.innerText = "User belum terdaftar, hubungi admin";
-      return;
+      throw new Error("User belum terdaftar, hubungi admin");
     }
 
     const roleDB = snap.data().role;
 
     if (!roleDB) {
-      error.innerText = "Role tidak ditemukan";
-      return;
+      throw new Error("Role tidak ditemukan");
     }
 
-    // ================= 3️⃣ SESSION =================
+    // 3️⃣ VALIDASI ROLE
+    const selectedRole = roleSelect?.value;
+
+    if (selectedRole && selectedRole !== roleDB) {
+      throw new Error("Role yang dipilih tidak sesuai dengan akun!");
+    }
+
+    // 4️⃣ SIMPAN SESSION
     localStorage.setItem("uid", uid);
     localStorage.setItem("role", roleDB);
 
-    // ================= 4️⃣ REDIRECT =================
+    // 5️⃣ REDIRECT
     if (roleDB === "admin") {
       window.location.href = "admin/dashboard.html";
     } else if (roleDB === "guru") {
       window.location.href = "guru/dashboard-guru.html";
     } else {
-      error.innerText = "Role tidak dikenali!";
+      throw new Error("Role tidak dikenali!");
     }
 
   } catch (e) {
     console.error("Login gagal:", e);
 
+    // 🔥 ERROR FRIENDLY
     if (e.code === "auth/user-not-found") {
       error.innerText = "Email belum terdaftar";
     } else if (e.code === "auth/wrong-password") {
@@ -67,6 +77,11 @@ loginBtn.onclick = async () => {
     } else {
       error.innerText = e.message;
     }
+
+  } finally {
+    // 🔄 LOADING OFF
+    loginBtn.classList.remove("loading");
+    loginBtn.innerText = "Login";
   }
 };
 
@@ -82,7 +97,6 @@ if (togglePassword) {
 
     passwordInput.setAttribute("type", type);
 
-    // Ganti icon
     togglePassword.classList.toggle("fa-eye");
     togglePassword.classList.toggle("fa-eye-slash");
   });

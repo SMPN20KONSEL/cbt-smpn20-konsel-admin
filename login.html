@@ -6,69 +6,57 @@
   <title>Login | Ujian Online</title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/login.css">
 
-  <!-- Font Awesome (jika icon dipakai) -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
-<body class="dark">
-  <div class="container">
-    <div class="card">
+<body>
 
-      <!-- Logo Sekolah -->
-      <img
-        src="assets/img/logo-sekolah.png"
-        class="logo"
-        alt="Logo SMPN 20 Konawe Selatan"
-      >
+<div class="container">
+  <div class="card">
 
-      <!-- Icon -->
-      <i class="fas fa-laptop-code icon"></i>
+    <!-- Logo -->
+    <img src="assets/img/logo-sekolah.png" class="logo" alt="Logo Sekolah">
 
-      <!-- Judul -->
-      <h1>UJIAN ONLINE SEKOLAH</h1>
-      <p class="subtitle">SMPN 20 KONAWE SELATAN</p>
+    <!-- Judul -->
+    <h1>UJIAN ONLINE</h1>
+    <p class="subtitle">SMPN 20 KONAWE SELATAN</p>
 
-      <!-- Form Login -->
-      <h2>Login</h2>
+    <h2>Login</h2>
 
-      <select id="role">
-        <option value="admin">Admin</option>
-        <option value="guru">Guru</option>
-      </select>
+    <!-- Email -->
+    <input type="email" id="email" placeholder="Email" required>
 
+    <!-- Password -->
+    <div class="password-wrapper">
       <input
-        type="email"
-        id="email"
-        placeholder="Email"
+        type="password"
+        id="password"
+        placeholder="Password"
         required
       >
+      <i class="fas fa-eye" id="togglePassword"></i>
+    </div>
 
-<div class="password-wrapper">
-  <input
-    type="password"
-    id="password"
-    placeholder="Password"
-    required
-  >
-  <i class="fas fa-eye" id="togglePassword"></i>
+    <!-- Tombol -->
+    <button id="loginBtn">
+      <span class="btn-text">Login</span>
+      <span class="btn-loader"></span>
+    </button>
+
+    <!-- Error -->
+    <p id="error"></p>
+
+  </div>
 </div>
 
-      <!-- Tombol Login -->
-      <button id="loginBtn">
-        <span class="btn-text">Login</span>
-        <span class="btn-loader"></span>
-      </button>
+<!-- Footer -->
+<div class="footer">© 2026 Sistem Ujian Sekolah</div>
 
-      <!-- Error -->
-      <p id="error"></p>
+<!-- Script -->
+<script type="module" src="assets/js/auth.js"></script>
 
-    </div>
-  </div>
-
-  <!-- Auth Firebase -->
-  <script type="module" src="assets/js/auth.js"></script>
 </body>
 </html>
