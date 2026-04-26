@@ -199,8 +199,20 @@ tr:hover{
 </div>
 <script type="module">
 import { auth, db } from "../assets/js/firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+import {
+  doc,
+  getDoc,
+  collection,
+  onSnapshot   // ✅ TAMBAH INI
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+// ================= ELEMENT =================
+const tableBody = document.getElementById("table-body"); // ✅ TAMBAH INI
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -212,28 +224,20 @@ onAuthStateChanged(auth, async (user) => {
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      const data = snap.data();
+    document.getElementById("nama-guru").textContent =
+      snap.exists() ? snap.data().nama || user.email : user.email;
 
-      document.getElementById("nama-guru").textContent =
-        data.nama || user.email;
-    } else {
-      document.getElementById("nama-guru").textContent = user.email;
-    }
+    // ✅ PANGGIL MONITOR DI SINI
+    loadMonitor();
 
   } catch (err) {
     console.error(err);
-    document.getElementById("nama-guru").textContent = user.email;
   }
 });
 
-// ======================= MONITOR SISWA =======================
 function loadMonitor() {
 
-  if (!tableBody) {
-    console.warn("table-body tidak ditemukan");
-    return;
-  }
+  if (!tableBody) return;
 
   onSnapshot(collection(db, "peserta"), (snapshot) => {
 
@@ -246,11 +250,9 @@ function loadMonitor() {
       docs.push({ id: d.id, ...d.data() });
     });
 
-    // SORT STATUS
     docs.sort((a, b) => {
       const order = {
         mengerjakan: 1,
-        mulai: 1,
         login: 2,
         selesai: 3
       };
@@ -273,10 +275,6 @@ function loadMonitor() {
       if (isOnline) {
         if (data.status === "login") {
           statusBadge = "🟡 Login";
-          statusClass = "online";
-        } 
-        else if (data.status === "belum_mulai") {
-          statusBadge = "🟣 Belum Mulai";
           statusClass = "online";
         } 
         else if (data.status === "mengerjakan") {
