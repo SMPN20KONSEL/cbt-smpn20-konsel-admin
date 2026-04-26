@@ -605,7 +605,6 @@ const mapel = mapelInput.value.trim();
 
 // ===== KELAS (AUTO HURUF BESAR) =====
 const kelas = kelasInput.value.trim().toUpperCase();
-
     if(!judul||!mapel||!kelas){
       throw new Error("Data wajib diisi");
     }
@@ -675,7 +674,7 @@ const kelas = kelasInput.value.trim().toUpperCase();
       }
     });
 
-    const docId = buatDocId(judul,mapel,kelas);
+    const docId = `${buatDocId(judul, mapel, kelas)}_${Date.now()}`;
 
 await setDoc(doc(db,"bank_soal",docId),{
   judul,

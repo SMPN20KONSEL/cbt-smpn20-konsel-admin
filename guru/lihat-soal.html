@@ -109,7 +109,6 @@ async function loadSoal(){
   document.getElementById("judul").innerText = data.judul || "-";
 
   let html = "";
-  let no = 1;
 
   const getOpsi = (opsi)=>{
     if(!opsi) return [];
@@ -120,18 +119,41 @@ async function loadSoal(){
 
   let semuaSoal = [];
 
-  (data.soalPG || []).forEach(s=> semuaSoal.push({ ...s, tipe:"pg" }));
-  (data.soalMCMA || []).forEach(s=> semuaSoal.push({ ...s, tipe:"mcma" }));
-  (data.soalKategori || []).forEach(s=> semuaSoal.push({ ...s, tipe:"kategori" }));
-  (data.soalEssay || []).forEach(s=> semuaSoal.push({ ...s, tipe:"esai" }));
+  (data.soalPG || []).forEach((s,i)=>
+    semuaSoal.push({ ...s, tipe:"pg", index:i })
+  );
+
+  (data.soalMCMA || []).forEach((s,i)=>
+    semuaSoal.push({ ...s, tipe:"mcma", index:i })
+  );
+
+  (data.soalKategori || []).forEach((s,i)=>
+    semuaSoal.push({ ...s, tipe:"kategori", index:i })
+  );
+
+  (data.soalEssay || []).forEach((s,i)=>
+    semuaSoal.push({ ...s, tipe:"esai", index:i })
+  );
+
+  let no = 1;
 
   semuaSoal.forEach(s => {
 
     html += `
     <div class="soal-item ${s.tipe}">
 
+      <div class="soal-header">
+        <div class="label-jenis ${s.tipe}">
+          ${s.tipe.toUpperCase()}
+        </div>
+
+        <button class="btn-hapus" data-index="${s.index}" data-tipe="${s.tipe}">
+          🗑
+        </button>
+      </div>
+
       <div class="soal-content">
-        <div class="label-jenis ${s.tipe}">${s.tipe.toUpperCase()}</div>
+
         <div class="nomor">${no++}. ${s.pertanyaan}</div>
 
         ${s.tipe !== "esai" ? `
@@ -142,10 +164,13 @@ async function loadSoal(){
                   <div>${i+1}. ${p.teks}
                   <b>(${p.jawabanBenar?"Benar":"Salah"})</b></div>
                 `).join("")
-              : getOpsi(s.opsi).map(o=>`<div>${o.key}. ${o.val}</div>`).join("")
+              : getOpsi(s.opsi).map(o=>`
+                  <div>${o.key}. ${o.val}</div>
+                `).join("")
             }
           </div>
         ` : ""}
+
       </div>
 
       <div class="soal-footer">
@@ -156,14 +181,13 @@ async function loadSoal(){
             ? `<div class="kunci">Jawaban: ${(s.jawabanBenar||[]).join(", ")}</div>`
           : s.tipe === "esai"
             ? `<div class="kunci">Jawaban: (Essay)</div>`
-          : ``
+          : ""
         }
       </div>
 
     </div>`;
   });
 
-  // 🔥 RENDER SEKALI SAJA
   listEl.innerHTML = html;
 
   document.getElementById("meta").innerHTML = `
@@ -171,6 +195,38 @@ async function loadSoal(){
     🎓 Kelas ${data.kelas||"-"} |
     📝 ${no-1} Soal
   `;
+
+  // ================= HAPUS EVENT + KONFIRMASI =================
+  document.querySelectorAll(".btn-hapus").forEach(btn=>{
+    btn.onclick = async ()=>{
+
+      const index = parseInt(btn.dataset.index);
+      const tipe = btn.dataset.tipe;
+
+      // 🔥 KONFIRMASI HAPUS
+      const yakin = confirm("Yakin ingin menghapus soal ini?");
+      if(!yakin) return;
+
+      const ref = doc(db, "bank_soal", id);
+      const snap = await getDoc(ref);
+      const data = snap.data();
+
+      if(tipe === "pg") data.soalPG.splice(index,1);
+      if(tipe === "mcma") data.soalMCMA.splice(index,1);
+      if(tipe === "kategori") data.soalKategori.splice(index,1);
+      if(tipe === "esai") data.soalEssay.splice(index,1);
+
+      await updateDoc(ref, {
+        soalPG: data.soalPG || [],
+        soalMCMA: data.soalMCMA || [],
+        soalKategori: data.soalKategori || [],
+        soalEssay: data.soalEssay || []
+      });
+
+      loadSoal();
+    };
+  });
+
 }
 
 loadSoal();

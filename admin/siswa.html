@@ -30,31 +30,33 @@
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-<aside class="sidebar">
-  <h2><i class="fas fa-user-shield"></i> Admin</h2>
-  <ul class="menu">
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+    <ul class="menu">
       <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
       <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
       <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
       <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
       <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
       <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian  </a></li>
-      <li><a href="nilai.html"> <i class="fa fa-graduation-cap"></i> Nilai</a></li>
-  </ul>
-  <button class="logout" id="logout">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
-</aside>
+      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
 
   <!-- CONTENT -->
   <main class="content">
+
     <h1><i class="fa fa-users"></i> Data Siswa</h1>
 
-    <!-- FORM (SPLIT CARD) -->
+    <!-- FORM -->
     <div class="card split-card">
 
-      <!-- KIRI: TAMBAH SISWA -->
+      <!-- TAMBAH SISWA -->
       <div class="left">
         <h3>Tambah Siswa</h3>
         <input id="nis" placeholder="NIS">
@@ -67,13 +69,13 @@
         </button>
 
         <small>
-          Akun & password akan dibuat otomatis <br>
+          Akun & password otomatis <br>
           Email: namadepanNIS@smp.belajar.id <br>
           Password: 2 huruf nama + NIS
         </small>
       </div>
 
-      <!-- KANAN: IMPORT CSV -->
+      <!-- IMPORT CSV -->
       <div class="right">
         <h3>Import CSV</h3>
         <small>Format: nis,nama,kelas</small><br><br>
@@ -88,25 +90,20 @@
 
     </div>
 
-    <!-- DAFTAR SISWA -->
-    <div class="card">
-          <span id="totalSiswa" class="total-siswa">Total: 0 siswa</span>
-      <h3>Daftar Siswa</h3>
-      <table class="tabel-siswa">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>NIS</th>
-            <th>Kelas</th>
-            <th>Email</th>
-            <th>PW</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="list"></tbody>
-      </table>
+    <!-- DAFTAR SISWA (CARD PER KELAS) -->
+<div class="siswa-header">
+  
+  <h3 class="judul-siswa">Daftar Siswa</h3>
+
+  <div class="total-card">
+    <span id="totalSiswa">Total: 0 siswa</span>
+  </div>
+
+</div>
+
+      <!-- INI WAJIB (JS inject card per kelas ke sini) -->
+      <div id="list"></div>
+
     </div>
 
   </main>

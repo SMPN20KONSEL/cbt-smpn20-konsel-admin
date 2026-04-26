@@ -111,6 +111,26 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   font-weight: bold;
 }
 
+.bottom-row {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* total di kiri */
+.bottom-row .total {
+  font-weight: bold;
+}
+
+/* tanggal dorong ke kanan */
+.bottom-row .tanggal {
+  margin-left: auto;
+  color: #555;
+}
+.bottom-row i {
+  color: #b217fa;
+}
 /* =============================== FOLDER =============================== */
 .folder {
   margin-bottom: 20px;
@@ -132,6 +152,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 .folder.sas .folder-header { background: #2563eb; }
 .folder.sts .folder-header { background: #16a34a; }
 .folder.sh  .folder-header { background: #f59e0b; }
+.folder.usbn .folder-header { background: #dc2626; }
 .folder.lain .folder-header { background: #6b7280; }
 
 /* folder collapse system */
@@ -163,6 +184,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <header class="topbar">
 <div class="brand">
 <img src="../assets/img/logo-sekolah.png" class="brand-logo">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <div class="brand-text">
 <strong>SMPN 20 KONAWE SELATAN</strong>
@@ -228,6 +251,17 @@ return;
 }
 loadBankSoal();
 });
+function formatTanggal(ts){
+  if (!ts) return "-";
+
+  const date = ts.toDate(); // 🔥 convert Firestore timestamp
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
+
 
 async function loadBankSoal() {
 
@@ -246,6 +280,7 @@ const kelompok = {
 "Sumatif Akhir Semester": [],
 "Sumatif Tengah Semester": [],
 "Sumatif Harian": [],
+"USBN": [],
 "Lainnya": []
 };
 
@@ -263,6 +298,9 @@ kelompok["Sumatif Tengah Semester"].push(data);
 }
 else if (judul.includes("sumatif harian")) {
 kelompok["Sumatif Harian"].push(data);
+}
+else if (judul.includes("usbn")) {
+kelompok["USBN"].push(data);
 }
 else {
 kelompok["Lainnya"].push(data);
@@ -285,7 +323,7 @@ let warna = "lain";
 if (nama === "Sumatif Akhir Semester") warna = "sas";
 else if (nama === "Sumatif Tengah Semester") warna = "sts";
 else if (nama === "Sumatif Harian") warna = "sh";
-
+else if (nama === "USBN") warna = "usbn";
 const id = nama.replace(/\s+/g, "_");
 
 list.innerHTML += `
@@ -333,7 +371,15 @@ card.innerHTML = `
 
 <div class="soal-info">${infoHTML}</div>
 
-<div class="total">Total Soal : ${total}</div>
+<div class="bottom-row">
+  <span class="total">
+    Total Soal : ${total}
+  </span>
+
+  <span class="tanggal">
+    <i class="fa-solid fa-calendar"></i> ${formatTanggal(s.dibuat)}
+  </span>
+</div>
 `;
 
 container.appendChild(card);

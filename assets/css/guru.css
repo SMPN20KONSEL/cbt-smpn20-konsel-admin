@@ -3,9 +3,9 @@
 ===================================================== */
 /* HEADER DALAM CONTENT (CENTER) */
 .content h1 {
-  font-size: 24px;
+  font-size: 34px;
   font-weight: 700;
-  color: #1f3c88;
+  color: #000000;
 
   display: flex;
   align-items: center;
@@ -14,7 +14,39 @@
   gap: 10px;
   text-align: center;
 }
+/* ===============================
+   HEADER GURU (CENTER + RIGHT BADGE)
+================================ */
+.guru-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 12px;
+}
 
+/* JUDUL (TENGAH) */
+.judul-guru {
+  grid-column: 2;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: #1f3c88;
+  margin: 0;
+}
+
+/* ===============================
+   TOTAL CARD (KANAN)
+================================ */
+.total-card-guru {
+  grid-column: 3;
+  justify-self: end;
+  background: #2563eb;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
 /* =====================================================
    CARD
 ===================================================== */

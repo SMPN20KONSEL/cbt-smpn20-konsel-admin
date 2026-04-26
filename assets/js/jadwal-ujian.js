@@ -9,9 +9,9 @@ import {
   serverTimestamp,
   query,
   where,
-  updateDoc
+  updateDoc,
+  deleteDoc   // ⬅️ TAMBAH INI
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
 const soalSelect = document.getElementById("soalSelect");
 const list = document.getElementById("list");
 const btnBuat = document.getElementById("btnBuat");
@@ -30,11 +30,16 @@ async function loadBankSoal() {
 
   snap.forEach(d => {
     const s = d.data();
-    soalSelect.innerHTML += `
-      <option value="${d.id}">
-        ${s.judul} • ${s.mapel} • Kelas ${s.kelas}
-      </option>
-    `;
+    const waktu = s.dibuat?.toDate?.() 
+  ? s.dibuat.toDate().toLocaleString("id-ID")
+  : "";
+
+soalSelect.innerHTML += `
+  <option value="${d.id}">
+    ${s.judul} • ${s.mapel} • Kelas ${s.kelas}
+    ${waktu ? `(${waktu})` : ""}
+  </option>
+`;
   });
 }
 
@@ -84,7 +89,6 @@ await setDoc(doc(db, "jadwal_ujian", kode), {
 
   // ✅ AMBIL DARI BANK SOAL
   guruId: s.guruId || "",
-
   createdAt: serverTimestamp()
 });
 
@@ -129,7 +133,23 @@ async function toggleStatus(kode, statusSekarang) {
 
 // 👉 WAJIB untuk onclick HTML
 window.toggleStatus = toggleStatus;
+async function hapusUjian(kode) {
+  const konfirmasi = confirm("Yakin mau hapus jadwal ujian ini?");
 
+  if (!konfirmasi) return;
+
+  try {
+    await deleteDoc(doc(db, "jadwal_ujian", kode));
+    tampilkanToast("🗑️ Jadwal berhasil dihapus", "red");
+    loadJadwal();
+  } catch (err) {
+    console.error(err);
+    tampilkanToast("❌ Gagal menghapus data", "red");
+  }
+}
+
+// wajib agar bisa dipanggil dari HTML
+window.hapusUjian = hapusUjian;
 /* ================= LOAD JADWAL ================= */
 async function loadJadwal() {
   list.innerHTML = "";
@@ -185,19 +205,43 @@ async function loadJadwal() {
         <td>${u.kelas}</td>
         <td><b>${u.kode}</b></td>
         <td>${u.durasi} menit</td>
-        <td 
-          style="
-            cursor:pointer;
-            color:white;
-            background:${u.aktif ? 'green' : 'red'};
-            text-align:center;
-            border-radius:6px;
-            padding:4px;
-          "
-          onclick="toggleStatus('${u.kode}', ${u.aktif})"
-        >
-          ${u.aktif ? "Aktif" : "Nonaktif"}
-        </td>
+       <td style="display:flex; gap:6px; justify-content:center;">
+
+  <!-- TOGGLE -->
+  <button
+    onclick="toggleStatus('${u.kode}', ${u.aktif})"
+    style="
+      background:${u.aktif ? 'green' : 'red'};
+      color:white;
+      border:none;
+      padding:4px 8px;
+      border-radius:6px;
+      cursor:pointer;
+    "
+  >
+    ${u.aktif ? "Aktif" : "Nonaktif"}
+  </button>
+
+  <!-- HAPUS -->
+  <button
+    onclick="hapusUjian('${u.kode}')"
+    style="
+      background:#dc2626;
+      color:white;
+      border:none;
+      padding:4px 8px;
+      border-radius:6px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    "
+    title="Hapus"
+  >
+    🗑️
+  </button>
+
+</td>
       </tr>
     `;
   });

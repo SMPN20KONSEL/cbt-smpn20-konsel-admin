@@ -329,15 +329,59 @@ button{
   padding:22px;
   box-shadow:0 20px 40px rgba(0,0,0,0.15);
 }
-
-.modal-footer{
+.btn-hapus{
+  background: #ffe5e5;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #e74c3c;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:12px;
-  margin-top:20px;
+  justify-content:center;
+  transition: 0.2s;
 }
 
+.btn-hapus:hover{
+  background: #e74c3c;
+  color: white;
+  transform: scale(1.1);
+}
+/* =====================================================
+   8. MODAL HEADER + CLOSE BUTTON
+===================================================== */
+
+.modal-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* tombol X */
+.modal-close{
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: .2s;
+}
+
+.modal-close:hover{
+  background: #dc2626;
+  transform: scale(1.05);
+}
 
 /* =====================================================
    14. PLACEHOLDER

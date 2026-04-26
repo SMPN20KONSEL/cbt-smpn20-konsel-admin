@@ -144,7 +144,26 @@
   margin-top: 8px;
   font-weight: bold;
 }
+.bottom-row {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
 
+/* total di kiri */
+.bottom-row .total {
+  font-weight: bold;
+}
+
+/* tanggal dorong ke kanan */
+.bottom-row .tanggal {
+  margin-left: auto;
+  color: #555;
+}
+.bottom-row i {
+  color: #b217fa;
+}
 /* ===============================
    FOLDER
 ================================ */
@@ -383,7 +402,16 @@ onAuthStateChanged(auth, async user => {
     location.href = "../login.html";
   }
 });
+function formatTanggal(ts){
+  if (!ts) return "-";
 
+  const date = ts.toDate(); // 🔥 convert Firestore timestamp
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
 // ================= LOAD BANK SOAL =================
 async function loadBankSoal(user) {
   try {
@@ -463,9 +491,12 @@ async function loadBankSoal(user) {
           <div class="soal-info">
             ${infoHTML || "<i>Tidak ada soal</i>"}
           </div>
-
-          <div class="total">
-            Total Soal: ${total}
+          
+          <div class="bottom-row">
+            <span class="total">Total Soal : ${total}</span>
+            <span class="tanggal">
+            <i class="fa-solid fa-calendar"></i> ${formatTanggal(s.dibuat)}
+            </span>
           </div>
         </div>
       `;

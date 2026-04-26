@@ -196,25 +196,67 @@ btnReset.onclick = () => {
 // ================= EXPORT =================
 btnExport.onclick = () => {
 
-  if (!filterMapel.value)
-    return alert("Pilih mapel terlebih dahulu");
+  const data = semuaNilai.filter(n =>
+    (!filterMapel.value || n.mapel === filterMapel.value) &&
+    (!filterKelas.value || n.kelas === filterKelas.value) &&
+    (!filterJudul.value || n.judulUjian === filterJudul.value)
+  );
 
-  const data = semuaNilai
-    .filter(n => n.mapel === filterMapel.value)
-    .map((n, i) => ({
-      No: i + 1,
-      Nama: n.namaSiswa,
-      Kelas: n.kelas,
-      Mapel: n.mapel,
-      Ujian: n.judulUjian,
-      PG: Math.round(Number(n.nilaiPG || 0)),
-      Essay: formatNilai(Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0)),
-      Total: formatNilai(Number(n.nilaiTotal ?? n.totalNilai ?? 0))
-    }));
+  if (!data.length) {
+    alert("Tidak ada data untuk diexport");
+    return;
+  }
 
-  const ws = XLSX.utils.json_to_sheet(data);
+  // ================= DATA =================
+  const rows = data.map((n, i) => ([
+    i + 1,
+    n.namaSiswa || "-",
+    n.kelas || "-",
+    n.mapel || "-",
+    n.judulUjian || "-",
+    Math.round(Number(n.nilaiPG || 0)),
+    formatNilai(Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0)),
+    formatNilai(Number(n.nilaiTotal ?? n.totalNilai ?? 0))
+  ]));
+
+  // ================= HEADER RAPORT =================
+  const header = [
+    ["DAFTAR NILAI SISWA"],
+    [],
+    ["No", "Nama", "Kelas", "Mapel", "Judul Ujian", "Nilai PG", "Nilai Essay", "Nilai Total"]
+  ];
+
+  const finalData = [...header, ...rows];
+
+  const ws = XLSX.utils.aoa_to_sheet(finalData);
+
+  // ================= MERGE JUDUL =================
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }
+  ];
+
+  // ================= WIDTH KOLOM =================
+  ws["!cols"] = [
+    { wch: 5 },   // No
+    { wch: 22 },  // Nama
+    { wch: 10 },  // Kelas
+    { wch: 15 },  // Mapel
+    { wch: 25 },  // Judul
+    { wch: 10 },  // PG
+    { wch: 12 },  // Essay
+    { wch: 12 }   // Total
+  ];
+
+  // ================= SHEET =================
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
+  XLSX.utils.book_append_sheet(wb, ws, "Daftar Nilai");
 
-  XLSX.writeFile(wb, `Rekap_Nilai_${filterMapel.value}.xlsx`);
+  // ================= NAMA FILE DINAMIS =================
+  let namaFile = "DAFTAR_NILAI_SISWA";
+
+  if (filterMapel.value) namaFile += "_" + filterMapel.value;
+  if (filterKelas.value) namaFile += "_" + filterKelas.value;
+  if (filterJudul.value) namaFile += "_" + filterJudul.value;
+
+  XLSX.writeFile(wb, namaFile + ".xlsx");
 };

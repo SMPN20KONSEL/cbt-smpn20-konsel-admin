@@ -5,153 +5,211 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 // ================= ELEMENT =================
-const list = document.getElementById("list");
-const filterMapel = document.getElementById("filterMapel");
-const filterJudul = document.getElementById("filterJudul");
-const filterKelas = document.getElementById("filterKelas");
-const btnFilter = document.getElementById("btnFilter");
-const btnReset = document.getElementById("btnReset");
-const btnExport = document.getElementById("btnExport");
-const infoRekap = document.getElementById("infoRekap");
+document.addEventListener("DOMContentLoaded", () => {
 
-let semuaNilai = [];
+  const list = document.getElementById("list");
+  const filterMapel = document.getElementById("filterMapel");
+  const filterJudul = document.getElementById("filterJudul");
+  const filterKelas = document.getElementById("filterKelas");
 
-// ================= FORMAT NILAI =================
-const formatNilai = (n) => {
-  if (isNaN(n)) return 0;
-  return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
-};
+  const btnFilter = document.getElementById("btnFilter");
+  const btnReset = document.getElementById("btnReset");
+  const btnExport = document.getElementById("btnExport");
+  const infoRekap = document.getElementById("infoRekap");
 
-// ================= LOAD DATA =================
-async function loadNilai() {
+  let semuaNilai = [];
 
-  semuaNilai = [];
-  list.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
+  // ================= FORMAT =================
+  const formatNilai = (n) => {
+    if (isNaN(n)) return 0;
+    return Number.isInteger(n) ? n : parseFloat(n.toFixed(2));
+  };
 
-  filterMapel.innerHTML = `<option value="">Semua Mapel</option>`;
-  filterKelas.innerHTML = `<option value="">Semua Kelas</option>`;
-  filterJudul.innerHTML = `<option value="">Semua Judul</option>`;
+  // ================= LOAD DATA =================
+  async function loadNilai() {
 
-  try {
+    semuaNilai = [];
+    list.innerHTML = `<tr><td colspan="8">Loading...</td></tr>`;
 
-    const snap = await getDocs(collection(db, "jawaban_siswa"));
+    filterMapel.innerHTML = `<option value="">Semua Mapel</option>`;
+    filterKelas.innerHTML = `<option value="">Semua Kelas</option>`;
+    filterJudul.innerHTML = `<option value="">Semua Judul</option>`;
 
-    console.log("TOTAL DATA:", snap.size);
+    try {
 
-    if (snap.empty) {
-      list.innerHTML = `
-        <tr><td colspan="8" style="text-align:center">
-          ❌ Tidak ada data di Firestore
-        </td></tr>`;
+      const snap = await getDocs(collection(db, "jawaban_siswa"));
+
+      if (snap.empty) {
+        list.innerHTML = `<tr><td colspan="8">❌ Tidak ada data</td></tr>`;
+        return;
+      }
+
+      const mapelSet = new Set();
+      const kelasSet = new Set();
+      const judulSet = new Set();
+
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        semuaNilai.push(d);
+
+        if (d.mapel) mapelSet.add(d.mapel);
+        if (d.kelas) kelasSet.add(d.kelas);
+        if (d.judulUjian) judulSet.add(d.judulUjian);
+      });
+
+      mapelSet.forEach(m => {
+        filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
+      });
+
+      kelasSet.forEach(k => {
+        filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
+      });
+
+      judulSet.forEach(j => {
+        filterJudul.innerHTML += `<option value="${j}">${j}</option>`;
+      });
+
+      tampilkan(semuaNilai);
+
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = `<tr><td colspan="8">❌ Error load data</td></tr>`;
+    }
+  }
+
+  // ================= FILTER FUNCTION =================
+  function getFilteredData() {
+    return semuaNilai.filter(n =>
+      (!filterMapel.value || n.mapel === filterMapel.value) &&
+      (!filterKelas.value || n.kelas === filterKelas.value) &&
+      (!filterJudul.value || n.judulUjian === filterJudul.value)
+    );
+  }
+
+  // ================= TAMPILKAN =================
+  function tampilkan(data) {
+
+    list.innerHTML = "";
+    infoRekap.textContent = "";
+
+    if (!data.length) {
+      list.innerHTML = `<tr><td colspan="8">Data tidak ditemukan</td></tr>`;
       return;
     }
 
-    const mapelSet = new Set();
-    const kelasSet = new Set();
-    const judulSet = new Set();
-
-    snap.forEach(docSnap => {
-      const d = docSnap.data();
-
-      console.log("DATA:", d); // DEBUG
-
-      semuaNilai.push(d);
-
-      if (d.mapel) mapelSet.add(d.mapel);
-      if (d.kelas) kelasSet.add(d.kelas);
-      if (d.judulUjian) judulSet.add(d.judulUjian);
+    data.sort((a, b) => {
+      const aTime = a.waktu_mulai?.seconds || 0;
+      const bTime = b.waktu_mulai?.seconds || 0;
+      return bTime - aTime;
     });
 
-    // isi filter
-    mapelSet.forEach(m => {
-      filterMapel.innerHTML += `<option value="${m}">${m}</option>`;
+    let totalSemua = 0;
+
+    data.forEach((n, i) => {
+
+      const pg = Math.round(Number(n.nilaiPG || 0));
+      const essay = Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0);
+      const total = Number(n.nilaiTotal ?? n.totalNilai ?? 0);
+
+      totalSemua += total;
+
+      list.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${n.namaSiswa || "-"}</td>
+          <td>${n.kelas || "-"}</td>
+          <td>${n.mapel || "-"}</td>
+          <td>${n.judulUjian || "-"}</td>
+          <td>${pg}</td>
+          <td>${formatNilai(essay)}</td>
+          <td><b>${formatNilai(total)}</b></td>
+        </tr>
+      `;
     });
 
-    kelasSet.forEach(k => {
-      filterKelas.innerHTML += `<option value="${k}">${k}</option>`;
-    });
+    const rata = formatNilai(totalSemua / data.length);
 
-    judulSet.forEach(j => {
-      filterJudul.innerHTML += `<option value="${j}">${j}</option>`;
-    });
-
-    tampilkan(semuaNilai);
-
-  } catch (err) {
-    console.error(err);
-    list.innerHTML = `<tr><td colspan="8">❌ Error load data</td></tr>`;
+    infoRekap.textContent =
+      `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
   }
-}
 
-// ================= TAMPILKAN =================
-function tampilkan(data) {
+  // ================= FILTER BUTTON =================
+  btnFilter.addEventListener("click", () => {
+    tampilkan(getFilteredData());
+  });
 
-  list.innerHTML = "";
-  infoRekap.textContent = "";
+  // ================= RESET =================
+  btnReset.addEventListener("click", () => {
+    filterMapel.value = "";
+    filterKelas.value = "";
+    filterJudul.value = "";
+    tampilkan(semuaNilai);
+  });
+
+  // ================= EXPORT CSV =================
+btnExport.addEventListener("click", () => {
+
+  const data = getFilteredData();
 
   if (!data.length) {
-    list.innerHTML = `
-      <tr><td colspan="8" style="text-align:center">
-        Data tidak ditemukan
-      </td></tr>`;
+    alert("Tidak ada data untuk diexport");
     return;
   }
 
-  // SORT AMAN
-  data.sort((a, b) => {
-    const aTime = a.waktu_mulai?.seconds || 0;
-    const bTime = b.waktu_mulai?.seconds || 0;
-    return bTime - aTime;
-  });
+  // ================= DATA =================
+  const rows = data.map((n, i) => ([
+    i + 1,
+    n.namaSiswa || "-",
+    n.kelas || "-",
+    n.mapel || "-",
+    n.judulUjian || "-",
+    Math.round(Number(n.nilaiPG || 0)),
+    Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0),
+    Number(n.nilaiTotal ?? n.totalNilai ?? 0)
+  ]));
 
-  let totalSemua = 0;
+  // ================= HEADER KOLOM =================
+  const header = [
+    ["DAFTAR NILAI SISWA"], // JUDUL BESAR
+    [], // kosong 1 baris
+    ["No", "Nama", "Kelas", "Mapel", "Judul Ujian", "Nilai PG", "Nilai Essay", "Nilai Total"]
+  ];
 
-  data.forEach((n, i) => {
+  // gabungkan header + data
+  const finalData = [...header, ...rows];
 
-    const pg = Math.round(Number(n.nilaiPG || 0));
-    const essay = Number(n.nilaiEssayNormal ?? n.nilaiEssay ?? 0);
-    const total = Number(n.nilaiTotal ?? n.totalNilai ?? 0);
+  // ================= SHEET =================
+  const ws = XLSX.utils.aoa_to_sheet(finalData);
 
-    totalSemua += total;
+  // ================= LEBAR KOLOM =================
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 20 },
+    { wch: 10 },
+    { wch: 15 },
+    { wch: 25 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 12 }
+  ];
 
-    list.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${n.namaSiswa || "-"}</td>
-        <td>${n.kelas || "-"}</td>
-        <td>${n.mapel || "-"}</td>
-        <td>${n.judulUjian || "-"}</td>
-        <td>${pg}</td>
-        <td>${formatNilai(essay)}</td>
-        <td><b>${formatNilai(total)}</b></td>
-      </tr>
-    `;
-  });
+  // ================= MERGE JUDUL =================
+  ws["!merges"] = [
+    {
+      s: { r: 0, c: 0 },
+      e: { r: 0, c: 7 }
+    }
+  ];
 
-  const rata = formatNilai(totalSemua / data.length);
+  // ================= WORKBOOK =================
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Daftar Nilai");
 
-  infoRekap.textContent =
-    `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
-}
+  // ================= DOWNLOAD =================
+  XLSX.writeFile(wb, "DAFTAR_NILAI_SISWA.xlsx");
+});
 
-// ================= FILTER =================
-btnFilter.onclick = () => {
-  const hasil = semuaNilai.filter(n =>
-    (!filterMapel.value || n.mapel === filterMapel.value) &&
-    (!filterKelas.value || n.kelas === filterKelas.value) &&
-    (!filterJudul.value || n.judulUjian === filterJudul.value)
-  );
+  // ================= INIT =================
+  loadNilai();
 
-  tampilkan(hasil);
-};
-
-// ================= RESET =================
-btnReset.onclick = () => {
-  filterMapel.value = "";
-  filterKelas.value = "";
-  filterJudul.value = "";
-  tampilkan(semuaNilai);
-};
-
-// ================= INIT =================
-loadNilai();
+});
