@@ -290,16 +290,20 @@ const data = { id: d.id, ...s };
 
 const judul = (s.judul || "").toLowerCase();
 
-if (judul.includes("sumatif akhir semester")) {
-kelompok["Sumatif Akhir Semester"].push(data);
+if (
+  judul.includes("sumatif akhir semester") || 
+  judul.startsWith("sas") ||
+  judul.includes("sas ")
+) {
+  kelompok["Sumatif Akhir Semester"].push(data);
 }
-else if (judul.includes("sumatif tengah semester")) {
+else if (judul.includes("sumatif tengah semester") ||  judul.startsWith("sts") ||judul.includes("sts")) {
 kelompok["Sumatif Tengah Semester"].push(data);
 }
-else if (judul.includes("sumatif harian")) {
+else if (judul.includes("sumatif harian") || judul.startsWith("sh") || judul.includes("sh")) {
 kelompok["Sumatif Harian"].push(data);
 }
-else if (judul.includes("usbn")) {
+else if (judul.includes("usbn") || judul.startsWith("usbn")) {
 kelompok["USBN"].push(data);
 }
 else {
