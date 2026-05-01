@@ -286,7 +286,7 @@ const kelompok = {
 
 snap.forEach(d => {
 const s = d.data();
-const data = { id: d.id, ...s };
+const data = { ...s, id: d.id };
 
 const judul = (s.judul || "").toLowerCase();
 
@@ -362,7 +362,10 @@ ${labelMap[key]}: <b>${arr.length}</b>
 
 const card = document.createElement("div");
 card.className = "bank-card";
-card.onclick = () => lihatSoal(s.id);
+card.onclick = () => {
+  console.log("Klik ID:", s.id);
+  lihatSoal(s.id);
+};
 
 card.innerHTML = `
 <div class="bank-title-row">
@@ -425,7 +428,11 @@ folder.style.display = visible ? "block" : "none";
 });
 
 window.lihatSoal = (id) => {
-location.href = `lihat-soal.html?id=${id}`;
+  if (!id) {
+    alert("❌ ID tidak ditemukan");
+    return;
+  }
+  location.href = `lihat-soal.html?id=${id}`;
 };
 
 </script>
