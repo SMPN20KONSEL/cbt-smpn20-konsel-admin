@@ -80,7 +80,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
   align-items: center;
   gap: 10px;
 }
-
+.bank-card {
+  position: relative;
+  z-index: 10;
+}
 .mapel-badge {
   background: #2563eb;
   color: #fff;
@@ -135,7 +138,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 .folder {
   margin-bottom: 20px;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible; /* atau hapus saja */
 }
 
 .folder-header {
@@ -233,28 +236,23 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
 <script type="module">
 import { db, auth } from "../assets/js/firebase.js";
-import {
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-
-import {
-collection,
-getDocs
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const list = document.getElementById("list");
 
 onAuthStateChanged(auth, user => {
-if (!user) {
-location.href = "../login.html";
-return;
-}
-loadBankSoal();
+  if (!user) {
+    location.href = "../login.html";
+    return;
+  }
+  loadBankSoal();
 });
+
+// ================= FORMAT TANGGAL =================
 function formatTanggal(ts){
   if (!ts) return "-";
-
-  const date = ts.toDate(); // 🔥 convert Firestore timestamp
+  const date = ts.toDate();
   return date.toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "long",
@@ -262,179 +260,171 @@ function formatTanggal(ts){
   });
 }
 
-
+// ================= LOAD DATA =================
 async function loadBankSoal() {
 
-list.innerHTML = "<p>Memuat data...</p>";
+  list.innerHTML = "<p>Memuat data...</p>";
 
-const snap = await getDocs(collection(db, "bank_soal"));
+  const snap = await getDocs(collection(db, "bank_soal"));
 
-if (snap.empty) {
-list.innerHTML = "<p>Belum ada bank soal</p>";
-return;
-}
-
-list.innerHTML = "";
-
-const kelompok = {
-"Sumatif Akhir Semester": [],
-"Sumatif Tengah Semester": [],
-"Sumatif Harian": [],
-"USBN": [],
-"Lainnya": []
-};
-
-snap.forEach(d => {
-const s = d.data();
-const data = { ...s, id: d.id };
-
-const judul = (s.judul || "").toLowerCase();
-
-if (
-  judul.includes("sumatif akhir semester") || 
-  judul.startsWith("sas") ||
-  judul.includes("sas ")
-) {
-  kelompok["Sumatif Akhir Semester"].push(data);
-}
-else if (judul.includes("sumatif tengah semester") ||  judul.startsWith("sts") ||judul.includes("sts")) {
-kelompok["Sumatif Tengah Semester"].push(data);
-}
-else if (judul.includes("sumatif harian") || judul.startsWith("sh") || judul.includes("sh")) {
-kelompok["Sumatif Harian"].push(data);
-}
-else if (judul.includes("usbn") || judul.startsWith("usbn")) {
-kelompok["USBN"].push(data);
-}
-else {
-kelompok["Lainnya"].push(data);
-}
-});
-
-const labelMap = {
-soalPG: "Pilihan Ganda",
-soalMCMA: "PG Kompleks",
-soalKategori: "Kategori",
-soalEssay: "Esai"
-};
-
-Object.keys(kelompok).forEach(nama => {
-
-const dataList = kelompok[nama];
-if (!dataList.length) return;
-
-let warna = "lain";
-if (nama === "Sumatif Akhir Semester") warna = "sas";
-else if (nama === "Sumatif Tengah Semester") warna = "sts";
-else if (nama === "Sumatif Harian") warna = "sh";
-else if (nama === "USBN") warna = "usbn";
-const id = nama.replace(/\s+/g, "_");
-
-list.innerHTML += `
-<div class="folder ${warna} collapsed">
-<div class="folder-header" onclick="toggleFolder('${id}')">
-<span>📂 ${nama} (${dataList.length})</span>
-<span>▼</span>
-</div>
-
-<div id="group-${id}" class="folder-content cards-grid"></div>
-</div>
-`;
-
-const container = document.getElementById(`group-${id}`);
-
-dataList.forEach(s => {
-
-let total = 0;
-let infoHTML = "";
-
-Object.keys(labelMap).forEach(key => {
-const arr = s[key];
-if (Array.isArray(arr) && arr.length) {
-total += arr.length;
-infoHTML += `
-<div>
-<i class="fa fa-list"></i>
-${labelMap[key]}: <b>${arr.length}</b>
-</div>`;
-}
-});
-
-const card = document.createElement("div");
-card.className = "bank-card";
-card.onclick = () => {
-  console.log("Klik ID:", s.id);
-  lihatSoal(s.id);
-};
-
-card.innerHTML = `
-<div class="bank-title-row">
-<h3>${s.judul || "-"}</h3>
-<span class="mapel-badge">${s.mapel || "-"}</span>
-</div>
-
-<p>Kelas : ${s.kelas || "-"}</p>
-<p>Dibuat oleh : ${s.namaGuru || "-"}</p>
-
-<div class="soal-info">${infoHTML}</div>
-
-<div class="bottom-row">
-  <span class="total">
-    Total Soal : ${total}
-  </span>
-
-  <span class="tanggal">
-    <i class="fa-solid fa-calendar"></i> ${formatTanggal(s.dibuat)}
-  </span>
-</div>
-`;
-
-container.appendChild(card);
-
-});
-});
-}
-
-/* TOGGLE FOLDER */
-window.toggleFolder = (id) => {
-document.getElementById("group-" + id)
-.parentElement
-.classList.toggle("collapsed");
-};
-
-/* SEARCH */
-document.getElementById("searchInput").addEventListener("input", function () {
-
-const keyword = this.value.toLowerCase();
-
-document.querySelectorAll(".folder").forEach(folder => {
-
-let visible = 0;
-
-folder.querySelectorAll(".bank-card").forEach(card => {
-const txt = card.innerText.toLowerCase();
-
-if (txt.includes(keyword)) {
-card.style.display = "block";
-visible++;
-} else {
-card.style.display = "none";
-}
-});
-
-folder.style.display = visible ? "block" : "none";
-
-});
-});
-
-window.lihatSoal = (id) => {
-  if (!id) {
-    alert("❌ ID tidak ditemukan");
+  if (snap.empty) {
+    list.innerHTML = "<p>Belum ada bank soal</p>";
     return;
   }
-  location.href = `lihat-soal.html?id=${id}`;
-};
 
+  list.innerHTML = "";
+
+  const kelompok = {
+    "Sumatif Akhir Semester": [],
+    "Sumatif Tengah Semester": [],
+    "Sumatif Harian": [],
+    "USBN": [],
+    "Lainnya": []
+  };
+
+  // ================= KELOMPOKKAN =================
+  snap.forEach(d => {
+    const s = d.data();
+    const data = { ...s, id: d.id };
+    const judul = (s.judul || "").toLowerCase();
+
+    if (judul.includes("sumatif akhir semester") || judul.startsWith("sas")) {
+      kelompok["Sumatif Akhir Semester"].push(data);
+    }
+    else if (judul.includes("sumatif tengah semester") || judul.startsWith("sts")) {
+      kelompok["Sumatif Tengah Semester"].push(data);
+    }
+    else if (judul.includes("sumatif harian") || judul.startsWith("sh")) {
+      kelompok["Sumatif Harian"].push(data);
+    }
+    else if (judul.includes("usbn")) {
+      kelompok["USBN"].push(data);
+    }
+    else {
+      kelompok["Lainnya"].push(data);
+    }
+  });
+
+  const labelMap = {
+    soalPG: "Pilihan Ganda",
+    soalMCMA: "PG Kompleks",
+    soalKategori: "Kategori",
+    soalEssay: "Esai"
+  };
+
+  // ================= RENDER =================
+  Object.keys(kelompok).forEach(nama => {
+
+    const dataList = kelompok[nama];
+    if (!dataList.length) return;
+
+    let warna = "lain";
+    if (nama === "Sumatif Akhir Semester") warna = "sas";
+    else if (nama === "Sumatif Tengah Semester") warna = "sts";
+    else if (nama === "Sumatif Harian") warna = "sh";
+    else if (nama === "USBN") warna = "usbn";
+
+    const id = nama.replace(/\s+/g, "_");
+
+    // buat folder
+    const folder = document.createElement("div");
+    folder.className = `folder ${warna} collapsed`;
+
+    folder.innerHTML = `
+      <div class="folder-header">
+        <span>📂 ${nama} (${dataList.length})</span>
+        <span>▼</span>
+      </div>
+      <div class="folder-content cards-grid"></div>
+    `;
+
+    const container = folder.querySelector(".folder-content");
+
+    // 🔥 EVENT FOLDER (AMAN)
+    folder.querySelector(".folder-header").addEventListener("click", () => {
+      folder.classList.toggle("collapsed");
+    });
+
+    // ================= CARD =================
+    dataList.forEach(s => {
+
+      let total = 0;
+      let infoHTML = "";
+
+      Object.keys(labelMap).forEach(key => {
+        const arr = s[key];
+        if (Array.isArray(arr) && arr.length) {
+          total += arr.length;
+          infoHTML += `
+            <div>
+              <i class="fa fa-list"></i>
+              ${labelMap[key]}: <b>${arr.length}</b>
+            </div>`;
+        }
+      });
+
+      const card = document.createElement("div");
+      card.className = "bank-card";
+
+      // 🔥 FIX KLIK (PENTING)
+      card.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!s.id) {
+          alert("❌ ID tidak ditemukan");
+          return;
+        }
+        location.href = `lihat-soal.html?id=${s.id}`;
+      });
+
+      card.innerHTML = `
+        <div class="bank-title-row">
+          <h3>${s.judul || "-"}</h3>
+          <span class="mapel-badge">${s.mapel || "-"}</span>
+        </div>
+
+        <p>Kelas : ${s.kelas || "-"}</p>
+        <p>Dibuat oleh : ${s.namaGuru || "-"}</p>
+
+        <div class="soal-info">${infoHTML}</div>
+
+        <div class="bottom-row">
+          <span class="total">Total Soal : ${total}</span>
+          <span class="tanggal">
+            <i class="fa-solid fa-calendar"></i> ${formatTanggal(s.dibuat)}
+          </span>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    list.appendChild(folder);
+  });
+}
+
+// ================= SEARCH =================
+document.getElementById("searchInput").addEventListener("input", function () {
+
+  const keyword = this.value.toLowerCase();
+
+  document.querySelectorAll(".folder").forEach(folder => {
+
+    let visible = 0;
+
+    folder.querySelectorAll(".bank-card").forEach(card => {
+      const txt = card.innerText.toLowerCase();
+
+      if (txt.includes(keyword)) {
+        card.style.display = "block";
+        visible++;
+      } else {
+        card.style.display = "none";
+      }
+    });
+
+    folder.style.display = visible ? "block" : "none";
+  });
+});
 </script>
 
 <script type="module" src="../assets/js/logout.js"></script>
