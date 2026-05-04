@@ -29,85 +29,81 @@
 
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2><i class="fas fa-user-shield"></i> Admin</h2>
-    <ul class="menu">
-      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
-      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
-      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
-      <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
-      <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
-    </ul>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <h2><i class="fas fa-user-shield"></i> Admin</h2>
 
-    <button class="logout" id="logout">
-      <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
-  </aside>
+  <ul class="menu">
+    <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+    <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+    <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+    <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+    <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+    <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
+    <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
+    <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+  </ul>
 
-  <!-- CONTENT -->
-  <main class="content">
+  <button class="logout" id="logout">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </button>
+</aside>
 
-    <h1><i class="fa fa-users"></i> Data Siswa</h1>
+<!-- CONTENT -->
+<main class="content">
 
-    <!-- FORM -->
-    <div class="card split-card">
+  <h1><i class="fa fa-users"></i> Data Siswa</h1>
 
-      <!-- TAMBAH SISWA -->
-      <div class="left">
-        <h3>Tambah Siswa</h3>
-        <input id="nis" placeholder="NIS">
-        <input id="nama" placeholder="Nama Lengkap">
-        <input id="kelas" placeholder="Kelas">
+  <!-- FORM -->
+  <div class="card split-card">
 
-        <button class="btn secondary" onclick="tambahSiswa()">
-          <span class="btn-icon">➕</span>
-          <span>Tambah Siswa</span>
-        </button>
+    <!-- TAMBAH SISWA -->
+    <div class="left">
+      <h3>Tambah Siswa</h3>
 
-        <small>
-          Akun & password otomatis <br>
-          Email: namadepanNIS@smp.belajar.id <br>
-          Password: 2 huruf nama + NIS
-        </small>
-      </div>
+      <input id="nis" placeholder="NIS">
+      <input id="nama" placeholder="Nama Lengkap">
+      <input id="kelas" placeholder="Kelas">
 
-      <!-- IMPORT CSV -->
-      <div class="right">
-        <h3>Import CSV</h3>
-        <small>Format: nis,nama,kelas</small><br><br>
+      <button class="btn secondary" onclick="tambahSiswa()">
+        ➕ Tambah Siswa
+      </button>
 
-        <input type="file" id="fileImport" accept=".csv">
-
-        <button class="btn primary" onclick="importSiswa()">
-          <span class="btn-icon">📥</span>
-          <span>Import</span>
-        </button>
-      </div>
-
+      <small>
+        Akun & password otomatis <br>
+        Email: namadepanNIS@smp.belajar.id <br>
+        Password: 2 huruf nama + NIS
+      </small>
     </div>
 
-    <!-- DAFTAR SISWA (CARD PER KELAS) -->
-<div class="siswa-header">
-  
-  <h3 class="judul-siswa">Daftar Siswa</h3>
+    <!-- IMPORT CSV -->
+    <div class="right">
+      <h3>Import CSV</h3>
 
-  <div class="total-card">
-    <span id="totalSiswa">Total: 0 siswa</span>
+      <small>Format: nis,nama,kelas</small><br><br>
+
+      <input type="file" id="fileImport" accept=".csv">
+
+      <button class="btn primary" onclick="importSiswa()">
+        📥 Import
+      </button>
+    </div>
+
   </div>
 
-</div>
+  <!-- HEADER -->
+  <div class="siswa-header">
+    <h3 class="judul-siswa">Daftar Siswa</h3>
 
-      <!-- INI WAJIB (JS inject card per kelas ke sini) -->
-      <div id="list"></div>
-
+    <div class="total-card">
+      <span id="totalSiswa">Total: 0 siswa</span>
     </div>
+  </div>
 
-  </main>
+  <!-- LIST (JS inject di sini) -->
+  <div id="list"></div>
 
+</main>
 </div>
 
 <!-- SCRIPT -->

@@ -390,3 +390,74 @@ button{
   content: attr(data-placeholder);
   color:#9ca3af;
 }
+/* ================= RESPONSIVE HP FIX TOTAL ================= */
+@media (max-width: 768px) {
+
+  /* layout jadi vertikal */
+  .layout {
+    flex-direction: column;
+  }
+
+  /* header lebih fleksibel */
+  .header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* tipe soal full */
+  .tipe-soal {
+    width: 100%;
+  }
+
+  /* form opsi jadi wrap */
+  .opsi-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .opsi-kiri {
+    width: 100%;
+  }
+
+  .opsi-kanan {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* card lebih kecil */
+  .soal-item,
+  .soal-card {
+    padding: 16px;
+  }
+}
+
+/* ================= HP KECIL ================= */
+@media (max-width: 480px) {
+
+  /* grid jadi 1 kolom */
+  #soal-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* font diperkecil */
+  .nomor {
+    font-size: 14px;
+  }
+
+  .kunci {
+    font-size: 12px;
+  }
+
+  /* tombol full */
+  button {
+    width: 100%;
+  }
+
+  /* modal lebih nyaman */
+  .modal-content {
+    padding: 15px;
+    width: 95%;
+    max-height: 85vh;
+  }
+}

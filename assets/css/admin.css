@@ -60,7 +60,7 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  padding: 0 30px;
+  padding: 0 20px;
   z-index: 1000;
 
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
@@ -70,23 +70,30 @@ body {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand-logo {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 
 .brand-text strong {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .brand-text small {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.8;
+}
+
+/* tombol menu (mobile) */
+.menu-toggle {
+  display: none;
+  font-size: 22px;
+  cursor: pointer;
 }
 
 /* =====================================================
@@ -109,30 +116,31 @@ body {
   height: calc(100vh - 60px);
 
   background: #fff;
-  padding: 25px 15px;
+  padding: 20px 12px;
 
   display: flex;
   flex-direction: column;
 
   overflow-y: auto;
   box-shadow: 2px 0 6px rgba(0,0,0,0.08);
+
+  transition: 0.3s;
 }
 
-/* judul sidebar */
+/* judul */
 .sidebar h2 {
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   font-weight: 800;
-  font-size: 18px;
-  color: #000000;
+  font-size: 17px;
 }
 
 .nama-guru {
-  margin: 0 0 20px 0;
+  margin-bottom: 15px;
   text-align: center;
-  font-size: 17px;
-  font-weight: 800;
-  color: #2563eb;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
 }
 
 /* menu */
@@ -142,19 +150,20 @@ body {
 }
 
 .menu li {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .menu a {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 
-  padding: 10px 12px;
+  padding: 10px;
   border-radius: var(--radius-md);
 
   text-decoration: none;
   color: var(--text-dark);
+  font-size: 14px;
 
   transition: 0.2s;
 }
@@ -168,59 +177,65 @@ body {
 .logout {
   background: var(--danger);
   color: #fff;
-
   border: none;
+
   padding: 10px;
   border-radius: var(--radius-md);
-
   cursor: pointer;
 }
 
 /* =====================================================
-   CONTENT (GLOBAL)
+   CONTENT
 ===================================================== */
 .content {
   margin-left: 260px;
   width: calc(100% - 260px);
 
-  padding: 30px 24px;
+  padding: 25px 20px;
 
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
 }
 
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE MOBILE
 ===================================================== */
 @media (max-width: 768px) {
 
-  .dashboard {
-    flex-direction: column;
+  /* tombol muncul */
+  .menu-toggle {
+    display: block;
   }
 
+  /* sidebar jadi slide */
   .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-
-    flex-direction: row;
-    padding: 10px;
+    position: fixed;
+    left: -100%;
+    width: 240px;
+    z-index: 999;
   }
 
-  .sidebar h2 {
+  .sidebar.active {
+    left: 0;
+  }
+
+  /* overlay */
+  .overlay {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    background: rgba(0,0,0,0.3);
     display: none;
   }
 
-  .menu {
-    display: flex;
-    overflow-x: auto;
+  .overlay.active {
+    display: block;
   }
 
-  .menu li {
-    margin: 0 6px;
-  }
-
+  /* content full */
   .content {
     margin-left: 0;
     width: 100%;
@@ -231,6 +246,14 @@ body {
 @media (max-width: 576px) {
   .content {
     padding: 16px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 16px;
   }
 
   input,
@@ -247,7 +270,7 @@ body {
   }
 
   h1, h2, h3 {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
@@ -264,10 +287,10 @@ body {
   background: #16a34a;
   color: #fff;
 
-  padding: 14px 22px;
+  padding: 12px 18px;
   border-radius: 10px;
 
-  font-size: 15px;
+  font-size: 14px;
 
   z-index: 99999;
   box-shadow: 0 10px 25px rgba(0,0,0,0.25);

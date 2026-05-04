@@ -131,3 +131,86 @@
     max-width: 100%;
   }
 }
+/* ================= FIX TABLE ================= */
+.card {
+  overflow-x: auto; /* 🔥 biar tabel tidak keluar */
+}
+
+.table {
+  min-width: 600px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+
+  .content {
+    padding: 20px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  .btn {
+    font-size: 14px;
+  }
+}
+
+/* ================= MODE HP (TABEL JADI CARD) ================= */
+@media (max-width: 600px) {
+
+  .table,
+  .table thead,
+  .table tbody,
+  .table th,
+  .table td,
+  .table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    background: #fff;
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border: none;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+/* ================= HP KECIL ================= */
+@media (max-width: 400px) {
+
+  .content {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 16px;
+  }
+
+  .card h3 {
+    font-size: 14px;
+  }
+}

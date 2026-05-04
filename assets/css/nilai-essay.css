@@ -169,3 +169,59 @@
     font-size: 13px;
   }
 }
+/* ================= RESPONSIVE FIX ================= */
+@media (max-width: 600px) {
+
+  /* header turun */
+  .header-siswa {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nilai-pg {
+    text-align: left;
+    width: 100%;
+  }
+
+  /* soal + input jadi vertikal */
+  .baris-soal {
+    grid-template-columns: 1fr !important;
+    gap: 6px;
+  }
+
+  .input-nilai {
+    justify-content: flex-start;
+  }
+
+  .input-nilai input {
+    width: 100% !important;
+    max-width: 120px;
+  }
+
+  /* box lebih kecil */
+  .essay-box {
+    padding: 12px;
+  }
+
+  /* tombol full */
+  .btn-simpan {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
+/* ================= HP KECIL ================= */
+@media (max-width: 400px) {
+
+  .soal {
+    font-size: 14px;
+  }
+
+  .blok-teks p {
+    font-size: 13px;
+  }
+
+  .nilai-pg strong {
+    font-size: 18px;
+  }
+}

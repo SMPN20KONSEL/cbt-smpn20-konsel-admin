@@ -302,3 +302,32 @@ body {
     font-size: 13px;
   }
 }
+/* ===============================
+   FIX RESPONSIVE KARTU (LAYAR)
+================================ */
+@media (max-width: 768px) {
+
+  #hasil {
+    grid-template-columns: 1fr; /* 1 kolom */
+    justify-content: stretch;
+    gap: 12px;
+  }
+
+  .kartu {
+    width: 100%;
+    height: auto; /* biar fleksibel */
+  }
+
+  .ruang-qr {
+    width: 80px;
+    height: 80px;
+  }
+
+  .info-siswa {
+    font-size: 12px;
+  }
+
+  .kartu-header {
+    font-size: 12px;
+  }
+}

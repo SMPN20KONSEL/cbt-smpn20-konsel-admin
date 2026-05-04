@@ -412,17 +412,21 @@ row.innerHTML = `
 
       const tr = document.createElement("tr");
 
-      tr.innerHTML = `
-  <td><span contenteditable>${p.teks}</span></td>
-
-  <td>
-    <select class="jawaban-kategori">
-      <option value="true" ${p.jawabanBenar ? "selected":""}>Benar</option>
-      <option value="false" ${!p.jawabanBenar ? "selected":""}>Salah</option>
-    </select>
+tr.innerHTML = `
+  <td class="kolom-kiri">
+    <span contenteditable>${p.teks}</span>
   </td>
 
-  <td><button class="hapus">✖</button></td>
+  <td class="kolom-kanan">
+    <div class="jawaban-wrapper">
+      <select class="jawaban-kategori">
+        <option value="true" ${p.jawabanBenar ? "selected":""}>Benar</option>
+        <option value="false" ${!p.jawabanBenar ? "selected":""}>Salah</option>
+      </select>
+
+      <button class="hapus">✖</button>
+    </div>
+  </td>
 `;
 
       table.appendChild(tr);
@@ -461,10 +465,8 @@ window.tambahSoal = () => {
 <div class="kategori-options" style="display:none">
   <table class="kategori-table">
     <tr>
-      <th>Pernyataan</th>
-      <th>Benar</th>
-      <th>Salah</th>
-      <th></th>
+      <th style="text-align:left">Pernyataan</th>
+      <th style="text-align:left">Benar / Salah</th>
     </tr>
   </table>
 </div>
@@ -520,21 +522,29 @@ window.tambahSoal = () => {
   row.querySelector(".hapus-opsi").onclick = ()=>row.remove();
 }
 
-  function tambahKategori(){
-    const tr = document.createElement("tr");
+function tambahKategori(){
+  const tr = document.createElement("tr");
 
-    tr.innerHTML = `
-      <td><span contenteditable></span></td>
-      <select class="jawaban-kategori">
-  <option value="true">Benar</option>
-  <option value="false">Salah</option>
-</select>
-      <td><button>✖</button></td>
-    `;
+  tr.innerHTML = `
+    <td class="kolom-kiri">
+      <span contenteditable data-placeholder="Tulis pernyataan..."></span>
+    </td>
 
-    tr.querySelector("button").onclick=()=>tr.remove();
-    katTable.appendChild(tr);
-  }
+    <td class="kolom-kanan">
+      <div class="jawaban-wrapper">
+        <select class="jawaban-kategori">
+          <option value="true">Benar</option>
+          <option value="false">Salah</option>
+        </select>
+
+        <button>✖</button>
+      </div>
+    </td>
+  `;
+
+  tr.querySelector("button").onclick = ()=>tr.remove();
+  katTable.appendChild(tr);
+}
 
   for(let i=0;i<4;i++){
     tambahOpsi(pgBox);
@@ -710,7 +720,6 @@ judulManual.style.display = "none";
     toast("❌ "+err.message,"error");
   }
 };
-
 
 // ======================================================
 // ===================== EVENT ==========================

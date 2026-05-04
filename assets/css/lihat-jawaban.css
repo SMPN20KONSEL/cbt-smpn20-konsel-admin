@@ -196,3 +196,57 @@ h3 {
   font-size: 20px;
   color: #3498db;
 }
+/* ================= HP KECIL (PERBAIKAN TOTAL) ================= */
+@media (max-width: 480px) {
+
+  /* grid jadi 1 kolom */
+  #pgContainer,
+  #mcmaContainer,
+  #kategoriContainer {
+    grid-template-columns: 1fr;
+  }
+
+  /* header jadi rapi */
+  .header-siswa {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* nilai turun ke bawah */
+  .nilai-pg {
+    align-self: flex-start;
+    width: 100%;
+    text-align: left;
+  }
+
+  /* nilai wrapper jadi vertikal */
+  .nilai-wrapper {
+    flex-direction: column;
+  }
+
+  .nilai-box {
+    width: 100%;
+  }
+
+  /* padding diperkecil */
+  .card {
+    padding: 16px;
+  }
+
+  /* font lebih kecil */
+  h2 {
+    font-size: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+
+  .essay-box {
+    font-size: 13px;
+  }
+
+  .btn-simpan {
+    width: 100%;
+  }
+}

@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detail Siswa</title>
 
   <link rel="stylesheet" href="../assets/css/style.css">
@@ -12,6 +13,10 @@
 
 <!-- ================= HEADER ================= -->
 <header class="topbar">
+
+  <!-- tombol menu (HP) -->
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
   <div class="brand">
     <img src="../assets/img/logo-sekolah.png" class="brand-logo">
     <div class="brand-text">
@@ -24,7 +29,7 @@
 <div class="dashboard">
 
   <!-- ================= SIDEBAR ================= -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <h2>Admin</h2>
 
     <ul class="menu">
@@ -56,6 +61,12 @@
 </div>
 
 <!-- SCRIPT -->
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
+
 <script type="module" src="../assets/js/detail-siswa.js"></script>
 
 </body>

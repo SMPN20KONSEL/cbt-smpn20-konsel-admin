@@ -67,20 +67,23 @@ function updateUI(nis, aktif) {
   const aksiCell   = row.querySelector(".aksi");
 
   // update status
-  statusCell.innerHTML = aktif ? "✅ Aktif" : "❌ Nonaktif";
+  statusCell.innerHTML = aktif
+    ? `<span class="badge aktif">Aktif</span>`
+    : `<span class="badge nonaktif">Nonaktif</span>`;
 
   // update tombol
   aksiCell.innerHTML = aktif
-    ? `<button data-label="Nonaktifkan"
+    ? `<button class="btn danger"
+          data-label="Nonaktifkan"
           onclick="nonaktifkanAkun('${nis}', this)">
           Nonaktifkan
        </button>`
-    : `<button data-label="Aktifkan"
+    : `<button class="btn success"
+          data-label="Aktifkan"
           onclick="aktifkanAkun('${nis}', this)">
           Aktifkan
        </button>`;
-}
-
+} // 🔥 INI YANG KURANG
 /* ===============================
    AKTIFKAN AKUN SISWA
 ================================ */
@@ -241,37 +244,54 @@ function tampilkanSiswa(data) {
 
     siswaKelas.forEach((s, i) => {
       rows += `
-        <tr id="row-${s.nis}">
-          <td>${i + 1}</td>
-          <td>${s.nama}</td>
-          <td>${s.nis}</td>
-          <td>${s.kelas}</td>
-          <td>${s.email}</td>
-          <td>${s.password}</td>
-          <td class="status">${s.aktif ? "✅ Aktif" : "❌ Nonaktif"}</td>
-          <td class="aksi">
+  <tr id="row-${s.nis}">
+    
+    <td data-label="No">${i + 1}</td>
 
-            ${
-              s.aktif
-              ? `<button data-label="Nonaktifkan"
-                    onclick="nonaktifkanAkun('${s.nis}', this)">
-                    Nonaktifkan
-                 </button>`
-              : `<button data-label="Aktifkan"
-                    onclick="aktifkanAkun('${s.nis}', this)">
-                    Aktifkan
-                 </button>`
-            }
+    <td data-label="Nama">${s.nama}</td>
 
-            <button data-label="Hapus"
-              onclick="hapusSiswa('${s.nis}', this)"
-              style="background:red;color:white;margin-left:5px;">
-              Hapus
-            </button>
+    <td data-label="NIS">${s.nis}</td>
 
-          </td>
-        </tr>
-      `;
+    <td data-label="Kelas">${s.kelas}</td>
+
+    <td data-label="Email">${s.email}</td>
+
+    <td data-label="Password">${s.password}</td>
+
+    <td class="status" data-label="Status">
+      ${
+        s.aktif
+          ? `<span class="badge aktif">Aktif</span>`
+          : `<span class="badge nonaktif">Nonaktif</span>`
+      }
+    </td>
+
+    <td class="aksi" data-label="Aksi">
+
+      ${
+        s.aktif
+        ? `<button class="btn danger"
+              data-label="Nonaktifkan"
+              onclick="nonaktifkanAkun('${s.nis}', this)">
+              Nonaktifkan
+           </button>`
+        : `<button class="btn success"
+              data-label="Aktifkan"
+              onclick="aktifkanAkun('${s.nis}', this)">
+              Aktifkan
+           </button>`
+      }
+
+      <button class="btn danger"
+        data-label="Hapus"
+        onclick="hapusSiswa('${s.nis}', this)">
+        Hapus
+      </button>
+
+    </td>
+
+  </tr>
+`;
     });
 
     container.innerHTML += `

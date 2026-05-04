@@ -4,55 +4,63 @@
   <meta charset="UTF-8">
   <title>Dashboard Admin</title>
 
+  <!-- WAJIB untuk HP -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <!-- CSS -->
   <link rel="stylesheet" href="../assets/css/dasbor.css">
   <link rel="stylesheet" href="../assets/css/admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body>
 
   <!-- ================= TOPBAR ================= -->
   <header class="topbar">
     <div class="brand">
-      <img
-        src="../assets/img/logo-sekolah.png"
-        class="brand-logo"
-        alt="Logo Sekolah"
-      >
+      <img src="../assets/img/logo-sekolah.png" class="brand-logo">
       <div class="brand-text">
         <strong>SMPN 20 KONAWE SELATAN</strong>
         <small>CBT Application</small>
       </div>
     </div>
+
+    <!-- 🔥 tombol menu HP -->
+    <div class="menu-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
   </header>
+
+  <!-- 🔥 overlay -->
+  <div class="overlay" onclick="toggleSidebar()"></div>
 
   <!-- ================= DASHBOARD ================= -->
   <div class="dashboard">
 
     <!-- ===== SIDEBAR ===== -->
-<aside class="sidebar">
-  <h2><i class="fas fa-user-shield"></i> Admin</h2>
-  <ul class="menu">
-      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
-      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
-      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
-      <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian  </a></li>
-      <li><a href="nilai.html"> <i class="fa fa-graduation-cap"></i> Nilai</a></li>
-  </ul>
-  <button class="logout" id="logout">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
-</aside>
+    <aside class="sidebar">
+      <h2><i class="fas fa-user-shield"></i> Admin</h2>
+
+      <ul class="menu">
+        <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+        <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+        <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+        <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+        <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+        <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
+        <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
+        <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+      </ul>
+
+      <button class="logout" id="logout">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </aside>
 
     <!-- ===== CONTENT ===== -->
     <main class="content">
       <h1>Dashboard Admin</h1>
-      <p class="subtitle">
-        Selamat datang di sistem ujian online sekolah
-      </p>
+      <p class="subtitle">Selamat datang di sistem ujian online sekolah</p>
 
       <div class="cards">
 
@@ -103,11 +111,12 @@
             <p>Laporan hasil ujian</p>
           </div>
         </a>
+
         <a href="monitor-siswa.html" class="card-box">
-          <i class="fa fa-chart-bar"></i>
+          <i class="fa fa-eye"></i>
           <div class="card-text">
             <h3>Monitor Ujian</h3>
-            <p>Monitor Ujian</p>
+            <p>Monitor ujian siswa</p>
           </div>
         </a>
 
@@ -118,6 +127,14 @@
 
   <!-- ================= SCRIPT ================= -->
   <script type="module" src="../assets/js/logout.js"></script>
+
+  <!-- 🔥 SCRIPT SIDEBAR -->
+  <script>
+    function toggleSidebar() {
+      document.querySelector(".sidebar").classList.toggle("active");
+      document.querySelector(".overlay").classList.toggle("active");
+    }
+  </script>
 
 </body>
 </html>

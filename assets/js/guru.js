@@ -347,31 +347,56 @@ async function loadGuru() {
   // 🔥 UPDATE TOTAL (BENAR)
   updateTotalGuru(filtered);
 
-  list.innerHTML = "";
+filtered.forEach((g, i) => {
+  list.innerHTML += `
+    <tr>
+      <td data-label="No">${i + 1}</td>
 
-  filtered.forEach((g, i) => {
-    list.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${g.nama}${g.gelar ? ", " + g.gelar : ""}</td>
-        <td>${g.mapel}</td>
-        <td>${g.email}</td>
-        <td>${g.password ?? "-"}</td>
-        <td>${g.aktif ? "✅ Aktif" : "❌ Nonaktif"}</td>
-        <td>
-  ${
-    g.aktif
-      ? `<button onclick="nonaktifkanGuru('${g.id}', this)">Nonaktifkan</button>`
-      : `<button onclick="aktifkanGuru('${g.id}', this)">Aktifkan</button>`
-  }
-  <button style="background:red;color:white"
-    onclick="hapusGuru('${g.id}', this)">
-    Hapus
-  </button>
-</td>
-      </tr>
-    `;
-  });
+      <td data-label="Nama Guru">
+        ${g.nama}${g.gelar ? ", " + g.gelar : ""}
+      </td>
+
+      <td data-label="Mata Pelajaran">
+        ${g.mapel}
+      </td>
+
+      <td data-label="Email">
+        ${g.email}
+      </td>
+
+      <td data-label="Password">
+        ${g.password ?? "-"}
+      </td>
+
+      <td data-label="Status">
+        ${
+          g.aktif
+            ? `<span class="badge aktif">Aktif</span>`
+            : `<span class="badge nonaktif">Nonaktif</span>`
+        }
+      </td>
+
+      <td data-label="Aksi">
+        ${
+          g.aktif
+            ? `<button class="btn danger"
+                 onclick="nonaktifkanGuru('${g.id}', this)">
+                 Nonaktifkan
+               </button>`
+            : `<button class="btn success"
+                 onclick="aktifkanGuru('${g.id}', this)">
+                 Aktifkan
+               </button>`
+        }
+
+        <button class="btn danger"
+          onclick="hapusGuru('${g.id}', this)">
+          Hapus
+        </button>
+      </td>
+    </tr>
+  `;
+});
 }
 window.hapusGuru = async (id, btn) => {
   if (!confirm("Hapus guru ini permanen?")) return;

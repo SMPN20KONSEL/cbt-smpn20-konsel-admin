@@ -2,91 +2,129 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+
+  <!-- 🔥 WAJIB UNTUK RESPONSIVE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Jadwal Ujian</title>
 
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="../assets/css/ruang-ujian.css">
+  <link rel="stylesheet" href="../assets/css/ruang-ujian.css">
 
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
-      <div class="brand-text">
-        <strong>SMPN 20 KONAWE SELATAN</strong>
-        <small>CBT Application</small>
-      </div>
+
+<!-- ================= HEADER ================= -->
+<header class="topbar">
+
+  <!-- 🔥 TOGGLE SIDEBAR -->
+  <button class="menu-toggle">
+    <i class="fa fa-bars"></i>
+  </button>
+
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
     </div>
-  </header>
+  </div>
+</header>
+
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
-<aside class="sidebar">
-  <h2><i class="fas fa-user-shield"></i> Admin</h2>
-  <ul class="menu">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <h2><i class="fas fa-user-shield"></i> Admin</h2>
+
+    <ul class="menu">
       <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
       <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
       <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
       <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
       <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
       <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian  </a></li>
-      <li><a href="nilai.html"> <i class="fa fa-graduation-cap"></i> Nilai</a></li>
-  </ul>
-  <button class="logout" id="logout">
-    <i class="fas fa-sign-out-alt"></i> Logout
-  </button>
-</aside>
-  
-<!-- CONTENT -->
-<main class="content">
+      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
+      <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+    </ul>
 
-<h1><i class="fa fa-clock"></i> Jadwal Ujian</h1>
-<p>Buat jadwal ujian dari Bank Soal</p>
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </aside>
 
-<!-- FORM -->
-<div class="card">
-  <h3>Buat Jadwal</h3>
+  <!-- ================= CONTENT ================= -->
+  <main class="content">
 
-  <label>Pilih Bank Soal</label>
-  <select id="soalSelect"></select>
-  <input id="durasi" type="number" placeholder="Durasi (menit)">
+    <h1><i class="fa fa-clock"></i> Jadwal Ujian</h1>
+    <p>Buat jadwal ujian dari Bank Soal</p>
 
-  <button class="btn" id="btnBuat">
-  ➕ Buat Jadwal
-</button>
+    <!-- ================= FORM ================= -->
+    <div class="card">
+      <h3>Buat Jadwal</h3>
 
+      <!-- 🔥 TOOLBAR RESPONSIVE -->
+      <div class="toolbar">
+        <select id="soalSelect"></select>
+        <input id="durasi" type="number" placeholder="Durasi (menit)">
+        <button class="btn" id="btnBuat">➕ Buat Jadwal</button>
+      </div>
+    </div>
 
+    <!-- ================= LIST ================= -->
+    <div class="card">
+      <h3>Daftar Jadwal</h3>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ujian</th>
+            <th>Mapel</th>
+            <th>Kelas</th>
+            <th>Kode</th>
+            <th>Durasi</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <!-- 🔥 PENTING: isi tbody HARUS pakai data-label -->
+        <tbody id="list">
+          <!-- Contoh -->
+          <!--
+          <tr>
+            <td data-label="Ujian">UTS Matematika</td>
+            <td data-label="Mapel">Matematika</td>
+            <td data-label="Kelas">VII A</td>
+            <td data-label="Kode">ABC123</td>
+            <td data-label="Durasi">60 Menit</td>
+            <td data-label="Status">Aktif</td>
+          </tr>
+          -->
+        </tbody>
+      </table>
+    </div>
+
+  </main>
 </div>
 
-<!-- LIST -->
-<div class="card">
-  <h3>Daftar Jadwal</h3>
+<!-- ================= SCRIPT ================= -->
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Ujian</th>
-        <th>Mapel</th>
-        <th>Kelas</th>
-        <th>Kode</th>
-        <th>Durasi</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="list"></tbody>
-  </table>
-</div>
-
-</main>
-</div>
 <script type="module" src="../assets/js/logout.js"></script>
-
-<!-- SCRIPT -->
 <script type="module" src="../assets/js/jadwal-ujian.js"></script>
+
+<!-- 🔥 SIDEBAR TOGGLE -->
+<script>
+  const toggle = document.querySelector(".menu-toggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  toggle.addEventListener("click", () => {
+    sidebar.classList.toggle("active");
+  });
+</script>
+
 </body>
 </html>

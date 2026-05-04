@@ -45,23 +45,23 @@ select:focus {
   color: #fff;
   font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
 }
 
 #filter:hover {
   background: #1e40af;
 }
 
-/* ================= TABLE ================= */
+/* ================= TABLE (DESKTOP) ================= */
 .table-wrapper {
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
 table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
 }
 
@@ -115,32 +115,22 @@ tbody tr:hover {
   font-size: 13px;
   text-decoration: none;
   font-weight: 500;
-  transition: 0.2s;
 }
 
 .btn:hover {
   background: #059669;
 }
 
-/* =====================
-   TABLET & HP BESAR
-===================== */
+/* ================= TABLET ================= */
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
     width: 100%;
-    border-radius: 0;
     padding: 20px;
-  }
-
-  .form-row {
-    flex-direction: column;
   }
 }
 
-/* =====================
-   HP NORMAL
-===================== */
+/* ================= HP ================= */
 @media (max-width: 576px) {
   .content {
     padding: 16px;
@@ -155,9 +145,7 @@ tbody tr:hover {
   }
 }
 
-/* =====================
-   HP KECIL
-===================== */
+/* ================= HP KECIL ================= */
 @media (max-width: 360px) {
   .content {
     padding: 12px;
@@ -166,9 +154,81 @@ tbody tr:hover {
   h1, h2, h3 {
     font-size: 16px;
   }
+}
 
-  button {
-    padding: 10px;
-    font-size: 13px;
+/* ================= MODE CARD (HP FIX TOTAL) ================= */
+@media (max-width: 600px) {
+
+  .table-wrapper {
+    overflow: visible; /* 🔥 matikan scroll */
+  }
+
+  table {
+    min-width: 100%; /* 🔥 reset */
+  }
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+    width: 100%;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody tr {
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border: none;
+    font-size: 14px;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+/* ================= SIDEBAR RESPONSIVE ================= */
+.menu-toggle {
+  display: none;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    height: 100%;
+    background: #fff;
+    z-index: 999;
+    transition: 0.3s;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .content {
+    margin-left: 0;
   }
 }

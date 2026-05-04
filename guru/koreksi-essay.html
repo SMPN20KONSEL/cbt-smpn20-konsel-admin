@@ -2,13 +2,13 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Koreksi Essay</title>
 
 <link rel="stylesheet" href="../assets/css/koreksi.css">
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/admin.css">
 
-<!-- FONT AWESOME -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
@@ -16,8 +16,14 @@
 
 <!-- TOPBAR -->
 <header class="topbar">
+
+  <!-- tombol menu HP -->
+  <button class="menu-toggle" onclick="toggleSidebar()">
+    <i class="fa fa-bars"></i>
+  </button>
+
   <div class="brand">
-    <img src="../assets/img/logo-sekolah.png" class="brand-logo" alt="Logo Sekolah">
+    <img src="../assets/img/logo-sekolah.png" class="brand-logo">
     <div class="brand-text">
       <strong>SMPN 20 KONAWE SELATAN</strong>
       <small>CBT Application</small>
@@ -27,18 +33,17 @@
 
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
-<aside class="sidebar">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
   <h2><i class="fa fa-chalkboard-teacher"></i> Guru</h2>
 
-  <!-- Nama guru -->
   <p id="nama-guru" class="nama-guru">Memuat...</p>
 
   <ul class="menu">
-    <li><a href="dashboard-guru.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
+    <li><a href="dashboard-guru.html"><i class="fa fa-home"></i> Dashboard</a></li>
     <li><a href="buat-soal.html"><i class="fa fa-pen"></i> Buat Soal</a></li>
     <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-    <li><a href="koreksi-essay.html"><i class="fa fa-book"></i> Koreksi Essay</a></li>
+    <li><a href="koreksi-essay.html" class="active"><i class="fa fa-book"></i> Koreksi Essay</a></li>
     <li><a href="rekap-nilai.html"><i class="fa fa-chart-column"></i> Rekap Nilai</a></li>
   </ul>
 
@@ -47,11 +52,14 @@
   </button>
 </aside>
 
-  <!-- CONTENT -->
-  <main class="content">
-    <div class="card">
-      <h2>Koreksi Jawaban Essay</h2>
+<!-- CONTENT -->
+<main class="content">
 
+  <div class="card">
+    <h2>Koreksi Jawaban Essay</h2>
+
+    <!-- FILTER -->
+    <div class="filter-box">
       <select id="mapel">
         <option value="">Pilih Mapel</option>
       </select>
@@ -61,7 +69,10 @@
       </select>
 
       <button id="filter">Tampilkan</button>
+    </div>
 
+    <!-- WRAPPER TABLE -->
+    <div class="table-wrapper">
       <table>
         <thead>
           <tr>
@@ -75,10 +86,21 @@
         <tbody id="tabel"></tbody>
       </table>
     </div>
-  </main>
+
+  </div>
+
+</main>
 
 </div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
+
 <script type="module" src="../assets/js/nama.js"></script>
 <script type="module" src="../assets/js/koreksi-essay.js"></script>
+
 </body>
 </html>

@@ -1,5 +1,5 @@
 /* =====================================================
-   RESET & DASAR
+   RESET DASAR
 ===================================================== */
 *,
 *::before,
@@ -9,21 +9,15 @@
   padding: 0;
 }
 
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f4f6f9;
-  color: #1e293b;
-  min-height: 100vh;
-}
-
 /* =====================================================
-   VARIABEL GLOBAL
+   VARIABEL
 ===================================================== */
 :root {
   --primary: #2563eb;
   --primary-dark: #1e40af;
   --danger: #ef4444;
 
+  --bg-dashboard: #f4f6f9;
   --bg-content: #e0f2fe;
   --bg-white: #ffffff;
 
@@ -34,24 +28,148 @@ body {
   --radius-md: 12px;
 }
 
+/* =====================================================
+   BODY
+===================================================== */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg-dashboard);
+  color: var(--text-dark);
+}
 
+/* =====================================================
+   TOPBAR
+===================================================== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+
+  background: linear-gradient(135deg, #2c6fb7, #1f4e8c);
+  color: #fff;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-logo {
+  width: 36px;
+  height: 36px;
+}
+
+.brand-text strong {
+  font-size: 14px;
+}
+
+.brand-text small {
+  font-size: 11px;
+}
+
+/* tombol menu HP */
+.menu-toggle {
+  display: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+.dashboard {
+  display: flex;
+  margin-top: 60px;
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+.sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+
+  width: 260px;
+  height: calc(100vh - 60px);
+
+  background: #fff;
+  padding: 20px 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 2px 0 6px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.menu {
+  list-style: none;
+  flex: 1;
+}
+
+.menu li {
+  margin-bottom: 8px;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px;
+  border-radius: 10px;
+
+  text-decoration: none;
+  color: var(--text-dark);
+  font-size: 14px;
+}
+
+.menu a:hover,
+.menu a.active {
+  background: #f3f4f6;
+}
+
+/* logout */
+.logout {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
 
 /* =====================================================
    CONTENT
 ===================================================== */
 .content {
   margin-left: 260px;
-  flex: 1;
-
-  padding: 40px;
+  width: 100%;
+  padding: 30px;
   background: var(--bg-content);
 
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-/* Judul halaman */
 .content h1 {
   text-align: center;
   background: var(--primary);
@@ -59,15 +177,13 @@ body {
 
   padding: 14px;
   border-radius: 10px;
-  font-size: 22px;
+  font-size: 20px;
 }
 
-/* Subjudul */
 .subtitle {
   text-align: center;
   color: var(--text-muted);
   font-size: 14px;
-  margin-top: -10px;
 }
 
 /* =====================================================
@@ -75,7 +191,7 @@ body {
 ===================================================== */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
@@ -86,180 +202,73 @@ body {
 
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 15px;
 
   text-decoration: none;
   color: var(--text-dark);
 
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  transition: 0.25s;
+  transition: 0.3s;
 }
 
 .card-box i {
-  font-size: 36px;
+  font-size: 32px;
   color: var(--primary);
-  min-width: 42px;
 }
 
 .card-text h3 {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .card-text p {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
 .card-box:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.15);
-}
-
-/* Card utama */
-.card-box.highlight {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  color: #fff;
-}
-
-.card-box.highlight i,
-.card-box.highlight p {
-  color: #fff;
+  transform: translateY(-5px);
 }
 
 /* =====================================================
-   CARD / FORM UMUM
-===================================================== */
-.card {
-  background: var(--bg-white);
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-
-.card label {
-  display: block;
-  margin-top: 12px;
-  font-weight: 600;
-}
-
-.card input,
-.card select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-
-  border-radius: var(--radius-md);
-  border: 1px solid #d1d5db;
-}
-
-/* =====================================================
-   BUTTON GLOBAL (AMAN)
-===================================================== */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  padding: 10px 16px;
-  font-size: 14px;
-
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-}
-
-.btn i {
-  font-size: 1em;
-  line-height: 1;
-}
-
-.btn.primary {
-  background: var(--primary);
-  color: #fff;
-}
-
-.btn.primary:hover {
-  background: var(--primary-dark);
-}
-
-.btn.secondary {
-  background: #6b7280;
-  color: #fff;
-}
-
-.btn.danger {
-  background: var(--danger);
-  color: #fff;
-}
-
-.btn.small {
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
-/* =====================================================
-   TABLE
-===================================================== */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th {
-  background: var(--primary);
-  color: #fff;
-  padding: 12px;
-}
-
-.table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-}
-
-.table tr:nth-child(even) {
-  background: #f2f2f2;
-}
-
-.table tr:hover {
-  background: #e0f2fe;
-}
-
-/* =====================================================
-   RESPONSIVE
+   RESPONSIVE MOBILE
 ===================================================== */
 @media (max-width: 768px) {
+
+  .menu-toggle {
+    display: block;
+  }
+
   .sidebar {
-    position: relative;
+    left: -100%;
+    width: 240px;
+    z-index: 999;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 60px;
+    left: 0;
     width: 100%;
-    height: auto;
-    flex-direction: row;
-  }
-
-  .sidebar h2 {
+    height: calc(100vh - 60px);
+    background: rgba(0,0,0,0.3);
     display: none;
+    z-index: 998;
   }
 
-  .menu {
-    display: flex;
-    overflow-x: auto;
+  .overlay.active {
+    display: block;
   }
 
   .content {
     margin-left: 0;
     padding: 20px;
   }
-}
 
-@media (max-width: 576px) {
-  button,
-  input,
-  select {
-    width: 100%;
-  }
-
-  .card-box {
-    flex-direction: column;
-    align-items: flex-start;
+  .cards {
+    grid-template-columns: 1fr;
   }
 }

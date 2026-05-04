@@ -140,3 +140,58 @@ button:hover{
   color:#fff;
   opacity:0.8;
 }
+/* ================= FIX MOBILE HEIGHT ================= */
+body{
+  min-height:100vh; /* ganti dari height */
+  padding:20px;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 480px){
+
+  /* card lebih kecil */
+  .card{
+    padding:20px 15px;
+    border-radius:16px;
+  }
+
+  /* logo lebih kecil */
+  .logo{
+    width:55px;
+  }
+
+  /* font lebih kecil */
+  h1{
+    font-size:16px;
+  }
+
+  h2{
+    font-size:14px;
+  }
+
+  .subtitle{
+    font-size:12px;
+  }
+
+  input{
+    font-size:13px;
+    padding:10px;
+  }
+
+  button{
+    padding:10px;
+    font-size:14px;
+  }
+}
+
+/* ================= HP SANGAT KECIL ================= */
+@media (max-width: 360px){
+
+  .card{
+    padding:16px 12px;
+  }
+
+  .container{
+    max-width:100%;
+  }
+}

@@ -16,13 +16,13 @@
   margin-left: 260px;
   width: calc(100% - 260px);
   padding: 40px;
-
   background: var(--bg-light);
 
   display: flex;
   flex-direction: column;
+  gap: 20px;
 
-  box-sizing: border-box; /* 🔥 penting biar gak nabrak */
+  box-sizing: border-box;
 }
 
 /* =====================================================
@@ -30,13 +30,12 @@
 ===================================================== */
 .container {
   background: #fff;
-
   width: 100%;
-  max-width: 1100px; /* 🔥 biar gak terlalu lebar di layar besar */
-  margin: 0 auto; /* 🔥 bikin dia di tengah */
+  max-width: 1100px;
+  margin: 0 auto;
+
   padding: 28px;
   border-radius: var(--radius-lg);
-
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 
   display: flex;
@@ -54,15 +53,65 @@
   font-size: 14px;
   color: var(--text-muted);
 }
-/* biar card soal gak nempel ke pinggir */
+
+/* =====================================================
+   DAFTAR SOAL
+===================================================== */
 #daftarSoal {
   width: 100%;
   max-width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch !important;
 }
 
-/* kasih jarak antar soal */
+/* =====================================================
+   SOAL CARD
+===================================================== */
 .soal-card {
+  width: 100% !important;
+  max-width: 100% !important;
+
   margin-bottom: 12px;
+  padding: 16px;
+
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+
+  transition: 0.2s;
+}
+
+.soal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* =====================================================
+   INPUT SOAL
+===================================================== */
+[contenteditable] {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.soal-card > .pertanyaan[contenteditable] {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  margin-top: 6px;
+
+  border-radius: var(--radius-md);
+  border: 1px solid #d1d5db;
+
+  font-family: inherit;
+}
+
+.soal-card textarea:focus,
+.soal-card [contenteditable]:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
 /* =====================================================
@@ -74,7 +123,6 @@
   gap: 12px;
 }
 
-/* Box info ujian */
 .form-row:first-of-type {
   background: #f8fafc;
   padding: 16px;
@@ -82,7 +130,6 @@
   border: 1px solid #e5e7eb;
 }
 
-/* Input */
 .form-row input {
   flex: 1;
   min-width: 200px;
@@ -90,7 +137,6 @@
 
   border-radius: var(--radius-md);
   border: 1px solid #d1d5db;
-
   font-size: 14px;
 }
 
@@ -120,7 +166,6 @@ button:hover {
   background: var(--primary-dark);
 }
 
-/* tombol simpan */
 #btnSimpan {
   background: #16a34a;
 }
@@ -130,111 +175,71 @@ button:hover {
 }
 
 /* =====================================================
-   TOAST
+   OPSI (PG & MCMA)
 ===================================================== */
-#toast {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  z-index: 9999;
-
+.opsi-row {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  justify-content: space-between;
+  align-items: center;
 
-.toast-item {
-  padding: 10px 18px;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 6px 8px;
+
   border-radius: 8px;
-  color: #fff;
-  font-weight: 500;
-
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-
-  opacity: 0;
-  transform: translateY(-20px);
-  animation: toastIn 0.3s forwards;
 }
 
-.toast-success { background: #16a34a; }
-.toast-error   { background: #dc2626; }
-
-@keyframes toastIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =====================================================
-   PREVIEW
-===================================================== */
-#previewBox {
-  background: #fff;
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-
-#previewBox h3 {
-  margin-bottom: 12px;
-  color: var(--primary);
-}
-
-#previewPG,
-#previewEsai {
-  margin-top: 10px;
-}
-
-/* =====================================================
-   DAFTAR SOAL
-===================================================== */
-#daftarSoal {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch !important;
-  width: 100%;
-}
-
-.soal-card {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-.soal-card {
+.opsi-row:hover {
   background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
-  padding: 16px;
-  transition: 0.2s;
 }
 
-.soal-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+.opsi-kiri {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
 }
 
-/* input soal */
-.soal-card > .pertanyaan[contenteditable] {
-  width: 100%;
- min-height: 36px;     /* 🔥 lebih pendek */
-  padding: 6px 10px;    /* 🔥 kecilin atas bawah */
-  margin-top: 6px;
-
-  border-radius: var(--radius-md);
-  border: 1px solid #d1d5db;
-
-  font-family: inherit;
+.opsi-kiri b {
+  width: 25px;
+  flex-shrink: 0;
 }
+
 .opsi-text {
-  margin-top: 0 !important;
-  width: auto !important;
+  flex: 1;
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+
+  word-break: break-word;
 }
-.soal-card textarea:focus,
-.soal-card [contenteditable]:focus {
-  outline: none;
-  border-color: var(--primary);
+
+.opsi-kanan {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.opsi-kanan input[type="checkbox"] {
+  transform: scale(1.3);
+  cursor: pointer;
+}
+
+.hapus-opsi {
+  background: #2c5aa0;
+  color: white;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+}
+
+.hapus-opsi:hover {
+  background: #1b3f73;
 }
 
 /* =====================================================
@@ -253,280 +258,161 @@ button:hover {
   padding: 6px 10px;
 }
 
-.soal-actions button:hover {
-  background: #d1d5db;
-}
-
 .soal-actions .hapus {
   background: var(--danger);
   color: #fff;
 }
 
-.soal-actions .hapus:hover {
-  background: #dc2626;
-}
-
-/* =========================
-   OPSI (PG & MCMA RAPI)
-========================= */
-.opsi-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-  padding: 6px 8px;
-  border-radius: 8px;
-}
-
-.opsi-row:hover {
-  background: #f9fafb;
-}
-
-/* kiri */
-.opsi-kiri {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  flex: 1;
-}
-
-/* label */
-.opsi-kiri b {
-  width: 25px;
-  flex-shrink: 0;
-}
-
-/* teks */
-.opsi-text {
-  flex: 1;
-  width: 100%;
-  min-height: 36px;
-  padding: 6px 10px;
-
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-
-  word-break: break-word;
-}
-
-/* kanan */
-.opsi-kanan {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-/* checkbox */
-.opsi-kanan input[type="checkbox"] {
-  transform: scale(1.3);
-  cursor: pointer;
-}
-
-/* tombol hapus */
-.hapus-opsi {
-  background: #2c5aa0;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-}
-
-.hapus-opsi:hover {
-  background: #1b3f73;
-}
-[contenteditable] {
-  white-space: pre-wrap;
-  word-break: break-word;
-}
 /* =====================================================
-   DROPDOWN JAWABAN (RAPI)
+   DROPDOWN JAWABAN
 ===================================================== */
 .jawaban {
   margin-top: 10px;
-  padding: 6px 10px;          /* 🔥 lebih ramping */
+  padding: 6px 10px;
   border-radius: var(--radius-md);
   border: 1px solid #d1d5db;
-  width: 120px;               /* 🔥 tidak terlalu panjang */
+  width: 120px;
 }
+/* =========================
+   KATEGORI 2 KOLOM FIX
+========================= */
 
-/* =====================================================
-   KATEGORI (TABEL - FINAL FIX)
-===================================================== */
-/* =====================================================
-   KATEGORI WRAPPER
-===================================================== */
-.kategori-options {
-  margin-top: 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-md);
-  padding: 12px;
-  background: #fff;
-}
-
-/* =====================================================
-   TABLE BASE
-===================================================== */
 .kategori-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 10px;
+  border-collapse: collapse;
 }
 
 /* header */
 .kategori-table th {
-  font-size: 13px;
-  color: #666;
-  font-weight: 600;
-  text-align: center;
-  padding-bottom: 6px;
+  padding: 10px;
+  font-size: 14px;
+  color: #555;
+  border-bottom: 2px solid #e5e7eb;
 }
 
-/* =====================================================
-   ROW FIX (INI PENTING - BIAR TIDAK TABRAKAN)
-===================================================== */
-.kategori-table tr {
-  background: transparent;
-}
-
-/* ❌ jangan pakai hover td langsung (ini bikin select/radio rusak)
-   ✔ pakai hover per cell */
-.kategori-table tr:hover td {
-  background: transparent;
-}
-
-.kategori-table tr:hover td:first-child span {
-  background: #f9fafb;
-}
-
-/* =====================================================
-   CELL GENERAL
-===================================================== */
+/* cell */
 .kategori-table td {
-  padding: 6px;
+  padding: 10px;
   vertical-align: middle;
+  border-bottom: 1px solid #eee;
 }
 
-/* =====================================================
-   KOLOM TEKS
-===================================================== */
-.kategori-table td:first-child {
-  width: 100%;
-  padding-right: 12px;
+/* kiri (pernyataan) */
+.kolom-kiri {
+  width: 70%;
 }
 
-.kategori-table td:first-child span {
+.kolom-kiri span {
   display: block;
   width: 100%;
-  min-height: 32px;
-  padding: 6px 10px;
-
-  border: 1px solid #d1d5db;
-  border-radius: var(--radius-md);
-  background: #fff;
-
-  word-break: break-word;
-}
-
-/* =====================================================
-   SELECT (INI PENGGANTI RADIO - JAUH LEBIH STABIL)
-===================================================== */
-.kategori-table td select.jawaban-kategori {
-  width: 100%;
-  min-width: 90px;
-
+  min-height: 40px;
   padding: 8px 10px;
 
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  border: 2px solid #cbd5e1;
-
   background: #fff;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  color: #111;
-  cursor: pointer;
-
-  appearance: auto; /* penting biar tidak aneh di beberapa browser */
 }
 
-/* =====================================================
-   KOLOM CENTER (TRUE/FALSE)
-===================================================== */
-.kategori-table td:nth-child(2),
-.kategori-table td:nth-child(3) {
-  width: 80px;
-  text-align: center;
+/* kanan */
+.kolom-kanan {
+  width: 11%;
 }
 
-/* kalau masih pakai radio (legacy support) */
-.kategori-table input[type="radio"] {
-  transform: scale(1.2);
-  cursor: pointer;
+/* isi kanan */
+.jawaban-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* =====================================================
-   KOLOM HAPUS
-===================================================== */
-.kategori-table td:last-child {
-  width: 60px;
-  text-align: right;
-  padding-right: 8px;
+/* dropdown */
+.jawaban-wrapper select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
 }
 
-.kategori-table button {
-  background: #2a5298;
+/* tombol hapus */
+.jawaban-wrapper button {
+  width: 32px;
+  height: 32px;
+  background: var(--danger);
   color: #fff;
-  border-radius: 10px;
-  padding: 6px 10px;
-  border: none;
-  cursor: pointer;
+  border-radius: 6px;
 }
+/* =========================
+   RESPONSIVE KHUSUS KATEGORI
+========================= */
+@media (max-width: 576px) {
 
-.kategori-table button:hover {
-  background: #1e3c72;
+  /* ubah jadi stack */
+  .kategori-table td {
+    display: block;
+    width: 100%;
+  }
+
+  /* jarak antar bagian */
+  .kolom-kanan {
+    margin-top: 6px;
+    width: 100%;
+  }
+
+  /* isi kanan tetap rapi */
+  .jawaban-wrapper {
+    justify-content: space-between;
+  }
 }
 /* =====================================================
-   BUTTON TAMBAH
+   TOAST
 ===================================================== */
-.btn-add-opsi,
-.btn-add-opsi-mcma,
-.btn-add-kategori {
-  margin-top: 8px;
-  background: #e5e7eb;
-  color: #111;
+#toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
 }
 
-.btn-add-opsi:hover,
-.btn-add-opsi-mcma:hover,
-.btn-add-kategori:hover {
-  background: #d1d5db;
+.toast-item {
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.toast-success { background: #16a34a; }
+.toast-error   { background: #dc2626; }
+
+/* =====================================================
+   PREVIEW
+===================================================== */
+#previewBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: var(--radius-lg);
 }
 
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE (FIX FINAL)
 ===================================================== */
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
+    width: 100%;
     padding: 20px;
   }
 
   .form-row {
     flex-direction: column;
   }
+
+  .opsi-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 @media (max-width: 576px) {
-  .content {
-    padding: 16px;
-  }
-
   input,
   textarea,
   button {
@@ -537,20 +423,5 @@ button:hover {
 @media (max-width: 360px) {
   .content {
     padding: 12px;
-  }
-
-  h1, h2, h3 {
-    font-size: 16px;
-  }
-
-  button {
-    font-size: 13px;
-  }
-}
-@media (max-width: 768px) {
-  .content {
-    margin-left: 0;
-    width: 100%; /* 🔥 WAJIB */
-    padding: 20px;
   }
 }
