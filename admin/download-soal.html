@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Daftar Download Soal</title>
+
+<!-- RESPONSIVE -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- CSS -->
+<link rel="stylesheet" href="../assets/css/admin.css">
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ================= CONTENT ================= */
+.content{
+  flex:1;
+  padding:30px;
+}
+
+.container{
+  width:100%;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+h1{
+  margin-top:0;
+  color:#1e293b;
+}
+
+.subtitle{
+  color:#64748b;
+  margin-bottom:25px;
+}
+
+/* ================= TABLE ================= */
+.table-wrapper{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+thead{
+  background:#2563eb;
+  color:white;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid #e2e8f0;
+  text-align:left;
+  font-size:14px;
+}
+
+tbody tr:hover{
+  background:#f8fafc;
+}
+
+/* ================= BUTTON ================= */
+.btn-download{
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  background:#16a34a;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+
+.btn-download:hover{
+  background:#15803d;
+}
+
+/* ================= TEXT ================= */
+.loading{
+  text-align:center;
+  padding:30px;
+  color:#64748b;
+}
+
+.empty{
+  text-align:center;
+  padding:30px;
+  color:#ef4444;
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:700px){
+
+  .content{
+    padding:15px;
+  }
+
+  th,td{
+    font-size:12px;
+    padding:10px;
+  }
+
+  .btn-download{
+    padding:8px 10px;
+    font-size:12px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= TOPBAR ================= -->
+<header class="topbar">
+
+  <div class="brand">
+
+    <img src="../assets/img/logo-sekolah.png"
+         class="brand-logo">
+
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+
+  </div>
+
+  <!-- MENU HP -->
+  <div class="menu-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </div>
+
+</header>
+
+<!-- OVERLAY -->
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<!-- ================= DASHBOARD ================= -->
+<div class="dashboard">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+
+    <h2>
+      <i class="fas fa-user-shield"></i>
+      Admin
+    </h2>
+
+    <ul class="menu">
+
+      <li>
+        <a href="dashboard.html">
+          <i class="fa fa-home"></i>
+          Dashboard
+        </a>
+      </li>
+
+      <li>
+        <a href="siswa.html">
+          <i class="fa fa-users"></i>
+          Data Siswa
+        </a>
+      </li>
+
+      <li>
+        <a href="guru.html">
+          <i class="fa fa-chalkboard-teacher"></i>
+          Data Guru
+        </a>
+      </li>
+
+      <li>
+        <a href="bank-soal.html">
+          <i class="fa fa-book"></i>
+          Bank Soal
+        </a>
+      </li>
+
+      <li>
+        <a href="kartu-ujian.html">
+          <i class="fa fa-id-card"></i>
+          Kartu Ujian
+        </a>
+      </li>
+
+      <li>
+        <a href="ujian.html">
+          <i class="fa fa-desktop"></i>
+          Ruang Ujian
+        </a>
+      </li>
+
+      <li>
+        <a href="monitor-siswa.html">
+          <i class="fa fa-eye"></i>
+          Monitor Ujian
+        </a>
+      </li>
+
+      <li>
+        <a href="nilai.html">
+          <i class="fa fa-graduation-cap"></i>
+          Nilai
+        </a>
+      </li>
+
+      <li>
+        <a href="download-soal.html" class="active">
+          <i class="fa fa-download"></i>
+          Download Soal
+        </a>
+      </li>
+
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+
+  </aside>
+
+  <!-- ================= CONTENT ================= -->
+  <main class="content">
+
+    <div class="container">
+
+      <h1>
+        <i class="fa fa-book"></i>
+        Daftar Bank Soal
+      </h1>
+
+      <p class="subtitle">
+        Download seluruh soal ujian guru
+      </p>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Mapel</th>
+              <th>Judul Ujian</th>
+              <th>Guru</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody id="tbody">
+
+            <tr>
+              <td colspan="5" class="loading">
+                Memuat data...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script type="module">
+
+import { db }
+from "../assets/js/firebase.js";
+
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+// ================= ELEMENT =================
+const tbody = document.getElementById("tbody");
+
+// ================= LOAD DATA =================
+async function loadData(){
+
+  try{
+
+    const snap = await getDocs(
+      collection(db, "bank_soal")
+    );
+
+    // kosong
+    if(snap.empty){
+
+      tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty">
+          Tidak ada data soal
+        </td>
+      </tr>
+      `;
+
+      return;
+    }
+
+    let html = "";
+    let no = 1;
+
+    snap.forEach((docu) => {
+
+      const d = docu.data();
+
+      html += `
+      <tr>
+
+        <td>${no++}</td>
+
+        <td>${d.mapel || "-"}</td>
+
+        <td>${d.judul || "-"}</td>
+
+        <td>${d.namaGuru || "-"}</td>
+
+        <td>
+
+          <button
+            class="btn-download"
+            data-id="${docu.id}">
+
+            <i class="fa fa-download"></i>
+            Unduh
+
+          </button>
+
+        </td>
+
+      </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+
+    // ================= EVENT DOWNLOAD =================
+    document.querySelectorAll(".btn-download")
+    .forEach((btn) => {
+
+      btn.addEventListener("click", async () => {
+
+        try{
+
+          const id = btn.dataset.id;
+
+          // ambil dokumen langsung
+          const soalSnap = await getDoc(
+            doc(db, "bank_soal", id)
+          );
+
+          // tidak ditemukan
+          if(!soalSnap.exists()){
+
+            alert("Data tidak ditemukan");
+
+            return;
+          }
+
+          const data = soalSnap.data();
+
+          // ================= ISI FILE =================
+          let isi = `
+${data.judul || "BANK SOAL"}
+
+Mapel : ${data.mapel || "-"}
+Guru  : ${data.namaGuru || "-"}
+Kelas : ${data.kelas || "-"}
+
+==================================================
+
+`;
+
+          let nomor = 1;
+
+          // ================= PG =================
+          (data.soalPG || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n`;
+
+            Object.entries(s.opsi || {})
+            .forEach(([k,v]) => {
+
+              isi += `${k}. ${v}\n`;
+
+            });
+
+            isi += `Jawaban : ${s.jawabanBenar || "-"}\n\n`;
+
+          });
+
+          // ================= MCMA =================
+          (data.soalMCMA || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n`;
+
+            Object.entries(s.opsi || {})
+            .forEach(([k,v]) => {
+
+              isi += `${k}. ${v}\n`;
+
+            });
+
+            isi += `Jawaban : ${(s.jawabanBenar || []).join(", ")}\n\n`;
+
+          });
+
+          // ================= KATEGORI =================
+          (data.soalKategori || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n`;
+
+            (s.pernyataan || [])
+            .forEach((p,i) => {
+
+              isi += `${i+1}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})\n`;
+
+            });
+
+            isi += `\n`;
+
+          });
+
+          // ================= ESSAY =================
+          (data.soalEssay || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n\n`;
+
+          });
+
+          // ================= DOWNLOAD =================
+          const blob = new Blob(
+            [isi],
+            {
+              type:"application/msword;charset=utf-8"
+            }
+          );
+
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+
+          a.href = url;
+
+          a.download = `${data.judul || "bank-soal"}.doc`;
+
+          document.body.appendChild(a);
+
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+        }catch(err){
+
+          console.error(err);
+
+          alert("Gagal download");
+
+        }
+
+      });
+
+    });
+
+  }catch(err){
+
+    console.error(err);
+
+    tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="empty">
+        Gagal memuat data
+      </td>
+    </tr>
+    `;
+
+  }
+
+}
+
+loadData();
+
+</script>
+
+<!-- LOGOUT -->
+<script type="module"
+src="../assets/js/logout.js"></script>
+
+</body>
+</html>

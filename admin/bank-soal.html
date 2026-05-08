@@ -195,9 +195,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <header class="topbar">
 <div class="brand">
 
-<button id="menuBtn">
-<i class="fa fa-bars"></i>
-</button>
 
 <img src="../assets/img/logo-sekolah.png" class="brand-logo">
 
@@ -222,6 +219,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
 <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
 <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+<li><a href="download-soal.html"><i class="fa fa-download"></i> Download Soal</a></li>
 </ul>
 
 <button class="logout" id="logout">
@@ -252,10 +250,6 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.8.0/f
 
 const list = document.getElementById("list");
 
-// TOGGLE SIDEBAR
-document.getElementById("menuBtn").onclick = () => {
-  document.querySelector(".sidebar").classList.toggle("active");
-};
 
 onAuthStateChanged(auth, user => {
   if (!user) {

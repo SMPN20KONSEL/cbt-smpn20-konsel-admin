@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Daftar Download Soal</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="../assets/css/admin.css">
+
+<!-- Font Awesome -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+/* ================= CONTENT ================= */
+.content{
+  flex:1;
+  padding:30px;
+}
+
+.container{
+  width:100%;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+h1{
+  margin-top:0;
+  color:#1e293b;
+}
+
+.subtitle{
+  color:#64748b;
+  margin-bottom:25px;
+}
+
+.table-wrapper{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+thead{
+  background:#2563eb;
+  color:white;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid #e2e8f0;
+  text-align:left;
+  font-size:14px;
+}
+
+tbody tr:hover{
+  background:#f8fafc;
+}
+
+.btn-download{
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  background:#16a34a;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+  transition:.2s;
+}
+
+.btn-download:hover{
+  background:#15803d;
+}
+
+.loading{
+  text-align:center;
+  padding:30px;
+  color:#64748b;
+}
+
+.empty{
+  text-align:center;
+  padding:30px;
+  color:#ef4444;
+}
+
+@media(max-width:700px){
+
+  .content{
+    padding:15px;
+  }
+
+  th,td{
+    font-size:12px;
+    padding:10px;
+  }
+
+  .btn-download{
+    padding:8px 10px;
+    font-size:12px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <img src="../assets/img/logo-sekolah.png"
+         class="brand-logo"
+         alt="Logo Sekolah">
+
+    <div class="brand-text">
+      <strong>SMPN 20 KONAWE SELATAN</strong>
+      <small>CBT Application</small>
+    </div>
+  </div>
+</header>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <h2>
+      <i class="fa fa-chalkboard-teacher"></i>
+      Guru
+    </h2>
+
+    <p id="nama-guru" class="nama-guru">
+      Memuat...
+    </p>
+
+    <ul class="menu">
+
+      <li>
+        <a href="dashboard-guru.html">
+          <i class="fa fa-home"></i>
+          Dashboard
+        </a>
+      </li>
+
+      <li>
+        <a href="buat-soal.html">
+          <i class="fa fa-pen"></i>
+          Buat Soal
+        </a>
+      </li>
+
+      <li>
+        <a href="bank-soal.html">
+          <i class="fa fa-book"></i>
+          Bank Soal
+        </a>
+      </li>
+
+      <li>
+        <a href="downloat.html" class="active">
+          <i class="fa fa-download"></i>
+          Download Soal
+        </a>
+      </li>
+
+      <li>
+        <a href="koreksi-essay.html">
+          <i class="fa fa-book"></i>
+          Koreksi Essay
+        </a>
+      </li>
+
+      <li>
+        <a href="rekap-nilai.html">
+          <i class="fa fa-chart-column"></i>
+          Rekap Nilai
+        </a>
+      </li>
+
+    </ul>
+
+    <button class="logout" id="logout">
+      <i class="fas fa-sign-out-alt"></i>
+      Logout
+    </button>
+
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <div class="container">
+
+      <h1>
+        <i class="fa fa-book"></i>
+        Daftar Bank Soal
+      </h1>
+
+      <p class="subtitle">
+        Download seluruh soal ujian guru
+      </p>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Mapel</th>
+              <th>Judul Ujian</th>
+              <th>Guru</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody id="tbody">
+
+            <tr>
+              <td colspan="5" class="loading">
+                Memuat data...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- NAMA GURU -->
+<script type="module" src="../assets/js/nama.js"></script>
+
+<!-- LOGOUT -->
+<script type="module" src="../assets/js/logout.js"></script>
+
+<!-- SCRIPT -->
+<script type="module">
+
+import { db, auth }
+from "../assets/js/firebase.js";
+
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  where,
+  query
+}
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+import {
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+// ================= ELEMENT =================
+const tbody = document.getElementById("tbody");
+
+// ================= AUTH =================
+onAuthStateChanged(auth, async (user) => {
+
+  if(!user){
+    location.href = "../login.html";
+    return;
+  }
+
+  try{
+
+    // cek user
+    const userSnap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    if(!userSnap.exists()){
+
+      alert("User tidak ditemukan");
+
+      location.href = "../login.html";
+
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    // cek role
+    if(userData.role !== "guru"){
+
+      alert("Akses khusus guru");
+
+      location.href = "../login.html";
+
+      return;
+    }
+
+    // load soal guru login
+    loadData(user);
+
+  }catch(err){
+
+    console.error(err);
+
+    alert("Gagal autentikasi");
+
+  }
+
+});
+
+// ================= LOAD DATA =================
+async function loadData(user){
+
+  try{
+
+    tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="loading">
+        Memuat data...
+      </td>
+    </tr>
+    `;
+
+    // FILTER BERDASARKAN GURU LOGIN
+    const q = query(
+      collection(db, "bank_soal"),
+      where("guruId", "==", user.uid)
+    );
+
+    const snap = await getDocs(q);
+
+    // kosong
+    if(snap.empty){
+
+      tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty">
+          Belum ada bank soal
+        </td>
+      </tr>
+      `;
+
+      return;
+    }
+
+    let html = "";
+    let no = 1;
+
+    snap.forEach((docu) => {
+
+      const d = docu.data();
+
+      html += `
+      <tr>
+
+        <td>${no++}</td>
+
+        <td>${d.mapel || "-"}</td>
+
+        <td>${d.judul || "-"}</td>
+
+        <td>${d.namaGuru || "-"}</td>
+
+        <td>
+
+          <button
+            class="btn-download"
+            data-id="${docu.id}">
+
+            <i class="fa fa-download"></i>
+            Unduh
+
+          </button>
+
+        </td>
+
+      </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+
+    // ================= DOWNLOAD =================
+    document.querySelectorAll(".btn-download")
+    .forEach((btn) => {
+
+      btn.addEventListener("click", async () => {
+
+        try{
+
+          const id = btn.dataset.id;
+
+          // ambil soal
+          const soalSnap = await getDoc(
+            doc(db, "bank_soal", id)
+          );
+
+          if(!soalSnap.exists()){
+
+            alert("Data soal tidak ditemukan");
+
+            return;
+          }
+
+          const data = soalSnap.data();
+
+          // ================= ISI FILE =================
+          let isi = `
+${data.judul || "BANK SOAL"}
+
+Mapel : ${data.mapel || "-"}
+Guru  : ${data.namaGuru || "-"}
+Kelas : ${data.kelas || "-"}
+
+==================================================
+
+`;
+
+          let nomor = 1;
+
+          // ================= PG =================
+          (data.soalPG || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n`;
+
+            Object.entries(s.opsi || {})
+            .forEach(([k,v]) => {
+
+              isi += `${k}. ${v}\n`;
+
+            });
+
+            isi += `Jawaban : ${s.jawabanBenar || "-"}\n\n`;
+
+          });
+
+          // ================= MCMA =================
+          (data.soalMCMA || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n`;
+
+            Object.entries(s.opsi || {})
+            .forEach(([k,v]) => {
+
+              isi += `${k}. ${v}\n`;
+
+            });
+
+            isi += `Jawaban : ${(s.jawabanBenar || []).join(", ")}\n\n`;
+
+          });
+
+          // ================= KATEGORI =================
+          (data.soalKategori || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n`;
+
+            (s.pernyataan || [])
+            .forEach((p, i) => {
+
+              isi += `${i+1}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})\n`;
+
+            });
+
+            isi += `\n`;
+
+          });
+
+          // ================= ESSAY =================
+          (data.soalEssay || []).forEach((s) => {
+
+            isi += `${nomor++}. ${s.pertanyaan}\n\n`;
+
+          });
+
+          // ================= DOWNLOAD FILE =================
+          const blob = new Blob(
+            [isi],
+            {
+              type:"application/msword;charset=utf-8"
+            }
+          );
+
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+
+          a.href = url;
+
+          a.download = `${data.judul || "bank-soal"}.doc`;
+
+          document.body.appendChild(a);
+
+          a.click();
+
+          document.body.removeChild(a);
+
+          URL.revokeObjectURL(url);
+
+        }catch(err){
+
+          console.error(err);
+
+          alert("Gagal download file");
+
+        }
+
+      });
+
+    });
+
+  }catch(err){
+
+    console.error(err);
+
+    tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="empty">
+        Gagal memuat data
+      </td>
+    </tr>
+    `;
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
