@@ -184,15 +184,14 @@ btnSimpan.onclick = async () => {
 
     const nilaiPG = parseFloat(nilaiPGEl.textContent) || 0;
 
-    const nilaiTotal = (nilaiPG + nilaiEssayNormal) / 2;
+    const totalNilai = (nilaiPG * 0.7) + (nilaiEssayNormal * 0.3);
 
     await updateDoc(jawabanRef, {
       nilaiEssayDetail,
       nilaiEssay: Number(totalEssay.toFixed(2)),
       nilaiEssayNormal: Number(nilaiEssayNormal.toFixed(2)),
-      nilaiTotal: Number(nilaiTotal.toFixed(2)),
-      statusNilai: "sudah_dinilai",
-      totalNilai: null
+      totalNilai: Number(totalNilai.toFixed(2)),
+      statusNilai: "sudah_dinilai"
     });
 
     btnSimpan.textContent = "✔ Tersimpan (bisa diedit lagi)";
