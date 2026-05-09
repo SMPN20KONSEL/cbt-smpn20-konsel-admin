@@ -39,9 +39,24 @@ function renderTabel(snap) {
   snap.forEach(docu => {
     const d = docu.data();
 
-    const status = d.statusNilai === "sudah_dinilai"
-      ? `<span class="badge sudah">Sudah</span>`
-      : `<span class="badge belum">Belum</span>`;
+const adaEssay = Object.keys(d.jawabanEssay || {}).length > 0;
+
+let status = "";
+
+// ✅ kalau tidak ada essay
+if (!adaEssay) {
+  status = `<span class="badge sudah">Tidak Perlu Koreksi</span>`;
+}
+
+// ✅ kalau essay sudah dinilai
+else if (d.statusNilai === "sudah_dinilai") {
+  status = `<span class="badge sudah">Sudah di Koreksi</span>`;
+}
+
+// ✅ kalau essay belum dinilai
+else {
+  status = `<span class="badge belum">Belum di Koreksi</span>`;
+}
 
     html += `
       <tr>
@@ -56,10 +71,18 @@ function renderTabel(snap) {
             👁 Lihat
           </button>
 
-          <button onclick="koreksi('${docu.id}')"
-            style="background:#2ecc71;color:white;border:none;padding:6px 10px;border-radius:6px">
-            ✏️ Koreksi
-          </button>
+${Object.keys(d.jawabanEssay || {}).length > 0 ? `
+  <button onclick="koreksi('${docu.id}')"
+    style="background:#2ecc71;color:white;border:none;padding:6px 10px;border-radius:6px">
+    ✏️ Koreksi
+  </button>
+` : `
+  <button
+    style="background:#bdc3c7;color:white;border:none;padding:6px 10px;border-radius:6px;cursor:not-allowed"
+    disabled>
+    Tidak Ada Essay
+  </button>
+`}
 
         </td>
       </tr>

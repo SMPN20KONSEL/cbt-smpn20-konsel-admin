@@ -164,10 +164,8 @@ function tampilkan(data) {
     `;
   });
 
-  const rata = formatNilai(totalSemua / data.length);
-
-  infoRekap.textContent =
-    `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
+infoRekap.textContent =
+  `Jumlah siswa: ${data.length}`;
 }
 
 

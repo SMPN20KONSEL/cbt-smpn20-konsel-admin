@@ -127,10 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
 
-    const rata = formatNilai(totalSemua / data.length);
-
     infoRekap.textContent =
-      `Jumlah siswa: ${data.length} | Rata-rata nilai: ${rata}`;
+  `Jumlah siswa: ${data.length}`;
   }
 
   // ================= FILTER BUTTON =================

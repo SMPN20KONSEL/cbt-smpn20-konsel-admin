@@ -88,27 +88,57 @@ function updateUI(nis, aktif) {
    AKTIFKAN AKUN SISWA
 ================================ */
 window.aktifkanAkun = async (nis, btn) => {
+
   setLoading(btn, true);
 
   try {
+
     const siswaRef = doc(db, "siswa", nis);
     const snap = await getDoc(siswaRef);
 
-    if (!snap.exists()) throw "Data siswa tidak ditemukan";
+    if (!snap.exists()) {
+      throw new Error("Data siswa tidak ditemukan");
+    }
 
     const siswa = snap.data();
-    if (siswa.aktif) throw "Akun sudah aktif";
 
-    // 1️⃣ BUAT AUTH
-    const cred = await createUserWithEmailAndPassword(
-      secondaryAuth,
-      siswa.email,
-      siswa.password
-    );
+    let uid = "";
 
-    const uid = cred.user.uid;
+    // ===============================
+    // CEK / BUAT AUTH
+    // ===============================
+    try {
 
-    // 2️⃣ SIMPAN akun_siswa
+      // coba buat akun baru
+      const cred = await createUserWithEmailAndPassword(
+        secondaryAuth,
+        siswa.email,
+        siswa.password
+      );
+
+      uid = cred.user.uid;
+
+    } catch (err) {
+
+      // kalau email sudah ada → login saja
+      if (err.code === "auth/email-already-in-use") {
+
+        const login = await signInWithEmailAndPassword(
+          secondaryAuth,
+          siswa.email,
+          siswa.password
+        );
+
+        uid = login.user.uid;
+
+      } else {
+        throw err;
+      }
+    }
+
+    // ===============================
+    // SIMPAN akun_siswa
+    // ===============================
     await setDoc(doc(db, "akun_siswa", uid), {
       uid,
       nis,
@@ -116,7 +146,9 @@ window.aktifkanAkun = async (nis, btn) => {
       createdAt: new Date()
     });
 
-    // 3️⃣ UPDATE siswa
+    // ===============================
+    // UPDATE STATUS SISWA
+    // ===============================
     await updateDoc(siswaRef, {
       aktif: true
     });
@@ -125,13 +157,22 @@ window.aktifkanAkun = async (nis, btn) => {
 
     alert("Akun siswa berhasil diaktifkan ✅");
 
-    // 🔥 UPDATE UI TANPA RELOAD
+    // update UI tanpa reload
     updateUI(nis, true);
 
   } catch (err) {
-    alert("Gagal aktivasi ❌\n" + err);
+
+    console.error(err);
+
+    alert(
+      "Gagal aktivasi ❌\n" +
+      (err.message || err)
+    );
+
   } finally {
+
     setLoading(btn, false);
+
   }
 };
 
