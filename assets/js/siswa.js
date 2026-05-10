@@ -56,34 +56,110 @@ function updateTotalSiswa(data) {
     "Total: " + data.length + " siswa";
 }
 
+function showNotif(text, color = "#16a34a") {
+
+  const notif = document.createElement("div");
+
+  notif.className = "notif";
+  notif.innerHTML = text;
+
+  notif.style.background = color;
+
+  document.body.appendChild(notif);
+
+  setTimeout(() => {
+    notif.remove();
+  }, 2000);
+}
+
+function confirmCustom(text) {
+
+  const bg = document.createElement("div");
+  bg.className = "confirm-bg";
+
+  bg.innerHTML = `
+    <div class="confirm-box">
+
+      <div class="confirm-text">
+        ${text}
+      </div>
+
+      <div class="confirm-actions">
+
+        <button type="button" class="btn-batal">
+          Batal
+        </button>
+
+        <button type="button" class="btn-hapus-confirm">
+          Hapus
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(bg);
+
+  return new Promise(resolve => {
+
+    bg.querySelector(".btn-batal").onclick = () => {
+      bg.remove();
+      resolve(false);
+    };
+
+    bg.querySelector(".btn-hapus-confirm").onclick = () => {
+      bg.remove();
+      resolve(true);
+    };
+
+  });
+}
+
 /* ===============================
    UPDATE UI TANPA RELOAD
 ================================ */
 function updateUI(nis, aktif) {
+
   const row = document.getElementById(`row-${nis}`);
   if (!row) return;
 
   const statusCell = row.querySelector(".status");
   const aksiCell   = row.querySelector(".aksi");
 
-  // update status
+  // ===============================
+  // UPDATE STATUS
+  // ===============================
   statusCell.innerHTML = aktif
     ? `<span class="badge aktif">Aktif</span>`
     : `<span class="badge nonaktif">Nonaktif</span>`;
 
-  // update tombol
-  aksiCell.innerHTML = aktif
-    ? `<button class="btn danger"
-          data-label="Nonaktifkan"
-          onclick="nonaktifkanAkun('${nis}', this)">
-          Nonaktifkan
-       </button>`
-    : `<button class="btn success"
-          data-label="Aktifkan"
-          onclick="aktifkanAkun('${nis}', this)">
-          Aktifkan
-       </button>`;
-} // 🔥 INI YANG KURANG
+  // ===============================
+  // UPDATE TOMBOL
+  // ===============================
+  aksiCell.innerHTML = `
+    ${
+      aktif
+      ? `<button class="btn btn-nonaktif"
+            data-label="Nonaktifkan"
+            onclick="nonaktifkanAkun('${nis}', this)">
+            Nonaktifkan
+         </button>`
+      : `<button class="btn btn-aktif"
+            data-label="Aktifkan"
+            onclick="aktifkanAkun('${nis}', this)">
+            Aktifkan
+         </button>`
+    }
+
+    <button class="btn btn-hapus"
+      data-label="Hapus"
+      onclick="hapusSiswa('${nis}', this)">
+      Hapus
+    </button>
+  `;
+}
+
 /* ===============================
    AKTIFKAN AKUN SISWA
 ================================ */
@@ -155,7 +231,8 @@ window.aktifkanAkun = async (nis, btn) => {
 
     await signOut(secondaryAuth);
 
-    alert("Akun siswa berhasil diaktifkan ✅");
+    // notifikasi kecil otomatis hilang
+    showNotif("✅ Akun siswa berhasil diaktifkan");
 
     // update UI tanpa reload
     updateUI(nis, true);
@@ -180,53 +257,71 @@ window.aktifkanAkun = async (nis, btn) => {
    NONAKTIFKAN AKUN SISWA
 ================================ */
 window.nonaktifkanAkun = async (nis, btn) => {
-  if (!confirm("Nonaktifkan akun siswa ini?")) return;
 
   setLoading(btn, true);
 
   try {
+
     const siswaRef = doc(db, "siswa", nis);
     const snap = await getDoc(siswaRef);
 
-    if (!snap.exists()) throw "Data siswa tidak ditemukan";
+    if (!snap.exists()) {
+      throw new Error("Data siswa tidak ditemukan");
+    }
 
     const siswa = snap.data();
 
-    // 1️⃣ LOGIN AUTH SISWA
+    // LOGIN AUTH SISWA
     const cred = await signInWithEmailAndPassword(
       secondaryAuth,
       siswa.email,
       siswa.password
     );
 
-    // 2️⃣ HAPUS AUTH
+    // HAPUS AUTH
     await deleteUser(cred.user);
 
-    // 3️⃣ HAPUS akun_siswa (LEBIH CEPAT)
-    const q = query(collection(db, "akun_siswa"), where("nis", "==", nis));
+    // HAPUS akun_siswa
+    const q = query(
+      collection(db, "akun_siswa"),
+      where("nis", "==", nis)
+    );
+
     const akunSnap = await getDocs(q);
 
-    akunSnap.forEach(async d => {
+    for (const d of akunSnap.docs) {
       await deleteDoc(d.ref);
-    });
+    }
 
-    // 4️⃣ UPDATE siswa
+    // UPDATE STATUS
     await updateDoc(siswaRef, {
       aktif: false
     });
 
     await signOut(secondaryAuth);
 
-    alert("Akun siswa dinonaktifkan 🗑️");
+    // NOTIFIKASI
+    showNotif(
+      "🗑️ Akun siswa berhasil dinonaktifkan",
+      "#dc2626"
+    );
 
-    // 🔥 UPDATE UI TANPA RELOAD
+    // UPDATE UI
     updateUI(nis, false);
 
   } catch (err) {
+
     console.error(err);
-    alert("Gagal nonaktif ❌\n" + err.message);
+
+    showNotif(
+      "❌ Gagal menonaktifkan akun",
+      "#dc2626"
+    );
+
   } finally {
+
     setLoading(btn, false);
+
   }
 };
 
@@ -310,24 +405,24 @@ function tampilkanSiswa(data) {
     <td class="aksi" data-label="Aksi">
 
       ${
-        s.aktif
-        ? `<button class="btn danger"
-              data-label="Nonaktifkan"
-              onclick="nonaktifkanAkun('${s.nis}', this)">
-              Nonaktifkan
-           </button>`
-        : `<button class="btn success"
-              data-label="Aktifkan"
-              onclick="aktifkanAkun('${s.nis}', this)">
-              Aktifkan
-           </button>`
-      }
+  s.aktif
+  ? `<button class="btn btn-nonaktif"
+        data-label="Nonaktifkan"
+        onclick="nonaktifkanAkun('${s.nis}', this)">
+        Nonaktifkan
+     </button>`
+  : `<button class="btn btn-aktif"
+        data-label="Aktifkan"
+        onclick="aktifkanAkun('${s.nis}', this)">
+        Aktifkan
+     </button>`
+}
 
-      <button class="btn danger"
-        data-label="Hapus"
-        onclick="hapusSiswa('${s.nis}', this)">
-        Hapus
-      </button>
+<button class="btn btn-hapus"
+  data-label="Hapus"
+  onclick="hapusSiswa('${s.nis}', this)">
+  Hapus
+</button>
 
     </td>
 
@@ -380,7 +475,12 @@ async function load() {
 load();
 
 window.hapusSiswa = async (nis, btn) => {
-  if (!confirm("Hapus siswa ini? Data tidak bisa dikembalikan!")) return;
+
+  const lanjut = await confirmCustom(
+    "🗑️ Hapus siswa ini?<br><small>Data tidak bisa dikembalikan</small>"
+  );
+
+  if (!lanjut) return;
 
   setLoading(btn, true);
 
@@ -388,9 +488,8 @@ window.hapusSiswa = async (nis, btn) => {
     const siswaRef = doc(db, "siswa", nis);
     const snap = await getDoc(siswaRef);
 
-    if (!snap.exists()) throw "Data tidak ditemukan";
+    if (!snap.exists()) throw new Error("Data tidak ditemukan");
 
-    // hapus akun_siswa
     const q = query(collection(db, "akun_siswa"), where("nis", "==", nis));
     const akunSnap = await getDocs(q);
 
@@ -398,22 +497,20 @@ window.hapusSiswa = async (nis, btn) => {
       await deleteDoc(d.ref);
     }
 
-    // hapus siswa
     await deleteDoc(siswaRef);
 
-    // hapus UI
     const row = document.getElementById(`row-${nis}`);
     if (row) row.remove();
 
-    // update total tanpa reload
-    const totalRow = document.querySelectorAll("#list tr").length;
+    const totalRow = document.querySelectorAll(".tabel-kelas tbody tr").length;
+
     document.getElementById("totalSiswa").innerText =
       "Total: " + totalRow + " siswa";
 
-    alert("Siswa berhasil dihapus 🗑️");
+    showNotif("✅ Siswa berhasil dihapus", "#dc2626");
 
   } catch (err) {
-    alert("Gagal hapus ❌\n" + err);
+    showNotif("❌ Gagal menghapus siswa", "#dc2626");
   } finally {
     setLoading(btn, false);
   }

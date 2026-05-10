@@ -1,121 +1,87 @@
 /* =====================================================
-   HALAMAN GURU (AMAN - TANPA BENTROK)
+   GLOBAL RESET
 ===================================================== */
-
-/* ================= HEADER ================= */
-.content h1 {
-  font-size: 34px;
-  font-weight: 700;
-  color: #000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 10px;
-  text-align: center;
-}
-
-/* ================= HEADER GURU ================= */
-.guru-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.judul-guru {
-  grid-column: 2;
-  text-align: center;
-  font-size: 24px;
-  font-weight: 800;
-  color: #1f3c88;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
 }
 
-/* TOTAL (KANAN) */
-.total-card-guru {
-  grid-column: 3;
-  justify-self: end;
-  background: #2563eb;
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 700;
+body {
+  background: #f4f6fb;
+  color: #111;
 }
 
-/* ================= CARD ================= */
+/* =====================================================
+   HEADER
+===================================================== */
+.content h1 {
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+/* =====================================================
+   CARD
+===================================================== */
 .card {
   background: #fff;
+  padding: 18px;
   border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
 }
 
 .card h3 {
   font-size: 18px;
+  margin-bottom: 12px;
   color: #1f3c88;
-  font-weight: 600;
 }
 
-.total-guru {
-  display: inline-block;
-  background: #3b82f6;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-}
-
-/* ================= FORM ================= */
+/* =====================================================
+   FORM
+===================================================== */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
 }
 
-.form-grid input {
-  padding: 12px 14px;
-  border-radius: 10px;
+.form-grid input,
+.form-grid select {
+  padding: 12px;
   border: 1px solid #d1d5db;
+  border-radius: 10px;
+  outline: none;
   font-size: 14px;
+  transition: 0.2s;
 }
 
-.form-grid input:focus {
-  outline: none;
+.form-grid input:focus,
+.form-grid select:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
 }
 
-/* ================= BUTTON ================= */
+/* =====================================================
+   BUTTON
+===================================================== */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  padding: 10px 16px;
+  border: none;
+  padding: 10px 14px;
   border-radius: 10px;
-
+  cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-
-  cursor: pointer;
-  border: none;
-}
-
-.btn.secondary {
-  background: #2563eb;
-  color: #fff;
-}
-
-.btn.secondary:hover {
-  background: #1e40af;
+  transition: 0.2s;
 }
 
 .btn.success {
@@ -123,21 +89,58 @@
   color: #fff;
 }
 
+.btn.success:hover {
+  background: #15803d;
+}
+
 .btn.danger {
   background: #dc2626;
   color: #fff;
 }
 
-/* ================= TABLE ================= */
+.btn.danger:hover {
+  background: #b91c1c;
+}
+
+/* =====================================================
+   HEADER LIST
+===================================================== */
+.guru-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.judul-guru {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1f3c88;
+}
+
+.total-card-guru {
+  background: #2563eb;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+.table-wrapper {
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
-}
-
-/* biar bisa scroll di HP */
-.table-wrapper {
-  overflow-x: auto;
+  min-width: 800px;
 }
 
 .table thead {
@@ -149,29 +152,26 @@
 .table td {
   padding: 12px;
   text-align: left;
-  vertical-align: middle;
+  font-size: 14px;
 }
 
 .table tbody tr {
   border-bottom: 1px solid #e5e7eb;
+  transition: 0.2s;
 }
 
 .table tbody tr:hover {
   background: #f1f5f9;
 }
 
-/* tombol tidak turun */
-.table td:last-child {
-  white-space: nowrap;
-}
-
-/* ================= BADGE ================= */
+/* =====================================================
+   BADGE
+===================================================== */
 .badge {
-  display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .badge.aktif {
@@ -185,85 +185,169 @@
 }
 
 /* =====================================================
-   RESPONSIVE HP
+   ACTION BUTTON TABLE
+===================================================== */
+.table td button {
+  margin-right: 5px;
+}
+
+/* =====================================================
+   NOTIFIKASI
+===================================================== */
+.notif {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 14px 18px;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 600;
+  z-index: 9999;
+  background: #2563eb;
+}
+
+/* =====================================================
+   CONFIRM MODAL
+===================================================== */
+.confirm-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+.confirm-box {
+  background: #fff;
+  width: 320px;
+  border-radius: 16px;
+  padding: 22px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: pop 0.2s ease;
+}
+
+.confirm-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 12px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.confirm-box h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.confirm-box p {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 18px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.confirm-actions .no {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.confirm-actions .no:hover {
+  background: #d1d5db;
+}
+
+.confirm-actions .yes {
+  background: #ef4444;
+  color: #fff;
+}
+
+.confirm-actions .yes:hover {
+  background: #dc2626;
+}
+
+/* =====================================================
+   ANIMATION
+===================================================== */
+@keyframes pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* =====================================================
+   RESPONSIVE
 ===================================================== */
 @media (max-width: 768px) {
 
-  /* judul */
-  .content h1 {
-    font-size: 20px;
-    flex-direction: column;
-  }
-
-  /* header jadi 1 kolom */
-  .guru-header {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    text-align: center;
-  }
-
-  .judul-guru {
-    grid-column: auto;
-    font-size: 18px;
-  }
-
-  .total-card-guru {
-    grid-column: auto;
-    justify-self: center;
-    font-size: 12px;
-    padding: 5px 10px;
-  }
-
-  /* form full */
   .form-grid {
     grid-template-columns: 1fr;
   }
 
-  /* tabel jadi card */
+  .guru-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .table {
+    min-width: 100%;
+  }
+
   .table thead {
     display: none;
   }
 
-  .table,
-  .table tbody,
-  .table tr,
-  .table td {
-    display: block;
-    width: 100%;
-  }
-
   .table tr {
-    background: #fff;
+    display: block;
     margin-bottom: 12px;
+    background: #fff;
     border-radius: 10px;
     padding: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
 
   .table td {
-    padding: 8px 10px;
-    text-align: left;
-    position: relative;
+    display: block;
+    padding: 6px 0;
   }
 
-  /* label otomatis */
   .table td::before {
     content: attr(data-label);
-    font-weight: 600;
-    display: block;
-    margin-bottom: 4px;
+    font-weight: 700;
     color: #6b7280;
-    font-size: 12px;
-  }
-
-  /* tombol */
-  .table td:last-child {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .btn {
-    width: 100%;
+    display: block;
+    margin-bottom: 3px;
   }
 }

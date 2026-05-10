@@ -272,6 +272,11 @@ tbody tr:hover{
   </main>
 
 </div>
+<!-- DOCX LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+
+<!-- DOCX LIBRARY -->
+<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
 
 <!-- ================= SCRIPT ================= -->
 <script type="module">
@@ -290,6 +295,55 @@ from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 // ================= ELEMENT =================
 const tbody = document.getElementById("tbody");
 
+// ================= LOAD IMAGE =================
+async function loadImage(url){
+
+  const res = await fetch(url);
+
+  if(!res.ok){
+    throw new Error("Gagal memuat gambar");
+  }
+
+  return await res.arrayBuffer();
+}
+
+// ================= FORMAT JUDUL =================
+function formatJudul(judul){
+
+  if(!judul) return "BANK SOAL";
+
+  const j = judul.toLowerCase().trim();
+
+  if(
+    j.includes("sumatif akhir semester") ||
+    j.startsWith("sas")
+  ){
+    return "SUMATIF AKHIR SEMESTER (SAS)";
+  }
+
+  else if(
+    j.includes("sumatif tengah semester") ||
+    j.startsWith("sts")
+  ){
+    return "SUMATIF TENGAH SEMESTER (STS)";
+  }
+
+  else if(
+    j.includes("sumatif harian") ||
+    j.startsWith("sh")
+  ){
+    return "SUMATIF HARIAN (SH)";
+  }
+
+  else if(
+    j.includes("usbn")
+  ){
+    return "UJIAN SEKOLAH BERSTANDAR NASIONAL (USBN)";
+  }
+
+  return judul.toUpperCase();
+}
+
 // ================= LOAD DATA =================
 async function loadData(){
 
@@ -299,7 +353,7 @@ async function loadData(){
       collection(db, "bank_soal")
     );
 
-    // kosong
+    // ================= DATA KOSONG =================
     if(snap.empty){
 
       tbody.innerHTML = `
@@ -316,6 +370,7 @@ async function loadData(){
     let html = "";
     let no = 1;
 
+    // ================= LOOP =================
     snap.forEach((docu) => {
 
       const d = docu.data();
@@ -350,7 +405,7 @@ async function loadData(){
 
     tbody.innerHTML = html;
 
-    // ================= EVENT DOWNLOAD =================
+    // ================= BUTTON DOWNLOAD =================
     document.querySelectorAll(".btn-download")
     .forEach((btn) => {
 
@@ -358,14 +413,36 @@ async function loadData(){
 
         try{
 
+          // ================= CEK DOCX =================
+          if(!window.docx){
+
+            alert("Library DOCX belum siap");
+
+            return;
+          }
+
+          // ================= DOCX =================
+          const {
+            Document,
+            Packer,
+            Paragraph,
+            TextRun,
+            AlignmentType,
+            Table,
+            TableRow,
+            TableCell,
+            WidthType,
+            BorderStyle,
+            ImageRun
+          } = window.docx;
+
+          // ================= GET DATA =================
           const id = btn.dataset.id;
 
-          // ambil dokumen langsung
           const soalSnap = await getDoc(
             doc(db, "bank_soal", id)
           );
 
-          // tidak ditemukan
           if(!soalSnap.exists()){
 
             alert("Data tidak ditemukan");
@@ -375,82 +452,552 @@ async function loadData(){
 
           const data = soalSnap.data();
 
-          // ================= ISI FILE =================
-          let isi = `
-${data.judul || "BANK SOAL"}
+          // ================= LOAD LOGO =================
+          const logoKiri = await loadImage(
+            "../assets/img/logo-konawe.png"
+          );
 
-Mapel : ${data.mapel || "-"}
-Guru  : ${data.namaGuru || "-"}
-Kelas : ${data.kelas || "-"}
+          const logoKanan = await loadImage(
+            "../assets/img/tutwuri.png"
+          );
 
-==================================================
-
-`;
-
+          // ================= NOMOR =================
           let nomor = 1;
+
+          // ================= CHILDREN =================
+          const children = [];
+
+          // ================= HEADER =================
+          const kopTable = new Table({
+
+            width:{
+              size:100,
+              type:WidthType.PERCENTAGE
+            },
+
+            borders:{
+              top:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+              bottom:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+              left:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+              right:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+              insideHorizontal:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+              insideVertical:{style:BorderStyle.NONE,size:0,color:"FFFFFF"}
+            },
+
+            rows:[
+
+              new TableRow({
+
+                children:[
+
+                  // ================= LOGO KIRI =================
+                  new TableCell({
+
+                    width:{
+                      size:15,
+                      type:WidthType.PERCENTAGE
+                    },
+
+                    borders:{
+                      top:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      bottom:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      left:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      right:{style:BorderStyle.NONE,size:0,color:"FFFFFF"}
+                    },
+
+                    children:[
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        children:[
+
+                          new ImageRun({
+
+                            data:logoKiri,
+
+                            transformation:{
+                              width:70,
+                              height:70
+                            }
+
+                          })
+
+                        ]
+
+                      })
+
+                    ]
+
+                  }),
+
+                  // ================= TENGAH =================
+                  new TableCell({
+
+                    width:{
+                      size:70,
+                      type:WidthType.PERCENTAGE
+                    },
+
+                    borders:{
+                      top:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      bottom:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      left:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      right:{style:BorderStyle.NONE,size:0,color:"FFFFFF"}
+                    },
+
+                    children:[
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        spacing:{ after:50 },
+
+                        children:[
+
+                          new TextRun({
+                            text:"PEMERINTAH KABUPATEN KONAWE SELATAN",
+                            bold:true,
+                            size:28
+                          })
+
+                        ]
+
+                      }),
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        spacing:{ after:50 },
+
+                        children:[
+
+                          new TextRun({
+                            text:"DINAS PENDIDIKAN DAN KEBUDAYAAN",
+                            bold:true,
+                            size:28
+                          })
+
+                        ]
+
+                      }),
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        spacing:{ after:50 },
+
+                        children:[
+
+                          new TextRun({
+                            text:"SMP NEGERI 20 KONAWE SELATAN",
+                            bold:true,
+                            size:30
+                          })
+
+                        ]
+
+                      }),
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        children:[
+
+                          new TextRun({
+                            text:"Jl. Sabulakoa - Landono Desa Sabulakoa Kec. Sabulakoa",
+                            size:22
+                          })
+
+                        ]
+
+                      })
+
+                    ]
+
+                  }),
+
+                  // ================= LOGO KANAN =================
+                  new TableCell({
+
+                    width:{
+                      size:15,
+                      type:WidthType.PERCENTAGE
+                    },
+
+                    borders:{
+                      top:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      bottom:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      left:{style:BorderStyle.NONE,size:0,color:"FFFFFF"},
+                      right:{style:BorderStyle.NONE,size:0,color:"FFFFFF"}
+                    },
+
+                    children:[
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        children:[
+
+                          new ImageRun({
+
+                            data:logoKanan,
+
+                            transformation:{
+                              width:70,
+                              height:70
+                            }
+
+                          })
+
+                        ]
+
+                      })
+
+                    ]
+
+                  })
+
+                ]
+
+              })
+
+            ]
+
+          });
+
+          children.push(kopTable);
+
+          // ================= GARIS HEADER =================
+          children.push(
+
+            new Paragraph({
+
+              border:{
+                bottom:{
+                  color:"000000",
+                  style:BorderStyle.DOUBLE,
+                  size:6
+                }
+              },
+
+              spacing:{
+                after:300
+              }
+
+            })
+
+          );
+
+          // ================= JUDUL =================
+          children.push(
+
+            new Paragraph({
+
+              alignment:AlignmentType.CENTER,
+
+              spacing:{
+                after:300
+              },
+
+              children:[
+
+                new TextRun({
+                  text: formatJudul(data.judul),
+                  bold:true,
+                  size:28
+                })
+
+              ]
+
+            })
+
+          );
+
+          // ================= IDENTITAS =================
+          children.push(
+
+            new Paragraph({
+              text:`Mata Pelajaran : ${data.mapel || "-"}`,
+              spacing:{ line:360 }
+            }),
+
+            new Paragraph({
+              text:`Guru           : ${data.namaGuru || "-"}`,
+              spacing:{ line:360 }
+            }),
+
+            new Paragraph({
+              text:`Kelas          : ${data.kelas || "-"}`,
+              spacing:{ line:360 }
+            }),
+
+            // ================= SPASI =================
+            new Paragraph({
+              text:"",
+              spacing:{
+                after:200
+              }
+            }),
+
+            // ================= SOAL =================
+            new Paragraph({
+
+              alignment:AlignmentType.CENTER,
+
+              spacing:{
+                after:100
+              },
+
+              children:[
+
+                new TextRun({
+                  text:"SOAL - SOAL",
+                  bold:true,
+                  size:26
+                })
+
+              ]
+
+            }),
+
+            // ================= GARIS =================
+            new Paragraph({
+
+              text:"=".repeat(95),
+
+              alignment:AlignmentType.CENTER,
+
+              spacing:{
+                after:300
+              }
+
+            })
+
+          );
 
           // ================= PG =================
           (data.soalPG || []).forEach((s) => {
 
-            isi += `${nomor++}. ${s.pertanyaan}\n`;
+            children.push(
+
+              new Paragraph({
+
+                text:`${nomor++}. ${s.pertanyaan}`,
+
+                spacing:{
+                  before:200,
+                  line:360
+                }
+
+              })
+
+            );
 
             Object.entries(s.opsi || {})
             .forEach(([k,v]) => {
 
-              isi += `${k}. ${v}\n`;
+              children.push(
+
+                new Paragraph({
+
+                  text:`${k}. ${v}`,
+
+                  spacing:{
+                    line:360
+                  }
+
+                })
+
+              );
 
             });
 
-            isi += `Jawaban : ${s.jawabanBenar || "-"}\n\n`;
+            children.push(
+
+              new Paragraph({
+
+                text:`Jawaban : ${s.jawabanBenar || "-"}`,
+
+                spacing:{
+                  after:200,
+                  line:360
+                }
+
+              })
+
+            );
 
           });
 
           // ================= MCMA =================
           (data.soalMCMA || []).forEach((s) => {
 
-            isi += `${nomor++}. ${s.pertanyaan}\n`;
+            children.push(
+
+              new Paragraph({
+
+                text:`${nomor++}. ${s.pertanyaan}`,
+
+                spacing:{
+                  before:200,
+                  line:360
+                }
+
+              })
+
+            );
 
             Object.entries(s.opsi || {})
             .forEach(([k,v]) => {
 
-              isi += `${k}. ${v}\n`;
+              children.push(
+
+                new Paragraph({
+
+                  text:`${k}. ${v}`,
+
+                  spacing:{
+                    line:360
+                  }
+
+                })
+
+              );
 
             });
 
-            isi += `Jawaban : ${(s.jawabanBenar || []).join(", ")}\n\n`;
+            children.push(
+
+              new Paragraph({
+
+                text:`Jawaban : ${(s.jawabanBenar || []).join(", ")}`,
+
+                spacing:{
+                  after:200,
+                  line:360
+                }
+
+              })
+
+            );
 
           });
 
           // ================= KATEGORI =================
           (data.soalKategori || []).forEach((s) => {
 
-            isi += `${nomor++}. ${s.pertanyaan}\n`;
+            children.push(
+
+              new Paragraph({
+
+                text:`${nomor++}. ${s.pertanyaan}`,
+
+                spacing:{
+                  before:200,
+                  line:360
+                }
+
+              })
+
+            );
 
             (s.pernyataan || [])
             .forEach((p,i) => {
 
-              isi += `${i+1}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})\n`;
+              children.push(
+
+                new Paragraph({
+
+                  text:`${i+1}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})`,
+
+                  spacing:{
+                    line:360
+                  }
+
+                })
+
+              );
 
             });
 
-            isi += `\n`;
+            children.push(
+              new Paragraph({ text:"" })
+            );
 
           });
 
           // ================= ESSAY =================
           (data.soalEssay || []).forEach((s) => {
 
-            isi += `${nomor++}. ${s.pertanyaan}\n\n`;
+            children.push(
+
+              new Paragraph({
+
+                text:`${nomor++}. ${s.pertanyaan}`,
+
+                spacing:{
+                  before:200,
+                  after:400,
+                  line:360
+                }
+
+              })
+
+            );
 
           });
 
-          // ================= DOWNLOAD =================
-          const blob = new Blob(
-            [isi],
-            {
-              type:"application/msword;charset=utf-8"
-            }
-          );
+          // ================= DOCUMENT =================
+          const docFile = new Document({
+
+            styles:{
+              default:{
+                document:{
+                  run:{
+                    font:"Times New Roman",
+                    size:24
+                  },
+                  paragraph:{
+                    spacing:{
+                      line:360
+                    }
+                  }
+                }
+              }
+            },
+
+            sections:[
+
+              {
+
+                properties:{
+                  page:{
+                    margin:{
+                      top:700,
+                      right:700,
+                      bottom:700,
+                      left:700
+                    }
+                  }
+                },
+
+                children
+
+              }
+
+            ]
+
+          });
+
+          // ================= EXPORT =================
+          const blob = await Packer.toBlob(docFile);
 
           const url = URL.createObjectURL(blob);
 
@@ -458,7 +1005,7 @@ Kelas : ${data.kelas || "-"}
 
           a.href = url;
 
-          a.download = `${data.judul || "bank-soal"}.doc`;
+          a.download = `${data.judul || "bank-soal"}.docx`;
 
           document.body.appendChild(a);
 
@@ -473,7 +1020,6 @@ Kelas : ${data.kelas || "-"}
           console.error(err);
 
           alert("Gagal download");
-
         }
 
       });
@@ -491,11 +1037,11 @@ Kelas : ${data.kelas || "-"}
       </td>
     </tr>
     `;
-
   }
 
 }
 
+// ================= LOAD =================
 loadData();
 
 </script>

@@ -1,19 +1,15 @@
-/* ===============================
-   FIREBASE CORE
-================================ */
+/* =====================================================
+   FIREBASE CORE (CLEAN SYSTEM)
+===================================================== */
 import { app, db } from "./firebase.js";
-
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-
 import {
   collection,
-  getDocs,
   doc,
   getDoc,
   setDoc,
   updateDoc,
-  deleteDoc
+  deleteDoc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 import {
@@ -24,349 +20,166 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-/* ===============================
-   SECONDARY AUTH (KHUSUS GURU)
-================================ */
-const secondaryApp  = initializeApp(app.options, "secondary-guru");
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+
+/* =====================================================
+   SECONDARY AUTH
+===================================================== */
+const secondaryApp = initializeApp(app.options, "secondary-guru");
 const secondaryAuth = getAuth(secondaryApp);
 
-/* ===============================
+/* =====================================================
    ELEMENT
-================================ */
-const namaInput  = document.getElementById("nama");
+===================================================== */
+const namaInput = document.getElementById("nama");
 const mapelInput = document.getElementById("mapel");
-const list       = document.getElementById("list");
-/* ===============================
-   LIST MAPEL SMP
-================================ */
-const daftarMapelSMP = [
+const list = document.getElementById("list");
+const totalGuru = document.getElementById("totalGuru");
+const btnTambah = document.getElementById("btnTambah");
+
+/* =====================================================
+   MAPEL
+===================================================== */
+const mapelList = [
   "Pendidikan Agama Islam",
   "Pendidikan Agama Kristen",
   "Pendidikan Agama Katolik",
   "Pendidikan Agama Hindu",
   "Pendidikan Agama Buddha",
   "Pendidikan Agama Konghucu",
-
   "PPKn",
   "Bahasa Indonesia",
   "Matematika",
   "IPA",
   "IPS",
   "Bahasa Inggris",
-
   "Seni Budaya",
-  "Pendidikan Jasmani, Olahraga, dan Kesehatan (PJOK)",
+  "PJOK",
   "Prakarya",
   "Informatika",
-
   "Bahasa Daerah",
   "Muatan Lokal"
 ];
 
-/* ===============================
-   INIT DROPDOWN MAPEL
-================================ */
+/* =====================================================
+   INIT MAPEL
+===================================================== */
 function initMapel() {
-  mapelInput.innerHTML = "";
-
-  const defaultOpt = document.createElement("option");
-  defaultOpt.value = "";
-  defaultOpt.textContent = "-- Pilih Mapel --";
-  mapelInput.appendChild(defaultOpt);
-
-  daftarMapelSMP.forEach(mapel => {
-    const opt = document.createElement("option");
-    opt.value = mapel;
-    opt.textContent = mapel;
-    mapelInput.appendChild(opt);
+  mapelInput.innerHTML = `<option value="">-- Pilih Mapel --</option>`;
+  mapelList.forEach(m => {
+    mapelInput.innerHTML += `<option value="${m}">${m}</option>`;
   });
 }
-/* ===============================
-   LOADING HELPER
-================================ */
-function setLoading(btn, state) {
-  if (!btn) return;
 
-  const text = document.getElementById("textBtn");
-  btn.disabled = state;
-
-  text.innerHTML = state
-    ? '<i class="fa fa-spinner fa-spin"></i> Proses...'
-    : 'Tambah Guru';
+/* =====================================================
+   NOTIF
+===================================================== */
+function showNotif(text, color = "#16a34a") {
+  const el = document.createElement("div");
+  el.className = "notif";
+  el.style.background = color;
+  el.innerHTML = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2000);
 }
 
+/* =====================================================
+   CONFIRM
+===================================================== */
+function confirmCustom(text) {
+  return new Promise(resolve => {
+    const bg = document.createElement("div");
+    bg.className = "confirm-bg";
 
-/* ===============================
-   PARSE NAMA (GELAR)
-================================ */
-function parseNamaLengkap(input) {
-  let words = input
-    .replace(/,/g, " ")
-    .split(/\s+/)
-    .filter(w => w);
+    bg.innerHTML = `
+      <div class="confirm-box">
 
-  const depan = [];
-  const nama = [];
-  const belakang = [];
+        <div class="confirm-icon">🗑️</div>
 
-  words.forEach(word => {
-    const clean = word.replace(/\./g, "").toLowerCase();
+        <h3>Konfirmasi</h3>
+        <p>${text}</p>
 
-    // GELAR DEPAN
-    if (["dr","drs","dra","h","hj","ir"].includes(clean)) {
-      depan.push(formatGelar(clean));
-      return;
-    }
+        <div class="confirm-actions">
+          <button class="no">Batal</button>
+          <button class="yes">Hapus</button>
+        </div>
 
-    // GELAR BELAKANG
-    if ([
-      "spd","spdi","sag","skom","si","se","sh","spsi",
-      "mpd","mpdi","mag","mkom","msi","me","mh","gr"
-    ].includes(clean)) {
-      belakang.push(formatGelar(clean));
-      return;
-    }
+      </div>
+    `;
 
-    // NAMA
-    nama.push(
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    );
+    document.body.appendChild(bg);
+
+    bg.querySelector(".no").onclick = () => {
+      bg.remove();
+      resolve(false);
+    };
+
+    bg.querySelector(".yes").onclick = () => {
+      bg.remove();
+      resolve(true);
+    };
   });
-
-  const depanFix = depan.join(" ");
-  const namaFix = nama.join(" ");
-  const belakangFix = belakang.join(", ");
-
-  return {
-    full: [
-      depanFix,
-      namaFix,
-      belakangFix ? ", " + belakangFix : ""
-    ].join("").trim()
-  };
 }
 
-// ================= FORMAT GELAR =================
-function formatGelar(g) {
-  g = g.toLowerCase().replace(/\./g, "").trim();
-
-  const map = {
-    // depan
-    "dr": "Dr.",
-    "drs": "Drs.",
-    "dra": "Dra.",
-    "h": "H.",
-    "hj": "Hj.",
-    "ir": "Ir.",
-
-    // pendidikan umum
-    "sd": "S.D.",
-    "smp": "S.M.P.",
-    "sma": "S.M.A.",
-
-    // sarjana
-    "spd": "S.Pd.",
-    "spdi": "S.Pd.I.",
-    "sag": "S.Ag.",
-    "skom": "S.Kom.",
-    "si": "S.I.",
-    "se": "S.E.",
-    "sh": "S.H.",
-    "spsi": "S.Psi.",
-
-    // magister
-    "mpd": "M.Pd.",
-    "mpdi": "M.Pd.I.",
-    "mag": "M.Ag.",
-    "mkom": "M.Kom.",
-    "msi": "M.Si.",
-    "me": "M.E.",
-    "mh": "M.H.",
-
-    // tambahan
-    "gr": "Gr."
-  };
-
-  return map[g] || g.toUpperCase();
-}
-
-/* ===============================
+/* =====================================================
    GENERATE AKUN
-================================ */
-function generateAkun(namaDasar) {
-  const angka = Math.floor(10 + Math.random() * 90);
-  const clean = namaDasar.toLowerCase().replace(/[^a-z]/g, "");
+===================================================== */
+function generateAkun(nama) {
+  const num = Math.floor(10 + Math.random() * 90);
+  const clean = nama.toLowerCase().replace(/[^a-z]/g, "");
 
   return {
-    email: `${clean}${angka}@smp.belajar.id`,
-    password: clean.slice(0, 4) + angka
+    email: `${clean}${num}@smp.belajar.id`,
+    password: `${clean.slice(0, 4)}${num}`
   };
 }
 
-/* ===============================
-   TOTAL GURU
-================================ */
-function updateTotalGuru(data) {
-  document.getElementById("totalGuru").innerText =
-    "Total: " + data.length + " guru";
-}
-
-/* ===============================
+/* =====================================================
    TAMBAH GURU
-================================ */
+===================================================== */
 window.tambahGuru = async () => {
-  try {
-    if (!namaInput.value || !mapelInput.value)
-      return alert("Lengkapi data guru");
+  if (!namaInput.value || !mapelInput.value)
+    return showNotif("Lengkapi data ❌", "#dc2626");
 
-    const parsed = parseNamaLengkap(namaInput.value);
-    const mapel = mapelInput.value;
-    const akun = generateAkun(parsed.full);
+  const akun = generateAkun(namaInput.value);
 
-    await setDoc(doc(db, "guru", akun.email), {
-      nama: parsed.full,
-      mapel,
-      email: akun.email,
-      password: akun.password,
-      aktif: false,
-      createdAt: new Date(),
-      deletedAt: null
-    });
+  await setDoc(doc(db, "guru", akun.email), {
+    nama: namaInput.value,
+    mapel: mapelInput.value,
+    email: akun.email,
+    password: akun.password,
+    aktif: false,
+    createdAt: new Date()
+  });
 
-    alert("Guru berhasil ditambahkan ✅");
+  showNotif("Guru berhasil ditambahkan ✅");
 
-    namaInput.value = "";
-    mapelInput.value = "";
-
-    loadGuru();
-
-  } catch (err) {
-    alert("Error ❌\n" + err.message);
-    console.error(err);
-  }
+  namaInput.value = "";
+  mapelInput.value = "";
 };
 
-/* ===============================
-   AKTIFKAN GURU
-================================ */
-window.aktifkanGuru = async (id, btn) => {
-  setLoading(btn, true);
+/* =====================================================
+   REALTIME SYSTEM (CORE CLEAN)
+===================================================== */
+onSnapshot(collection(db, "guru"), (snap) => {
 
-  try {
-    const ref = doc(db, "guru", id);
-    const snap = await getDoc(ref);
+  const data = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 
-    if (!snap.exists()) throw "Data guru tidak ditemukan";
-    const g = snap.data();
+  totalGuru.textContent = `Total: ${data.length} guru`;
 
-    if (g.aktif) throw "Akun sudah aktif";
+  list.innerHTML = data.map((g, i) => `
 
-    const cred = await createUserWithEmailAndPassword(
-      secondaryAuth,
-      g.email,
-      g.password
-    );
+    <tr id="row-${g.id}">
 
-    await setDoc(doc(db, "users", cred.user.uid), {
-      uid: cred.user.uid,
-      nama: g.nama,
-      email: g.email,
-      role: "guru",
-      createdAt: new Date()
-    });
-
-    await updateDoc(ref, { aktif: true, deletedAt: null });
-
-    await signOut(secondaryAuth);
-    alert("Akun guru berhasil diaktifkan ✅");
-
-    loadGuru();
-
-  } catch (err) {
-    alert("Gagal aktivasi ❌\n" + err);
-  }
-};
-
-/* ===============================
-   NONAKTIFKAN GURU
-================================ */
-window.nonaktifkanGuru = async (id, btn) => {
-  if (!confirm("Nonaktifkan akun guru ini?")) return;
-
-  setLoading(btn, true);
-
-  try {
-    const ref = doc(db, "guru", id);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) throw "Data guru tidak ditemukan";
-    const g = snap.data();
-
-    const cred = await signInWithEmailAndPassword(
-      secondaryAuth,
-      g.email,
-      g.password
-    );
-
-    await deleteUser(cred.user);
-
-    const usersSnap = await getDocs(collection(db, "users"));
-    for (const d of usersSnap.docs) {
-      if (d.data().email === g.email) {
-        await deleteDoc(d.ref);
-      }
-    }
-
-    await updateDoc(ref, {
-      aktif: false,
-      deletedAt: new Date()
-    });
-
-    await signOut(secondaryAuth);
-    alert("Akun guru dinonaktifkan 🗑️");
-
-    loadGuru();
-
-  } catch (err) {
-    alert("Gagal nonaktif ❌\n" + err.message);
-  }
-};
-
-/* ===============================
-   LOAD DATA
-================================ */
-async function loadGuru() {
-  const snap = await getDocs(collection(db, "guru"));
-  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  // 🔥 FILTER DULU
-  const filtered = data
-    .filter(g => !g.deletedAt || g.aktif)
-    .sort((a, b) => a.nama.localeCompare(b.nama));
-
-  // 🔥 UPDATE TOTAL (BENAR)
-  updateTotalGuru(filtered);
-
-filtered.forEach((g, i) => {
-  list.innerHTML += `
-    <tr>
       <td data-label="No">${i + 1}</td>
-
-      <td data-label="Nama Guru">
-        ${g.nama}${g.gelar ? ", " + g.gelar : ""}
-      </td>
-
-      <td data-label="Mata Pelajaran">
-        ${g.mapel}
-      </td>
-
-      <td data-label="Email">
-        ${g.email}
-      </td>
-
-      <td data-label="Password">
-        ${g.password ?? "-"}
-      </td>
+      <td data-label="Nama">${g.nama}</td>
+      <td data-label="Mapel">${g.mapel}</td>
+      <td data-label="Email">${g.email}</td>
+      <td data-label="Password">${g.password}</td>
 
       <td data-label="Status">
         ${
@@ -377,63 +190,56 @@ filtered.forEach((g, i) => {
       </td>
 
       <td data-label="Aksi">
+
         ${
           g.aktif
-            ? `<button class="btn danger"
-                 onclick="nonaktifkanGuru('${g.id}', this)">
+            ? `<button class="btn danger" onclick="toggleGuru('${g.id}', false)">
                  Nonaktifkan
                </button>`
-            : `<button class="btn success"
-                 onclick="aktifkanGuru('${g.id}', this)">
+            : `<button class="btn success" onclick="toggleGuru('${g.id}', true)">
                  Aktifkan
                </button>`
         }
 
-        <button class="btn danger"
-          onclick="hapusGuru('${g.id}', this)">
+        <button class="btn danger" onclick="hapusGuru('${g.id}')">
           Hapus
         </button>
+
       </td>
+
     </tr>
-  `;
+
+  `).join("");
 });
-}
-window.hapusGuru = async (id, btn) => {
-  if (!confirm("Hapus guru ini permanen?")) return;
 
-  setLoading(btn, true);
+/* =====================================================
+   TOGGLE AKTIF / NONAKTIF (FIX UTAMA)
+===================================================== */
+window.toggleGuru = async (id, status) => {
 
-  try {
-    const ref = doc(db, "guru", id);
-    const snap = await getDoc(ref);
+  const ref = doc(db, "guru", id);
 
-    if (!snap.exists()) throw "Data guru tidak ditemukan";
-    const g = snap.data();
+  await updateDoc(ref, {
+    aktif: status
+  });
 
-    // 🔥 HAPUS USERS COLLECTION
-    const usersSnap = await getDocs(collection(db, "users"));
-
-    for (const d of usersSnap.docs) {
-      if (d.data().email === g.email) {
-        await deleteDoc(d.ref);
-      }
-    }
-
-    // 🔥 HAPUS DATA GURU
-    await deleteDoc(ref);
-
-    alert("Guru berhasil dihapus (tanpa Auth)");
-
-    loadGuru();
-
-  } catch (err) {
-    alert("Gagal hapus ❌\n" + err.message);
-  }
-
-  setLoading(btn, false);
+  showNotif(status ? "Guru diaktifkan" : "Guru dinonaktifkan");
 };
-/* ===============================
+
+/* =====================================================
+   HAPUS GURU (REAL DELETE)
+===================================================== */
+window.hapusGuru = async (id) => {
+
+  const ok = await confirmCustom("Hapus guru ini?");
+  if (!ok) return;
+
+  await deleteDoc(doc(db, "guru", id));
+
+  showNotif("Guru dihapus ❌", "#dc2626");
+};
+
+/* =====================================================
    INIT
-================================ */
+===================================================== */
 initMapel();
-loadGuru();

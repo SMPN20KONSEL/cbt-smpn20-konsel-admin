@@ -1,5 +1,5 @@
 /* =====================================================
-   CONTENT KHUSUS RUANG UJIAN (FIX TIDAK BENTROK)
+   CONTENT RUANG UJIAN (FIX STABIL)
 ===================================================== */
 .content {
   margin-left: 260px;
@@ -7,16 +7,17 @@
   padding: 40px;
 
   background: var(--bg-light);
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
-  align-items: center; /* 🔥 ini yang bikin semua ke tengah */
 
-  box-sizing: border-box;
+  /* ❌ HAPUS center biar layout normal */
+  align-items: stretch;
 }
 
 /* =====================================================
-   JUDUL
+   HEADER
 ===================================================== */
 .content h1 {
   width: 100%;
@@ -32,12 +33,12 @@
 .content p {
   width: 100%;
   text-align: center;
-  color: #666;
+  color: #000000;
   margin-bottom: 20px;
 }
 
 /* =====================================================
-   CARD (FORM & LIST)
+   CARD
 ===================================================== */
 .card {
   width: 100%;
@@ -49,10 +50,12 @@
 
   box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 
-  margin-bottom: 20px;
+  margin: 0 auto 20px auto;
 }
 
-/* judul dalam card */
+/* =====================================================
+   CARD TITLE
+===================================================== */
 .card h3 {
   margin-bottom: 15px;
   text-align: center;
@@ -77,16 +80,31 @@
   border: 1px solid #ccc;
 }
 
-/* tombol */
-.btn {
-  margin-top: 15px;
-  width: 100%;
+/* =====================================================
+   TOOLBAR (FIX BIAR RAPi)
+===================================================== */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
+.toolbar select,
+.toolbar input {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* =====================================================
+   BUTTON
+===================================================== */
+.btn {
   background: #2563eb;
   color: #fff;
   border: none;
 
-  padding: 10px;
+  padding: 10px 15px;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -95,8 +113,23 @@
   background: #1e40af;
 }
 
+/* secondary button */
+.btn-secondary {
+  background: #1549af;
+  color: #fff;
+  border: none;
+
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #0d54b8;
+}
+
 /* =====================================================
-   TABLE
+   TABLE (FIX OVERFLOW STABIL)
 ===================================================== */
 .table {
   width: 100%;
@@ -108,22 +141,32 @@
 .table td {
   padding: 10px;
   text-align: center;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #eef1f7;
   font-size: 14px;
 }
 
+/* 🔵 HEADER JADI BIRU */
 .table th {
-  background: #f9fafb;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #fff;
   font-weight: 600;
 }
 
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE TABLE WRAPPER (FIX LEBIH AMAN)
+===================================================== */
+.card {
+  overflow-x: auto;
+}
+
+/* =====================================================
+   RESPONSIVE TABLE MODE MOBILE
 ===================================================== */
 @media (max-width: 768px) {
+
   .content {
     margin-left: 0;
-    width: 100%; /* 🔥 penting */
+    width: 100%;
     padding: 20px;
   }
 
@@ -131,36 +174,7 @@
     max-width: 100%;
   }
 }
-/* ================= FIX TABLE ================= */
-.card {
-  overflow-x: auto; /* 🔥 biar tabel tidak keluar */
-}
 
-.table {
-  min-width: 600px;
-}
-
-/* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
-
-  .content {
-    padding: 20px;
-  }
-
-  .card {
-    padding: 16px;
-  }
-
-  h1 {
-    font-size: 18px;
-  }
-
-  .btn {
-    font-size: 14px;
-  }
-}
-
-/* ================= MODE HP (TABEL JADI CARD) ================= */
 @media (max-width: 600px) {
 
   .table,
@@ -199,7 +213,6 @@
   }
 }
 
-/* ================= HP KECIL ================= */
 @media (max-width: 400px) {
 
   .content {

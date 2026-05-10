@@ -10,11 +10,16 @@ import {
   query,
   where,
   updateDoc,
-  deleteDoc   // ⬅️ TAMBAH INI
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
+/* ================= ELEMENT ================= */
 const soalSelect = document.getElementById("soalSelect");
 const list = document.getElementById("list");
 const btnBuat = document.getElementById("btnBuat");
+
+const filterJudulUjian = document.getElementById("filterJudulUjian");
+const btnUnduhToken = document.getElementById("btnUnduhToken");
 
 let loadingToggle = false;
 
@@ -23,27 +28,44 @@ function generateKode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+/* ================= FILTER JUDUL ================= */
+async function loadFilterJudul() {
+  filterJudulUjian.innerHTML = `<option value="">-- Filter Judul Ujian --</option>`;
+
+  const snap = await getDocs(collection(db, "jadwal_ujian"));
+  const setJudul = new Set();
+
+  snap.forEach(d => {
+    const data = d.data();
+    if (data.judul) setJudul.add(data.judul);
+  });
+
+  setJudul.forEach(j => {
+    filterJudulUjian.innerHTML += `<option value="${j}">${j}</option>`;
+  });
+}
+
 /* ================= LOAD BANK SOAL ================= */
 async function loadBankSoal() {
   soalSelect.innerHTML = `<option value="">-- Pilih Bank Soal --</option>`;
+
   const snap = await getDocs(collection(db, "bank_soal"));
 
   snap.forEach(d => {
     const s = d.data();
-    const waktu = s.dibuat?.toDate?.() 
-  ? s.dibuat.toDate().toLocaleString("id-ID")
-  : "";
+    const waktu = s.dibuat?.toDate?.()
+      ? s.dibuat.toDate().toLocaleString("id-ID")
+      : "";
 
-soalSelect.innerHTML += `
-  <option value="${d.id}">
-    ${s.judul} • ${s.mapel} • Kelas ${s.kelas}
-    ${waktu ? `(${waktu})` : ""}
-  </option>
-`;
+    soalSelect.innerHTML += `
+      <option value="${d.id}">
+        ${s.judul} • ${s.mapel} • Kelas ${s.kelas} ${waktu ? `(${waktu})` : ""}
+      </option>
+    `;
   });
 }
 
-/* ================= BUAT JADWAL UJIAN ================= */
+/* ================= BUAT UJIAN ================= */
 async function buatUjian() {
   try {
     const bankSoalId = soalSelect.value;
@@ -54,46 +76,45 @@ async function buatUjian() {
       return;
     }
 
-    // 🔒 CEK AGAR BANK SOAL TIDAK DIPAKAI DOBEL
+    // cek duplikat aktif
     const cek = await getDocs(
-  query(
-    collection(db, "jadwal_ujian"),
-    where("bankSoalId", "==", bankSoalId),
-    where("aktif", "==", true) // 🔥 hanya cek yang aktif
-  )
-);
+      query(
+        collection(db, "jadwal_ujian"),
+        where("bankSoalId", "==", bankSoalId),
+        where("aktif", "==", true)
+      )
+    );
 
-if (!cek.empty) {
-  tampilkanToast("❌ Bank soal masih dipakai", "red");
-  return;
-}
+    if (!cek.empty) {
+      tampilkanToast("❌ Bank soal masih dipakai", "red");
+      return;
+    }
 
-    // Ambil data bank soal
     const soalSnap = await getDoc(doc(db, "bank_soal", bankSoalId));
+
     if (!soalSnap.exists()) {
       tampilkanToast("❌ Bank soal tidak ditemukan", "red");
       return;
     }
 
-const s = soalSnap.data();
-const kode = generateKode();
+    const s = soalSnap.data();
+    const kode = generateKode();
 
-await setDoc(doc(db, "jadwal_ujian", kode), {
-  bankSoalId,
-  judul: s.judul,
-  mapel: s.mapel,
-  kelas: s.kelas,
-  kode,
-  durasi,
-  aktif: true,
-
-  // ✅ AMBIL DARI BANK SOAL
-  guruId: s.guruId || "",
-  createdAt: serverTimestamp()
-});
+    await setDoc(doc(db, "jadwal_ujian", kode), {
+      bankSoalId,
+      judul: s.judul,
+      mapel: s.mapel,
+      kelas: s.kelas,
+      kode,
+      durasi,
+      aktif: true,
+      guruId: s.guruId || "",
+      createdAt: serverTimestamp()
+    });
 
     tampilkanToast(`✅ Ujian dibuat | Kode: ${kode}`);
     loadJadwal();
+    loadFilterJudul();
 
   } catch (err) {
     console.error(err);
@@ -102,102 +123,70 @@ await setDoc(doc(db, "jadwal_ujian", kode), {
 }
 
 /* ================= TOGGLE STATUS ================= */
-async function toggleStatus(kode, statusSekarang) {
+async function toggleStatus(kode, status) {
   if (loadingToggle) return;
   loadingToggle = true;
 
-  const konfirmasi = confirm(
-    statusSekarang
-      ? "Nonaktifkan jadwal ini?"
-      : "Aktifkan kembali jadwal ini?"
-  );
-
-  if (!konfirmasi) {
+  if (!confirm(status ? "Nonaktifkan jadwal?" : "Aktifkan jadwal?")) {
     loadingToggle = false;
     return;
   }
 
   try {
     await updateDoc(doc(db, "jadwal_ujian", kode), {
-      aktif: !statusSekarang
+      aktif: !status
     });
 
     loadJadwal();
   } catch (err) {
-    alert("❌ Gagal update status");
     console.error(err);
+    alert("❌ Gagal update status");
   }
 
   loadingToggle = false;
 }
 
-// 👉 WAJIB untuk onclick HTML
 window.toggleStatus = toggleStatus;
-async function hapusUjian(kode) {
-  const konfirmasi = confirm("Yakin mau hapus jadwal ujian ini?");
 
-  if (!konfirmasi) return;
+/* ================= HAPUS ================= */
+async function hapusUjian(kode) {
+  if (!confirm("Yakin mau hapus?")) return;
 
   try {
     await deleteDoc(doc(db, "jadwal_ujian", kode));
-    tampilkanToast("🗑️ Jadwal berhasil dihapus", "red");
+    tampilkanToast("🗑️ Berhasil dihapus", "red");
     loadJadwal();
+    loadFilterJudul();
   } catch (err) {
     console.error(err);
-    tampilkanToast("❌ Gagal menghapus data", "red");
+    tampilkanToast("❌ Gagal hapus", "red");
   }
 }
 
-// wajib agar bisa dipanggil dari HTML
 window.hapusUjian = hapusUjian;
+
 /* ================= LOAD JADWAL ================= */
 async function loadJadwal() {
   list.innerHTML = "";
 
+  const selected = filterJudulUjian.value;
+
   const snap = await getDocs(collection(db, "jadwal_ujian"));
 
   const data = [];
-  snap.forEach(d => data.push(d.data()));
+  snap.forEach(d => {
+    const u = d.data();
+    if (!selected || u.judul === selected) {
+      data.push(u);
+    }
+  });
 
-  // SORT TERBARU
   data.sort((a, b) => {
     if (!a.createdAt || !b.createdAt) return 0;
     return b.createdAt.seconds - a.createdAt.seconds;
   });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  let lastTanggal = "";
-
   data.forEach(u => {
-    if (!u.createdAt) return;
-
-    const tgl = u.createdAt.toDate();
-    const tglOnly = new Date(tgl);
-    tglOnly.setHours(0, 0, 0, 0);
-
-    const formatTanggal = tglOnly.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
-
-    const isToday = tglOnly.getTime() === today.getTime();
-
-    // HEADER TANGGAL (selain hari ini)
-    if (!isToday && lastTanggal !== formatTanggal) {
-      list.innerHTML += `
-        <tr>
-          <td colspan="6" style="font-weight:bold; background:#f5f5f5;">
-            ${formatTanggal}
-          </td>
-        </tr>
-      `;
-      lastTanggal = formatTanggal;
-    }
-
-    // ROW DATA
     list.innerHTML += `
       <tr>
         <td>${u.judul}</td>
@@ -205,63 +194,403 @@ async function loadJadwal() {
         <td>${u.kelas}</td>
         <td><b>${u.kode}</b></td>
         <td>${u.durasi} menit</td>
-       <td style="display:flex; gap:6px; justify-content:center;">
+        <td style="display:flex; gap:6px; justify-content:center;">
+          
+          <button onclick="toggleStatus('${u.kode}', ${u.aktif})"
+            style="background:${u.aktif ? 'green' : 'red'};color:white;border:none;padding:4px 8px;border-radius:6px;">
+            ${u.aktif ? "Aktif" : "Nonaktif"}
+          </button>
 
-  <!-- TOGGLE -->
-  <button
-    onclick="toggleStatus('${u.kode}', ${u.aktif})"
-    style="
-      background:${u.aktif ? 'green' : 'red'};
-      color:white;
-      border:none;
-      padding:4px 8px;
-      border-radius:6px;
-      cursor:pointer;
-    "
-  >
-    ${u.aktif ? "Aktif" : "Nonaktif"}
-  </button>
+          <button onclick="hapusUjian('${u.kode}')"
+            style="background:#dc2626;color:white;border:none;padding:4px 8px;border-radius:6px;">
+            🗑️
+          </button>
 
-  <!-- HAPUS -->
-  <button
-    onclick="hapusUjian('${u.kode}')"
-    style="
-      background:#dc2626;
-      color:white;
-      border:none;
-      padding:4px 8px;
-      border-radius:6px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap:4px;
-    "
-    title="Hapus"
-  >
-    🗑️
-  </button>
-
-</td>
+        </td>
       </tr>
     `;
   });
 }
+
+/* ================= TOAST ================= */
 function tampilkanToast(pesan, warna = "green") {
   const toast = document.createElement("div");
-  toast.className = "toast";
   toast.textContent = pesan;
+  toast.className = "toast";
 
-  // warna dinamis
   if (warna === "red") toast.style.background = "#dc2626";
-  if (warna === "yellow") toast.style.background = "#f59e0b";
 
   document.body.appendChild(toast);
 
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
+  setTimeout(() => toast.remove(), 3000);
 }
-/* ================= INIT ================= */
+
+/* ================= DOWNLOAD TOKEN ================= */
+async function downloadWord(data) {
+
+  const {
+    Document,
+    Packer,
+    Paragraph,
+    Table,
+    TableRow,
+    TableCell,
+    WidthType,
+    AlignmentType,
+    TextRun,
+    ImageRun,
+    BorderStyle
+  } = window.docx;
+
+  // ================= LOAD IMAGE =================
+  async function loadImage(url) {
+    const res = await fetch(url);
+    return await res.arrayBuffer();
+  }
+
+  const logoKiri = await loadImage("../assets/img/logo-konawe.png");
+  const logoKanan = await loadImage("../assets/img/tutwuri.png");
+
+  // ================= HEADER =================
+  const kopTable = new Table({
+    width: {
+      size: 100,
+      type: WidthType.PERCENTAGE
+    },
+
+    borders: {
+      top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+    },
+
+    rows: [
+      new TableRow({
+        children: [
+
+          // ================= LOGO KIRI =================
+          new TableCell({
+            width: {
+              size: 13,
+              type: WidthType.PERCENTAGE
+            },
+
+            borders: {
+              top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+            },
+
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new ImageRun({
+                    data: logoKiri,
+                    transformation: {
+                      width: 60,
+                      height: 60
+                    }
+                  })
+                ]
+              })
+            ]
+          }),
+
+          // ================= TEKS =================
+          new TableCell({
+            width: {
+              size: 74,
+              type: WidthType.PERCENTAGE
+            },
+
+            borders: {
+              top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+            },
+
+            children: [
+
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 60 },
+                children: [
+                  new TextRun({
+                    text: "PEMERINTAH KABUPATEN KONAWE SELATAN",
+                    bold: true,
+                    size: 28,
+                    color: "8A6846"
+                  })
+                ]
+              }),
+
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 60 },
+                children: [
+                  new TextRun({
+                    text: "DINAS PENDIDIKAN DAN KEBUDAYAAN",
+                    bold: true,
+                    size: 28,
+                    color: "8A6846"
+                  })
+                ]
+              }),
+
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 60 },
+                children: [
+                  new TextRun({
+                    text: "SMP NEGERI 20 KONAWE SELATAN",
+                    bold: true,
+                    size: 30,
+                    color: "8A6846"
+                  })
+                ]
+              }),
+
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: "Jl. Sabulakoa - Landono Desa Sabulakoa Kec. Sabulakoa, Kode Pos 93373",
+                    size: 24,
+                    color: "8A6846"
+                  })
+                ]
+              })
+            ]
+          }),
+
+          // ================= LOGO KANAN =================
+          new TableCell({
+            width: {
+              size: 13,
+              type: WidthType.PERCENTAGE
+            },
+
+            borders: {
+              top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+              right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }
+            },
+
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new ImageRun({
+                    data: logoKanan,
+                    transformation: {
+                      width: 60,
+                      height: 60
+                    }
+                  })
+                ]
+              })
+            ]
+          })
+        ]
+      })
+    ]
+  });
+
+  // ================= GARIS =================
+  const garis = new Paragraph({
+    spacing: {
+      before: 50,
+      after: 200
+    },
+
+    border: {
+      bottom: {
+        color: "000000",
+        style: BorderStyle.DOUBLE,
+        size: 6
+      }
+    }
+  });
+
+  // ================= JUDUL =================
+  const title = new Paragraph({
+    alignment: AlignmentType.CENTER,
+
+    spacing: {
+      after: 250
+    },
+
+    children: [
+      new TextRun({
+        text: "DATA TOKEN UJIAN",
+        bold: true,
+        size: 34
+      })
+    ]
+  });
+
+  // ================= HEADER ROW =================
+  const headerRow = new TableRow({
+    children: [
+      "No",
+      "Mapel",
+      "Kelas",
+      "Judul",
+      "Durasi",
+      "Kode"
+    ].map(text =>
+      new TableCell({
+        shading: {
+          fill: "4F81BD"
+        },
+
+        children: [
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new TextRun({
+                text,
+                bold: true,
+                color: "FFFFFF"
+              })
+            ]
+          })
+        ]
+      })
+    )
+  });
+
+  // ================= ROW DATA =================
+  const rows = [headerRow];
+
+  data.forEach((d, i) => {
+
+    rows.push(
+      new TableRow({
+        children: [
+          i + 1,
+          d.mapel || "",
+          d.kelas || "",
+          d.judul || "",
+          d.durasi || "",
+          d.kode || ""
+        ].map(text =>
+          new TableCell({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: String(text),
+                    size: 24
+                  })
+                ]
+              })
+            ]
+          })
+        )
+      })
+    );
+
+  });
+
+  // ================= TABLE =================
+  const table = new Table({
+    width: {
+      size: 90,
+      type: WidthType.PERCENTAGE
+    },
+
+    alignment: AlignmentType.CENTER,
+
+    rows
+  });
+
+  // ================= DOCUMENT =================
+  const doc = new Document({
+
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: "Times New Roman",
+            size: 24
+          }
+        }
+      }
+    },
+
+    sections: [
+      {
+        properties: {
+          page: {
+            margin: {
+              top: 500,
+              right: 700,
+              bottom: 500,
+              left: 700
+            }
+          }
+        },
+
+        children: [
+          kopTable,
+          garis,
+          title,
+          table
+        ]
+      }
+    ]
+  });
+
+  // ================= DOWNLOAD =================
+  const blob = await Packer.toBlob(doc);
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "token-ujian.docx";
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+}
+btnUnduhToken.addEventListener("click", async () => {
+  const selected = filterJudulUjian.value;
+
+  const snap = await getDocs(collection(db, "jadwal_ujian"));
+
+  const data = [];
+  snap.forEach(d => {
+    const u = d.data();
+    if (!selected || u.judul === selected) {
+      data.push(u);
+    }
+  });
+
+  if (!data.length) {
+    alert("Data kosong");
+    return;
+  }
+
+  downloadWord(data); // ✅ FIX DI SINI
+});
+
+/* ================= EVENT ================= */
+filterJudulUjian.addEventListener("change", loadJadwal);
+
 btnBuat.addEventListener("click", buatUjian);
+
+/* ================= INIT ================= */
 loadBankSoal();
 loadJadwal();
+loadFilterJudul();

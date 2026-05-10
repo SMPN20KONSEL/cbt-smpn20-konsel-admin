@@ -99,6 +99,161 @@ th, td{
 tr:hover{
   background: #f1f5f9;
 }
+
+/* ===============================
+   STATUS WARNA
+=============================== */
+.online{
+  color:#f59e0b;
+  font-weight:bold;
+}
+
+.kerja{
+  color:#2563eb;
+  font-weight:bold;
+}
+
+.selesai{
+  color:#16a34a;
+  font-weight:bold;
+}
+
+.offline{
+  color:#dc2626;
+  font-weight:bold;
+}
+
+/* ===============================
+   LIVE TITLE
+=============================== */
+.live-title{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.live-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#22c55e;
+
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+  0%{
+    transform:scale(1);
+    opacity:1;
+  }
+
+  50%{
+    transform:scale(1.5);
+    opacity:.5;
+  }
+
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+
+  margin:20px auto;
+  width:100%;
+  max-width:1100px;
+}
+
+.stat-card{
+  background:white;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.stat-icon{
+  width:55px;
+  height:55px;
+  border-radius:12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:white;
+  font-size:22px;
+}
+
+.bg-online{ background:#f59e0b; }
+.bg-ujian{ background:#2563eb; }
+.bg-selesai{ background:#16a34a; }
+.bg-offline{ background:#dc2626; }
+
+.stat-info h2{
+  margin:0;
+  font-size:24px;
+}
+
+.stat-info p{
+  margin:0;
+  color:#6b7280;
+  font-size:14px;
+}
+
+/* ===============================
+   FILTER
+=============================== */
+.toolbar{
+  width:100%;
+  max-width:1100px;
+
+  display:flex;
+  gap:15px;
+  justify-content:space-between;
+  align-items:center;
+
+  margin:10px auto 20px;
+  flex-wrap:wrap;
+}
+
+.search-box{
+  position:relative;
+  flex:1;
+  min-width:250px;
+}
+
+.search-box input{
+  width:100%;
+  padding:12px 15px 12px 42px;
+
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  outline:none;
+}
+
+.search-box i{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#64748b;
+}
+
+.filter-select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #d1d5db;
+  outline:none;
+}
   </style>
 
   <!-- PROTECT LOGIN -->
@@ -179,9 +334,83 @@ tr:hover{
 
     </div>
     <section class="monitor-section">
-  <h2 style="text-align:center; margin: 30px 0 15px;">
-    📊 Monitoring Siswa Ujian
-  </h2>
+<!-- MENJADI -->
+<h2 class="live-title" style="margin:30px 0 15px;">
+  <span class="live-dot"></span>
+  Monitoring Realtime Siswa Ujian
+</h2>
+
+<!-- ===============================
+     STATISTIK
+================================ -->
+<div class="stats">
+
+  <div class="stat-card">
+    <div class="stat-icon bg-online">
+      <i class="fa fa-user"></i>
+    </div>
+
+    <div class="stat-info">
+      <h2 id="jmlOnline">0</h2>
+      <p>Online</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon bg-ujian">
+      <i class="fa fa-pen"></i>
+    </div>
+
+    <div class="stat-info">
+      <h2 id="jmlUjian">0</h2>
+      <p>Sedang Ujian</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon bg-selesai">
+      <i class="fa fa-check"></i>
+    </div>
+
+    <div class="stat-info">
+      <h2 id="jmlSelesai">0</h2>
+      <p>Selesai</p>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon bg-offline">
+      <i class="fa fa-times"></i>
+    </div>
+
+    <div class="stat-info">
+      <h2 id="jmlOffline">0</h2>
+      <p>Offline</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===============================
+     FILTER
+================================ -->
+<div class="toolbar">
+
+  <div class="search-box">
+    <i class="fa fa-search"></i>
+
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Cari nama siswa..."
+    >
+  </div>
+
+  <select id="filterKelas" class="filter-select">
+    <option value="">Semua Kelas</option>
+  </select>
+
+</div>
 
   <div class="table-wrap">
     <table>
@@ -242,79 +471,210 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-function loadMonitor() {
+/* =====================================================
+   SCRIPT MONITOR
+===================================================== */
+const searchInput = document.getElementById("searchInput");
+const filterKelas = document.getElementById("filterKelas");
 
-  if (!tableBody) return;
+let semuaData = [];
+
+function renderTable(dataList){
+
+  let html = "";
+  let no = 1;
+
+  let totalOnline = 0;
+  let totalUjian = 0;
+  let totalSelesai = 0;
+  let totalOffline = 0;
+
+  dataList.forEach(data => {
+
+    const lastOnline = data.lastOnline;
+
+    let isOnline = false;
+
+    if(lastOnline && lastOnline.toDate){
+
+      const selisih =
+        Date.now() - lastOnline.toDate().getTime();
+
+      isOnline = selisih <= 60000;
+    }
+
+    let statusBadge = "🔴 Offline";
+    let statusClass = "offline";
+
+    if(!isOnline){
+      totalOffline++;
+    }
+
+    if(isOnline){
+
+      if(data.status === "login"){
+
+        statusBadge = "🟡 Login";
+        statusClass = "online";
+
+        totalOnline++;
+      }
+
+      else if(data.status === "mengerjakan"){
+
+        statusBadge = "🔵 Sedang Ujian";
+        statusClass = "kerja";
+
+        totalUjian++;
+      }
+
+      else if(data.status === "selesai"){
+
+        statusBadge = "🟢 Selesai";
+        statusClass = "selesai";
+
+        totalSelesai++;
+      }
+    }
+
+    html += `
+      <tr>
+
+        <td>${no++}</td>
+
+        <td>${data.nama || "-"}</td>
+
+        <td>${data.email || "-"}</td>
+
+        <td>${data.kelas || "-"}</td>
+
+        <td>${data.kodeUjian || "-"}</td>
+
+        <td class="${statusClass}">
+          ${statusBadge}
+        </td>
+
+        <td>
+          ${
+            data.loginAt
+            ? data.loginAt.toDate().toLocaleTimeString()
+            : "-"
+          }
+        </td>
+
+        <td>
+          <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(data.id)}'">
+            Lihat
+          </button>
+        </td>
+
+      </tr>
+    `;
+  });
+
+  tableBody.innerHTML = html;
+
+  // statistik
+  document.getElementById("jmlOnline").textContent =
+    totalOnline;
+
+  document.getElementById("jmlUjian").textContent =
+    totalUjian;
+
+  document.getElementById("jmlSelesai").textContent =
+    totalSelesai;
+
+  document.getElementById("jmlOffline").textContent =
+    totalOffline;
+}
+
+/* ===============================
+   FILTER
+=============================== */
+function filterData(){
+
+  const keyword =
+    searchInput.value.toLowerCase();
+
+  const kelas =
+    filterKelas.value;
+
+  const hasil = semuaData.filter(data => {
+
+    const cocokNama =
+      (data.nama || "")
+      .toLowerCase()
+      .includes(keyword);
+
+    const cocokKelas =
+      kelas === ""
+      || data.kelas === kelas;
+
+    return cocokNama && cocokKelas;
+  });
+
+  renderTable(hasil);
+}
+
+function loadMonitor(){
+
+  if(!tableBody) return;
 
   onSnapshot(collection(db, "peserta"), (snapshot) => {
 
-    let html = "";
-    let no = 1;
+    semuaData = [];
 
-    const docs = [];
+    const kelasSet = new Set();
 
     snapshot.forEach(d => {
-      docs.push({ id: d.id, ...d.data() });
-    });
 
-    docs.sort((a, b) => {
-      const order = {
-        mengerjakan: 1,
-        login: 2,
-        selesai: 3
+      const data = {
+        id:d.id,
+        ...d.data()
       };
-      return (order[a.status] || 4) - (order[b.status] || 4);
+
+      semuaData.push(data);
+
+      if(data.kelas){
+        kelasSet.add(data.kelas);
+      }
     });
 
-    docs.forEach(data => {
+    // sorting
+    semuaData.sort((a,b) => {
 
-      const lastOnline = data.lastOnline;
+      const order = {
+        mengerjakan:1,
+        login:2,
+        selesai:3
+      };
 
-      let isOnline = false;
-      if (lastOnline && lastOnline.toDate) {
-        const selisih = Date.now() - lastOnline.toDate().getTime();
-        isOnline = selisih <= 60000;
-      }
+      return (order[a.status] || 4)
+        - (order[b.status] || 4);
+    });
 
-      let statusBadge = "🔴 Offline";
-      let statusClass = "offline";
+    // isi filter kelas
+    filterKelas.innerHTML =
+      `<option value="">Semua Kelas</option>`;
 
-      if (isOnline) {
-        if (data.status === "login") {
-          statusBadge = "🟡 Login";
-          statusClass = "online";
-        } 
-        else if (data.status === "mengerjakan") {
-          statusBadge = "🔵 Sedang Ujian";
-          statusClass = "kerja";
-        } 
-        else if (data.status === "selesai") {
-          statusBadge = "🟢 Selesai";
-          statusClass = "selesai";
-        }
-      }
+    [...kelasSet]
+    .sort()
+    .forEach(kelas => {
 
-      html += `
-        <tr>
-          <td>${no++}</td>
-          <td>${data.nama || "-"}</td>
-          <td>${data.email || "-"}</td>
-          <td>${data.kelas || "-"}</td>
-          <td>${data.kodeUjian || "-"}</td>
-          <td class="${statusClass}">${statusBadge}</td>
-          <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
-          <td>
-            <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(data.id)}'">
-              Lihat
-            </button>
-          </td>
-        </tr>
+      filterKelas.innerHTML += `
+        <option value="${kelas}">
+          ${kelas}
+        </option>
       `;
     });
 
-    tableBody.innerHTML = html;
+    renderTable(semuaData);
   });
 }
+
+searchInput.addEventListener("input", filterData);
+
+filterKelas.addEventListener("change", filterData);
 </script>
 <!-- LOGOUT -->
 <script type="module" src="../assets/js/logout.js"></script>

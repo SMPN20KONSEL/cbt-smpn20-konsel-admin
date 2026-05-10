@@ -141,28 +141,111 @@
   background: #f3f6ff;
 }
 
-/* =====================================================
-   BUTTON
-===================================================== */
-.tabel-kelas button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
+
+/* ===============================
+   CONFIRM CUSTOM
+================================ */
+.confirm-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 99999;
+
+  backdrop-filter: blur(3px);
+}
+
+.confirm-box {
+  width: 320px;
+  max-width: 90%;
+
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+
+  position: relative; /* penting */
+  z-index: 100000;
+
+  transform: translateZ(0);
+}
+
+.confirm-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+
+  margin-bottom: 18px;
+}
+
+.confirm-text small {
+  display: block;
+  margin-top: 6px;
+
+  color: #6b7280;
   font-size: 13px;
-  margin-right: 5px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-actions button {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+
+  padding: 10px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.btn-batal {
+  background: #e5e7eb;
+}
+
+.btn-hapus-confirm {
+  background: #dc2626;
   color: white;
 }
 
-.tabel-kelas button:first-of-type {
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.tabel-kelas button {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 5px;
+  color: white;
+  transition: all .2s ease;
+}
+
+.tabel-kelas button:hover {
+  transform: translateY(-1px);
+  opacity: .92;
+}
+
+/* warna tombol */
+.btn-aktif {
   background: #16a34a;
 }
 
-.tabel-kelas button:nth-of-type(2) {
+.btn-nonaktif {
   background: #f59e0b;
 }
 
-.tabel-kelas button:last-of-type {
+.btn-hapus {
   background: #dc2626;
 }
 
@@ -247,4 +330,70 @@
     width: 100%;
     margin-right: 0;
   }
+}
+/* =====================================================
+   ANIMASI HALUS
+===================================================== */
+
+.kelas-card,
+.tabel-kelas tr,
+.tabel-kelas button,
+.split-card input {
+  transition: all 0.2s ease;
+}
+
+.tabel-kelas button:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.kelas-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+}
+
+/* =====================================================
+   NOTIFIKASI
+===================================================== */
+
+.notif {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+
+  min-width: 260px;
+  max-width: 90%;
+
+  padding: 14px 20px;
+  border-radius: 14px;
+
+  color: white;
+  font-weight: 600;
+  text-align: center;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+
+  animation: notifShow .25s ease;
+}
+
+@keyframes notifShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes popup {
+  from { opacity: 0; scale: 0.95; }
+  to { opacity: 1; scale: 1; }
+}
+
+.confirm-box {
+  animation: popup .15s ease;
 }

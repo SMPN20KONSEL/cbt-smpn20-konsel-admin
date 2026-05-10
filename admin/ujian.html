@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
 
-  <!-- 🔥 WAJIB UNTUK RESPONSIVE -->
+  <!-- 🔥 RESPONSIVE WAJIB -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Jadwal Ujian</title>
@@ -20,8 +20,6 @@
 
 <!-- ================= HEADER ================= -->
 <header class="topbar">
-
-  <!-- 🔥 TOGGLE SIDEBAR -->
   <button class="menu-toggle">
     <i class="fa fa-bars"></i>
   </button>
@@ -68,11 +66,21 @@
     <div class="card">
       <h3>Buat Jadwal</h3>
 
-      <!-- 🔥 TOOLBAR RESPONSIVE -->
       <div class="toolbar">
         <select id="soalSelect"></select>
         <input id="durasi" type="number" placeholder="Durasi (menit)">
         <button class="btn" id="btnBuat">➕ Buat Jadwal</button>
+      </div>
+
+      <!-- FILTER + DOWNLOAD (dipindah ke dalam card biar rapi) -->
+      <div class="toolbar" style="margin-top:10px;">
+        <select id="filterJudulUjian">
+          <option value="">-- Filter Judul Ujian --</option>
+        </select>
+
+        <button id="btnUnduhToken" class="btn-secondary">
+          ⬇ Unduh Token
+        </button>
       </div>
     </div>
 
@@ -92,19 +100,7 @@
           </tr>
         </thead>
 
-        <!-- 🔥 PENTING: isi tbody HARUS pakai data-label -->
         <tbody id="list">
-          <!-- Contoh -->
-          <!--
-          <tr>
-            <td data-label="Ujian">UTS Matematika</td>
-            <td data-label="Mapel">Matematika</td>
-            <td data-label="Kelas">VII A</td>
-            <td data-label="Kode">ABC123</td>
-            <td data-label="Durasi">60 Menit</td>
-            <td data-label="Status">Aktif</td>
-          </tr>
-          -->
         </tbody>
       </table>
     </div>
@@ -113,11 +109,9 @@
 </div>
 
 <!-- ================= SCRIPT ================= -->
-
 <script type="module" src="../assets/js/logout.js"></script>
 <script type="module" src="../assets/js/jadwal-ujian.js"></script>
-
-<!-- 🔥 SIDEBAR TOGGLE -->
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 <script>
   const toggle = document.querySelector(".menu-toggle");
   const sidebar = document.querySelector(".sidebar");

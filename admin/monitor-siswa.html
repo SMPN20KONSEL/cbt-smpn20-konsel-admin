@@ -1,113 +1,302 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Monitor Siswa</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="../assets/css/admin.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<title>Monitor Siswa</title>
 
-  <style>
-    /* =====================================================
-   CONTENT (JANGAN RUSAK ADMIN)
+<!-- CSS -->
+<link rel="stylesheet" href="../assets/css/admin.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+/* =====================================================
+   CONTENT
 ===================================================== */
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 🔥 center semua isi */
-  padding: 30px;
+.content{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:30px;
+  gap:20px;
 }
 
 /* =====================================================
-   WRAPPER TABLE (BIAR TENGAH & LEBAR)
+   JUDUL
 ===================================================== */
-.table-wrap {
-  width: 100%;
-  max-width: 1100px; /* 🔥 atur lebar */
-  overflow-x: auto;  /* 🔥 scroll kalau kepanjangan */
+.page-title{
+  width:100%;
+  max-width:1100px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.page-title h1{
+  font-size:28px;
+  color:#0f172a;
+}
+
+/* =====================================================
+   STATISTIK
+===================================================== */
+.stats{
+  width:100%;
+  max-width:1100px;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+}
+
+.stat-card{
+  background:white;
+  border-radius:14px;
+  padding:20px;
+  box-shadow:0 3px 10px rgba(0,0,0,.08);
+
+  display:flex;
+  align-items:center;
+  gap:15px;
+
+  transition:.2s;
+}
+
+.stat-card:hover{
+  transform:translateY(-3px);
+}
+
+.stat-icon{
+  width:55px;
+  height:55px;
+  border-radius:12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:24px;
+  color:white;
+}
+
+.bg-online{
+  background:#f59e0b;
+}
+
+.bg-ujian{
+  background:#2563eb;
+}
+
+.bg-selesai{
+  background:#16a34a;
+}
+
+.bg-offline{
+  background:#dc2626;
+}
+
+.stat-info h2{
+  margin:0;
+  font-size:26px;
+  color:#111827;
+}
+
+.stat-info p{
+  margin:0;
+  color:#64748b;
+  font-size:14px;
+}
+
+/* =====================================================
+   FILTER
+===================================================== */
+.toolbar{
+  width:100%;
+  max-width:1100px;
+
+  display:flex;
+  gap:15px;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.search-box{
+  flex:1;
+  min-width:250px;
+  position:relative;
+}
+
+.search-box input{
+  width:100%;
+  padding:12px 15px 12px 45px;
+  border-radius:10px;
+  border:1px solid #d1d5db;
+  outline:none;
+  font-size:14px;
+}
+
+.search-box i{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#64748b;
+}
+
+.filter-select{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #d1d5db;
+  outline:none;
+}
+
+/* =====================================================
+   TABLE WRAP
+===================================================== */
+.table-wrap{
+  width:100%;
+  max-width:1100px;
+  overflow-x:auto;
 }
 
 /* =====================================================
    TABLE
 ===================================================== */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:14px;
+  overflow:hidden;
 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
 }
 
-/* header */
-th {
-  background: #0b48ac;
-  color: white;
+th{
+  background:#0b48ac;
+  color:white;
+  font-size:14px;
 }
 
-/* cell */
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: center;
-  font-size: 14px;
+th,td{
+  padding:12px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:center;
+  font-size:14px;
 }
 
-/* hover */
-tr:hover {
-  background: #f1f5f9;
+tr:hover{
+  background:#f8fafc;
 }
-/* ===============================
-   NAMA SISWA / KOLOM TEKS RATA KIRI
-================================ */
-.tabel-kelas td:nth-child(2),
-.tabel-kelas th:nth-child(2),
+
+/* nama rata kiri */
 table td:nth-child(2),
-table th:nth-child(2) {
-  text-align: left !important;
+table th:nth-child(2){
+  text-align:left;
 }
 
-/* biar lebih enak dibaca */
-.tabel-kelas td:nth-child(2),
-table td:nth-child(2) {
-  font-weight: 500;
+table td:nth-child(2){
+  font-weight:600;
 }
+
 /* =====================================================
-   STATUS WARNA
+   STATUS
 ===================================================== */
-.online { color: orange; }
-.kerja { color: blue; font-weight: bold; }
-.selesai { color: green; font-weight: bold; }
-.offline { color: red; }
+.online{
+  color:#f59e0b;
+  font-weight:bold;
+}
+
+.kerja{
+  color:#2563eb;
+  font-weight:bold;
+}
+
+.selesai{
+  color:#16a34a;
+  font-weight:bold;
+}
+
+.offline{
+  color:#dc2626;
+  font-weight:bold;
+}
 
 /* =====================================================
    BUTTON
 ===================================================== */
-button {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
-  font-size: 13px;
+.btn{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+  font-size:13px;
+  transition:.2s;
 }
 
-button:hover {
-  background: #1e40af;
+.btn:hover{
+  background:#1d4ed8;
+}
+
+/* =====================================================
+   LIVE DOT
+===================================================== */
+.live-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#22c55e;
+  display:inline-block;
+  margin-right:6px;
+
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+  0%{
+    transform:scale(1);
+    opacity:1;
+  }
+
+  50%{
+    transform:scale(1.4);
+    opacity:.5;
+  }
+
+  100%{
+    transform:scale(1);
+    opacity:1;
+  }
 }
 
 /* =====================================================
    RESPONSIVE
 ===================================================== */
-@media (max-width: 768px) {
-  .content {
-    padding: 20px;
+@media(max-width:768px){
+
+  .content{
+    padding:15px;
   }
+
+  th,td{
+    font-size:12px;
+    padding:10px;
+  }
+
+  .page-title h1{
+    font-size:22px;
+  }
+
 }
-  </style>
+
+</style>
 </head>
 <body>
 
@@ -115,6 +304,7 @@ button:hover {
 <header class="topbar">
   <div class="brand">
     <img src="../assets/img/logo-sekolah.png" class="brand-logo">
+
     <div class="brand-text">
       <strong>SMPN 20 KONAWE SELATAN</strong>
       <small>CBT Application</small>
@@ -124,31 +314,119 @@ button:hover {
 
 <div class="dashboard">
 
-  <!-- ================= SIDEBAR ================= -->
+<!-- ================= SIDEBAR ================= -->
 <aside class="sidebar">
-  <h2><i class="fas fa-user-shield"></i> Admin</h2>
+
+  <h2>
+    <i class="fas fa-user-shield"></i>
+    Admin
+  </h2>
+
   <ul class="menu">
-      <li><a href="dashboard.html" class="active"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
-      <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
-      <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-      <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
-      <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-      <li><a href="monitor-siswa.html"><i class="fa fa-eye"></i> Monitor Ujian  </a></li>
-      <li><a href="nilai.html"> <i class="fa fa-graduation-cap"></i> Nilai</a></li>
-      <li><a href="download-soal.html"><i class="fa fa-download"></i> Download Soal</a></li>
+    <li><a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
+    <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
+    <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
+    <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
+    <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
+    <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
+    <li><a href="monitor-siswa.html" class="active"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
+    <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
+    <li><a href="download-soal.html"><i class="fa fa-download"></i> Download Soal</a></li>
   </ul>
+
   <button class="logout" id="logout">
-    <i class="fas fa-sign-out-alt"></i> Logout
+    <i class="fas fa-sign-out-alt"></i>
+    Logout
   </button>
+
 </aside>
 
-  <!-- ================= CONTENT ================= -->
-  <div class="content">
+<!-- ================= CONTENT ================= -->
+<div class="content">
 
-    <h1>📊 Monitoring Siswa Ujian</h1>
+  <!-- ================= TITLE ================= -->
+  <div class="page-title">
+
+    <h1>
+      <span class="live-dot"></span>
+      Monitoring Realtime Siswa Ujian
+    </h1>
+
+  </div>
+
+  <!-- ================= STATISTIK ================= -->
+  <div class="stats">
+
+    <div class="stat-card">
+      <div class="stat-icon bg-online">
+        <i class="fa fa-user"></i>
+      </div>
+
+      <div class="stat-info">
+        <h2 id="jmlOnline">0</h2>
+        <p>Online</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-ujian">
+        <i class="fa fa-pen"></i>
+      </div>
+
+      <div class="stat-info">
+        <h2 id="jmlUjian">0</h2>
+        <p>Sedang Ujian</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-selesai">
+        <i class="fa fa-check"></i>
+      </div>
+
+      <div class="stat-info">
+        <h2 id="jmlSelesai">0</h2>
+        <p>Selesai</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-offline">
+        <i class="fa fa-times"></i>
+      </div>
+
+      <div class="stat-info">
+        <h2 id="jmlOffline">0</h2>
+        <p>Offline</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= TOOLBAR ================= -->
+  <div class="toolbar">
+
+    <div class="search-box">
+      <i class="fa fa-search"></i>
+
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Cari nama siswa..."
+      >
+    </div>
+
+    <select id="filterKelas" class="filter-select">
+      <option value="">Semua Kelas</option>
+    </select>
+
+  </div>
+
+  <!-- ================= TABLE ================= -->
+  <div class="table-wrap">
 
     <table>
+
       <thead>
         <tr>
           <th>No</th>
@@ -161,106 +439,266 @@ button:hover {
           <th>Aksi</th>
         </tr>
       </thead>
+
       <tbody id="table-body"></tbody>
+
     </table>
 
   </div>
 
 </div>
+</div>
 
 <!-- ================= SCRIPT ================= -->
 <script type="module">
+
 import { db } from "../assets/js/firebase.js";
+
 import {
   collection,
   onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
 const tableBody = document.getElementById("table-body");
+const searchInput = document.getElementById("searchInput");
+const filterKelas = document.getElementById("filterKelas");
 
-// 🔥 cek offline (tidak aktif > 1 menit)
-function isOffline(lastActive) {
-  if (!lastActive) return true;
-  return (Date.now() - lastActive.toDate().getTime()) > 60000;
-}
+let semuaData = [];
 
-onSnapshot(collection(db, "peserta"), (snapshot) => {
+/* =====================================================
+   RENDER TABLE
+===================================================== */
+function renderTable(dataList){
 
   tableBody.innerHTML = "";
+
   let no = 1;
 
-  const docs = [];
-  snapshot.forEach(doc => {
-    docs.push({ id: doc.id, ...doc.data() });
-  });
+  let totalOnline = 0;
+  let totalUjian = 0;
+  let totalSelesai = 0;
+  let totalOffline = 0;
 
-  docs.sort((a, b) => {
-    const order = {
-      mengerjakan: 1,
-      mulai: 1,
-      online: 2,
-      selesai: 3
-    };
-    return (order[a.status] || 4) - (order[b.status] || 4);
-  });
+  dataList.forEach(data => {
 
-  docs.forEach(data => {
+    const lastOnline = data.lastOnline;
 
-const lastOnline = data.lastOnline;
+    let isOnline = false;
 
-let isOnline = false;
+    if(lastOnline && lastOnline.toDate){
 
-if (lastOnline && lastOnline.toDate) {
-  const selisih = Date.now() - lastOnline.toDate().getTime();
-  isOnline = selisih <= 60000;
-}
+      const selisih =
+        Date.now() - lastOnline.toDate().getTime();
 
-let statusBadge = "🔴 Offline";
-let statusClass = "offline";
+      isOnline = selisih <= 60000;
 
-if (isOnline) {
-  if (data.status === "login") {
-    statusBadge = "🟡 Login";
-    statusClass = "online";
-  }
+    }
 
-  if (data.status === "belum_mulai") {
-    statusBadge = "🟣 Belum Mulai";
-    statusClass = "online";
-  }
+    let statusBadge = "🔴 Offline";
+    let statusClass = "offline";
 
-  if (data.status === "mengerjakan") {
-    statusBadge = "🔵 Sedang Ujian";
-    statusClass = "kerja";
-  }
+    if(!isOnline){
 
-  if (data.status === "selesai") {
-    statusBadge = "🟢 Selesai";
-    statusClass = "selesai";
-  }
-}
+      totalOffline++;
 
-const uid = data.id;
-tableBody.innerHTML += `
-  <tr>
-    <td>${no++}</td>
-    <td>${data.nama || "-"}</td>
-    <td>${data.email || "-"}</td>
-    <td>${data.kelas || "-"}</td>
-    <td>${data.kodeUjian || "-"}</td>
-    <td class="${statusClass}">${statusBadge}</td>
-    <td>${data.loginAt ? data.loginAt.toDate().toLocaleTimeString() : "-"}</td>
-    <td>
-      <button onclick="location.href='detail-siswa.html?id=${encodeURIComponent(uid)}'">
-        Lihat
-      </button>
-    </td>
-  </tr>
+    }
 
+    if(isOnline){
+
+      if(data.status === "login"){
+
+        statusBadge = "🟡 Login";
+        statusClass = "online";
+
+        totalOnline++;
+
+      }
+
+      if(data.status === "belum_mulai"){
+
+        statusBadge = "🟣 Belum Mulai";
+        statusClass = "online";
+
+        totalOnline++;
+
+      }
+
+      if(data.status === "mengerjakan"){
+
+        statusBadge = "🔵 Sedang Ujian";
+        statusClass = "kerja";
+
+        totalUjian++;
+
+      }
+
+      if(data.status === "selesai"){
+
+        statusBadge = "🟢 Selesai";
+        statusClass = "selesai";
+
+        totalSelesai++;
+
+      }
+
+    }
+
+    const uid = data.id;
+
+    tableBody.innerHTML += `
+      <tr>
+
+        <td>${no++}</td>
+
+        <td>${data.nama || "-"}</td>
+
+        <td>${data.email || "-"}</td>
+
+        <td>${data.kelas || "-"}</td>
+
+        <td>${data.kodeUjian || "-"}</td>
+
+        <td class="${statusClass}">
+          ${statusBadge}
+        </td>
+
+        <td>
+          ${
+            data.loginAt
+            ? data.loginAt.toDate().toLocaleTimeString()
+            : "-"
+          }
+        </td>
+
+        <td>
+
+          <button
+            class="btn"
+            onclick="location.href='detail-siswa.html?id=${encodeURIComponent(uid)}'"
+          >
+            Lihat
+          </button>
+
+        </td>
+
+      </tr>
     `;
+
   });
+
+  // statistik
+  document.getElementById("jmlOnline").textContent =
+    totalOnline;
+
+  document.getElementById("jmlUjian").textContent =
+    totalUjian;
+
+  document.getElementById("jmlSelesai").textContent =
+    totalSelesai;
+
+  document.getElementById("jmlOffline").textContent =
+    totalOffline;
+
+}
+
+/* =====================================================
+   FILTER DATA
+===================================================== */
+function filterData(){
+
+  const keyword =
+    searchInput.value.toLowerCase();
+
+  const kelas =
+    filterKelas.value;
+
+  let hasil = semuaData.filter(data => {
+
+    const cocokNama =
+      (data.nama || "")
+      .toLowerCase()
+      .includes(keyword);
+
+    const cocokKelas =
+      kelas === ""
+      || data.kelas === kelas;
+
+    return cocokNama && cocokKelas;
+
+  });
+
+  renderTable(hasil);
+
+}
+
+/* =====================================================
+   REALTIME FIRESTORE
+===================================================== */
+onSnapshot(collection(db, "peserta"), (snapshot) => {
+
+  semuaData = [];
+
+  const kelasSet = new Set();
+
+  snapshot.forEach(doc => {
+
+    const data = {
+      id: doc.id,
+      ...doc.data()
+    };
+
+    semuaData.push(data);
+
+    if(data.kelas){
+      kelasSet.add(data.kelas);
+    }
+
+  });
+
+  // sorting status
+  semuaData.sort((a,b) => {
+
+    const order = {
+      mengerjakan:1,
+      mulai:1,
+      login:2,
+      belum_mulai:2,
+      selesai:3
+    };
+
+    return (order[a.status] || 4)
+      - (order[b.status] || 4);
+
+  });
+
+  // isi filter kelas
+  filterKelas.innerHTML =
+    `<option value="">Semua Kelas</option>`;
+
+  [...kelasSet]
+  .sort()
+  .forEach(kelas => {
+
+    filterKelas.innerHTML += `
+      <option value="${kelas}">
+        ${kelas}
+      </option>
+    `;
+
+  });
+
+  renderTable(semuaData);
 
 });
+
+/* =====================================================
+   EVENT FILTER
+===================================================== */
+searchInput.addEventListener("input", filterData);
+
+filterKelas.addEventListener("change", filterData);
+
 </script>
 
 </body>
