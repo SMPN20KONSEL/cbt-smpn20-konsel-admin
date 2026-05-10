@@ -336,24 +336,140 @@ align-items:center;
 justify-content:center;
 z-index:999;
 ">
+
   <div style="
     background:#fff;
     padding:20px;
-    border-radius:10px;
-    width:300px;
+    border-radius:12px;
+    width:320px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+    animation: scaleIn 0.2s ease;
   ">
-    <h3>Edit Bank Soal</h3>
 
-    <input id="editJudul" placeholder="Judul" style="width:100%;margin:5px 0;">
-    <input id="editMapel" placeholder="Mapel" style="width:100%;margin:5px 0;">
-    <input id="editKelas" placeholder="Kelas" style="width:100%;margin:5px 0;">
+    <!-- HEADER -->
+    <h3 style="
+      margin-bottom:15px;
+      color:#2563eb;
+      text-align:center;
+    ">
+      Edit Bank Soal
+    </h3>
 
-    <div style="margin-top:10px;text-align:right;">
-      <button onclick="tutupModal()">Batal</button>
-      <button onclick="simpanEdit()">Simpan</button>
+    <input id="editJudul" placeholder="Judul" style="width:100%;margin:5px 0;padding:8px;border-radius:8px;border:1px solid #ccc;">
+    <input id="editMapel" placeholder="Mapel" style="width:100%;margin:5px 0;padding:8px;border-radius:8px;border:1px solid #ccc;">
+    <input id="editKelas" placeholder="Kelas" style="width:100%;margin:5px 0;padding:8px;border-radius:8px;border:1px solid #ccc;">
+
+    <!-- BUTTON -->
+    <div style="
+      margin-top:15px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    ">
+
+      <button onclick="tutupModal()" style="
+        flex:1;
+        padding:8px;
+        border:none;
+        border-radius:8px;
+        background:#dc2626;
+        color:#fff;
+        cursor:pointer;
+      ">
+        Batal
+      </button>
+
+      <button onclick="simpanEdit()" style="
+        flex:1;
+        padding:8px;
+        border:none;
+        border-radius:8px;
+        background:#16a34a;
+        color:#fff;
+        cursor:pointer;
+      ">
+        Simpan
+      </button>
+
     </div>
   </div>
 </div>
+<div id="modalConfirm" style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.55);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:1000;
+">
+
+  <div style="
+    background:#fff;
+    padding:22px;
+    border-radius:14px;
+    width:320px;
+    text-align:center;
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+    animation: scaleIn 0.2s ease;
+  ">
+
+    <!-- TITLE -->
+    <h3 style="
+      margin-bottom:8px;
+      color:#dc2626;
+      font-size:18px;
+    ">
+      Konfirmasi Hapus
+    </h3>
+
+    <!-- TEXT -->
+    <p id="confirmText" style="
+      font-size:14px;
+      color:#555;
+      margin-bottom:18px;
+    ">
+      Yakin ingin menghapus?
+    </p>
+
+    <!-- BUTTON -->
+    <div style="
+      display:flex;
+      gap:10px;
+    ">
+
+      <!-- BATAL -->
+      <button id="btnBatal" style="
+        flex:1;
+        padding:10px;
+        border:none;
+        background:#6396fb;
+        color:#111;
+        border-radius:10px;
+        cursor:pointer;
+        transition:0.2s;
+      ">
+        Batal
+      </button>
+
+      <!-- HAPUS -->
+      <button id="btnOk" style="
+        flex:1;
+        padding:10px;
+        border:none;
+        background:#dc2626;
+        color:#ffffff;
+        border-radius:10px;
+        cursor:pointer;
+        transition:0.2s;
+      ">
+        Hapus
+      </button>
+
+    </div>
+  </div>
+</div>
+
 </div>
 <script type="module" src="../assets/js/nama.js"></script>
 <!-- JS -->
@@ -414,6 +530,75 @@ function formatTanggal(ts){
     year: "numeric"
   });
 }
+
+const toastQueue = [];
+let toastActive = false;
+
+const container = document.createElement("div");
+container.className = "toast-container";
+document.body.appendChild(container);
+
+// ICON MAP
+const toastIcon = {
+  success: "✔",
+  error: "❌",
+  warning: "⚠",
+  info: "ℹ"
+};
+
+window.toast = function (message, type = "success", duration = 3000) {
+  toastQueue.push({ message, type, duration });
+  processQueue();
+};
+
+function processQueue() {
+  if (toastActive) return;
+  if (toastQueue.length === 0) return;
+
+  toastActive = true;
+
+  const { message, type, duration } = toastQueue.shift();
+
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+
+  el.innerHTML = `
+    <span class="icon">${toastIcon[type] || "ℹ"}</span>
+    <span class="msg">${message}</span>
+  `;
+
+  container.appendChild(el);
+
+  setTimeout(() => {
+    el.remove();
+    toastActive = false;
+    processQueue();
+  }, duration);
+}
+let confirmResolve = null;
+
+const modalConfirm = document.getElementById("modalConfirm");
+const btnBatal = document.getElementById("btnBatal");
+const btnOk = document.getElementById("btnOk");
+
+window.customConfirm = function (text = "Yakin?") {
+  document.getElementById("confirmText").innerText = text;
+  modalConfirm.style.display = "flex";
+
+  return new Promise((resolve) => {
+    confirmResolve = resolve;
+  });
+};
+
+btnBatal.onclick = () => {
+  modalConfirm.style.display = "none";
+  confirmResolve(false);
+};
+
+btnOk.onclick = () => {
+  modalConfirm.style.display = "none";
+  confirmResolve(true);
+};
 // ================= LOAD BANK SOAL =================
 async function loadBankSoal(user) {
   try {
@@ -519,18 +704,22 @@ window.lihatSoal = id => {
 
 // ================= HAPUS =================
 window.hapusBankSoal = async id => {
-  if (!confirm("Yakin ingin menghapus bank soal ini? Data tidak bisa dikembalikan!")) return;
+  const ok = await customConfirm("Yakin ingin menghapus bank soal ini? Data tidak bisa dikembalikan!");
+
+  if (!ok) return;
 
   try {
-    list.innerHTML = "<p>Menghapus...</p>";
+    toast("Menghapus...", "info");
 
     await deleteDoc(doc(db, "bank_soal", id));
+
+    toast("Berhasil dihapus", "success");
 
     loadBankSoal(currentUser);
 
   } catch (err) {
     console.error(err);
-    alert("Gagal menghapus");
+    toast("Gagal menghapus", "error");
   }
 };
 
@@ -551,7 +740,7 @@ window.editBankSoal = async (id) => {
 
   } catch (err) {
     console.error(err);
-    alert("Gagal membuka data");
+    toast("Gagal membuka data", "error");
   }
 };
 
@@ -569,14 +758,14 @@ window.simpanEdit = async () => {
       kelas: document.getElementById("editKelas").value
     });
 
-    alert("Berhasil diupdate");
+    toast("Berhasil diupdate", "success");
 
     tutupModal();
     loadBankSoal(currentUser);
 
   } catch (err) {
     console.error(err);
-    alert("Gagal update");
+    toast("Gagal update", "error");
   }
 };
 </script>
