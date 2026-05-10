@@ -75,6 +75,26 @@ daftarMapelSMP.forEach(mapel => {
   mapelInput.appendChild(opt);
 });
 
+const daftarKelas = [
+  "VII",
+  "VIII",
+  "IX",
+  "VII A",
+  "VII B",
+  "VIII A",
+  "VIII B",
+  "IX A",
+  "IX B"
+];
+
+// isi dropdown kelas otomatis
+daftarKelas.forEach(kelas => {
+  const opt = document.createElement("option");
+  opt.value = kelas;
+  opt.textContent = kelas;
+  kelasInput.appendChild(opt);
+});
+
 // ======================================================
 // ======================== TOAST =======================
 // ======================================================
@@ -396,42 +416,43 @@ row.innerHTML = `
   }
 
   // ===== KATEGORI =====
-  else if(data.tipe === "kategori"){
-    const table = card.querySelector(".kategori-table");
+else if(data.tipe === "kategori"){
+  const table = card.querySelector(".kategori-table");
 
-    table.innerHTML = `
-      <tr>
-        <th>Pernyataan</th>
-        <th>Benar</th>
-        <th>Salah</th>
-        <th></th>
-      </tr>
+  table.innerHTML = `
+    <tr>
+      <th>Pernyataan</th>
+      <th>Jawaban</th>
+    </tr>
+  `;
+
+  data.pernyataan.forEach((p)=>{
+
+    const tr = document.createElement("tr");
+
+    const nilai = (p.jawabanBenar === true || p.jawabanBenar === "benar");
+
+    tr.innerHTML = `
+      <td class="kolom-kiri">
+        <span contenteditable>${p.teks}</span>
+      </td>
+
+      <td class="kolom-kanan">
+        <div class="jawaban-wrapper">
+          <select class="jawaban-kategori">
+            <option value="true" ${nilai ? "selected" : ""}>Benar</option>
+            <option value="false" ${!nilai ? "selected" : ""}>Salah</option>
+          </select>
+
+          <button class="hapus-kategori">✖</button>
+        </div>
+      </td>
     `;
 
-    data.pernyataan.forEach((p,i)=>{
-
-      const tr = document.createElement("tr");
-
-tr.innerHTML = `
-  <td class="kolom-kiri">
-    <span contenteditable>${p.teks}</span>
-  </td>
-
-  <td class="kolom-kanan">
-    <div class="jawaban-wrapper">
-      <select class="jawaban-kategori">
-        <option value="true" ${p.jawabanBenar ? "selected":""}>Benar</option>
-        <option value="false" ${!p.jawabanBenar ? "selected":""}>Salah</option>
-      </select>
-
-      <button class="hapus">✖</button>
-    </div>
-  </td>
-`;
-
-      table.appendChild(tr);
-    });
-  }
+    tr.querySelector(".hapus-kategori").onclick = () => tr.remove();
+    table.appendChild(tr);
+  });
+}
 }
 
 
@@ -604,20 +625,21 @@ let judul = "";
 
 if (judulSelect.value === "lainnya") {
   judul = toTitleCase(judulManual.value.trim());
+
+  if (!judul) {
+    throw new Error("Judul manual harus diisi");
+  }
+
 } else {
   judul = judulSelect.value;
 }
-if (judulSelect.value === "lainnya" && !judul) {
-  throw new Error("Judul manual harus diisi");
-}
 // ===== MAPEL =====
 const mapel = mapelInput.value.trim();
+const kelas = kelasInput.value.trim();
 
-// ===== KELAS (AUTO HURUF BESAR) =====
-const kelas = kelasInput.value.trim().toUpperCase();
-    if(!judul||!mapel||!kelas){
-      throw new Error("Data wajib diisi");
-    }
+if (!judul || !mapel || !kelas) {
+  throw new Error("Data wajib diisi");
+}
 
     const soalPG=[], soalMCMA=[], soalKategori=[], soalEssay=[];
 

@@ -12,46 +12,66 @@ body {
   padding: 20px;
 }
 
+/* ================= CONTENT ================= */
+.content {
+  margin-left: 260px;
+  padding: 30px;
+}
+
 /* ================= FILTER ================= */
 .filter-box {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 12px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
+
+  flex-wrap: nowrap; /* tetap 1 baris */
 }
 
-select {
+/* select */
+.filter-box select {
+  flex: 1;
+  min-width: 0;
+
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
   background: #fff;
   font-size: 14px;
-  min-width: 160px;
   transition: 0.2s;
+
+  width: auto;
 }
 
-select:focus {
+.filter-box select:focus {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-#filter {
+/* tombol */
+.filter-box button {
+  width: auto;
+  flex-shrink: 0;
+
   padding: 10px 18px;
   border-radius: 8px;
   border: none;
+
   background: #2563eb;
   color: #fff;
+
   font-weight: 500;
   cursor: pointer;
+
+  white-space: nowrap;
 }
 
-#filter:hover {
+.filter-box button:hover {
   background: #1e40af;
 }
 
-/* ================= TABLE (DESKTOP) ================= */
+/* ================= TABLE ================= */
 .table-wrapper {
   background: #fff;
   border-radius: 12px;
@@ -69,7 +89,8 @@ thead {
   background: #f1f5f9;
 }
 
-th, td {
+th,
+td {
   padding: 14px 16px;
   font-size: 14px;
   text-align: left;
@@ -123,51 +144,57 @@ tbody tr:hover {
 
 /* ================= TABLET ================= */
 @media (max-width: 768px) {
+
   .content {
     margin-left: 0;
     width: 100%;
     padding: 20px;
   }
+
 }
 
 /* ================= HP ================= */
-@media (max-width: 576px) {
+@media (max-width: 600px) {
+
   .content {
     padding: 16px;
   }
 
-  input,
-  select,
-  textarea,
-  button {
-    width: 100%;
+  /* FILTER TETAP MENYAMPING */
+  .filter-box {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .filter-box select {
+    flex: 1;
+    width: auto !important;
+    min-width: 0;
     font-size: 14px;
   }
-}
 
-/* ================= HP KECIL ================= */
-@media (max-width: 360px) {
-  .content {
-    padding: 12px;
+  .filter-box button {
+    width: auto !important;
+    flex-shrink: 0;
+    font-size: 14px;
   }
 
-  h1, h2, h3 {
-    font-size: 16px;
-  }
-}
-
-/* ================= MODE CARD (HP FIX TOTAL) ================= */
-@media (max-width: 600px) {
-
+  /* TABLE MODE CARD */
   .table-wrapper {
-    overflow: visible; /* 🔥 matikan scroll */
+    overflow: visible;
   }
 
   table {
-    min-width: 100%; /* 🔥 reset */
+    min-width: 100%;
   }
 
-  table, thead, tbody, th, td, tr {
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
     display: block;
     width: 100%;
   }
@@ -197,6 +224,21 @@ tbody tr:hover {
     font-weight: 600;
     color: #555;
   }
+}
+
+/* ================= HP KECIL ================= */
+@media (max-width: 360px) {
+
+  .content {
+    padding: 12px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-size: 16px;
+  }
+
 }
 
 /* ================= SIDEBAR RESPONSIVE ================= */

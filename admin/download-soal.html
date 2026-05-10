@@ -908,24 +908,18 @@ async function loadData(){
 
             );
 
-            (s.pernyataan || [])
-            .forEach((p,i) => {
+            const huruf = ["a","b","c","d","e","f"];
 
-              children.push(
+(s.pernyataan || []).forEach((p,i) => {
 
-                new Paragraph({
+  children.push(
+    new Paragraph({
+      text:`${huruf[i]}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})`,
+      spacing:{ line:360 }
+    })
+  );
 
-                  text:`${i+1}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})`,
-
-                  spacing:{
-                    line:360
-                  }
-
-                })
-
-              );
-
-            });
+});
 
             children.push(
               new Paragraph({ text:"" })

@@ -119,10 +119,12 @@
 ===================================================== */
 .form-row {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
+  flex-wrap: nowrap;
 }
 
+/* khusus row pertama */
 .form-row:first-of-type {
   background: #f8fafc;
   padding: 16px;
@@ -130,9 +132,11 @@
   border: 1px solid #e5e7eb;
 }
 
+/* input */
 .form-row input {
   flex: 1;
-  min-width: 200px;
+  min-width: 250px;
+
   padding: 10px 12px;
 
   border-radius: var(--radius-md);
@@ -143,6 +147,13 @@
 .form-row input:focus {
   outline: none;
   border-color: var(--primary);
+}
+
+/* button dalam form-row */
+.form-row button {
+  width: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* =====================================================
@@ -249,6 +260,7 @@ button:hover {
   display: flex;
   gap: 8px;
   margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .soal-actions button {
@@ -256,6 +268,7 @@ button:hover {
   color: #111;
   font-size: 13px;
   padding: 6px 10px;
+  width: auto;
 }
 
 .soal-actions .hapus {
@@ -273,10 +286,10 @@ button:hover {
   border: 1px solid #d1d5db;
   width: 120px;
 }
+
 /* =========================
    KATEGORI 2 KOLOM FIX
 ========================= */
-
 .kategori-table {
   width: 100%;
   border-collapse: collapse;
@@ -297,7 +310,7 @@ button:hover {
   border-bottom: 1px solid #eee;
 }
 
-/* kiri (pernyataan) */
+/* kiri */
 .kolom-kiri {
   width: 70%;
 }
@@ -340,26 +353,25 @@ button:hover {
   color: #fff;
   border-radius: 6px;
 }
+
 /* =========================
    RESPONSIVE KHUSUS KATEGORI
 ========================= */
 @media (max-width: 576px) {
-
-  /* ubah jadi stack */
+  .kategori-table,
+  .kategori-table tr,
   .kategori-table td {
     display: block;
     width: 100%;
   }
 
-  /* jarak antar bagian */
-  .kolom-kanan {
-    margin-top: 6px;
+  .jawaban-wrapper {
+    justify-content: space-between;
     width: 100%;
   }
 
-  /* isi kanan tetap rapi */
-  .jawaban-wrapper {
-    justify-content: space-between;
+  .kolom-kanan {
+    width: 100%;
   }
 }
 /* =====================================================
@@ -380,8 +392,13 @@ button:hover {
   margin-bottom: 10px;
 }
 
-.toast-success { background: #16a34a; }
-.toast-error   { background: #dc2626; }
+.toast-success {
+  background: #16a34a;
+}
+
+.toast-error {
+  background: #dc2626;
+}
 
 /* =====================================================
    PREVIEW
@@ -393,35 +410,65 @@ button:hover {
 }
 
 /* =====================================================
-   RESPONSIVE (FIX FINAL)
+   RESPONSIVE TABLET
 ===================================================== */
 @media (max-width: 768px) {
+
   .content {
     margin-left: 0;
     width: 100%;
     padding: 20px;
   }
 
-  .form-row {
-    flex-direction: column;
-  }
-
   .opsi-row {
     flex-direction: column;
     align-items: stretch;
   }
+
 }
 
+/* =====================================================
+   RESPONSIVE HP
+===================================================== */
 @media (max-width: 576px) {
+
+  .content {
+    padding: 16px;
+  }
+
+  /* form tetap menyamping */
+  .form-row {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .form-row input {
+    flex: 1;
+    width: auto !important;
+    min-width: 0;
+  }
+
+  .form-row button {
+    width: auto !important;
+    flex-shrink: 0;
+  }
+
+  /* reset full width */
   input,
-  textarea,
-  button {
+  textarea {
     width: 100%;
   }
+
 }
 
+/* =====================================================
+   HP KECIL
+===================================================== */
 @media (max-width: 360px) {
+
   .content {
     padding: 12px;
   }
+
 }
