@@ -390,17 +390,6 @@ table td:nth-child(2){
       </div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-icon bg-offline">
-        <i class="fa fa-times"></i>
-      </div>
-
-      <div class="stat-info">
-        <h2 id="jmlOffline">0</h2>
-        <p>Offline</p>
-      </div>
-    </div>
-
   </div>
 
   <!-- ================= TOOLBAR ================= -->
@@ -480,21 +469,22 @@ function renderTable(dataList){
   let totalSelesai = 0;
   let totalOffline = 0;
 
-  dataList.forEach(data => {
+dataList.forEach(data => {
 
-    const lastOnline = data.lastOnline;
+  const lastOnline = data.lastOnline;
 
-    let isOnline = false;
+  let isOnline = false;
+  let selisih = null;
 
-    if(lastOnline && lastOnline.toDate){
+  if (lastOnline && lastOnline.toDate) {
+    selisih = Date.now() - lastOnline.toDate().getTime();
+    isOnline = selisih <= 60000;
+  }
 
-      const selisih =
-        Date.now() - lastOnline.toDate().getTime();
-
-      isOnline = selisih <= 60000;
-
-    }
-
+  // 🔴 SKIP: kalau offline lebih dari 1 menit
+  if (!isOnline && selisih !== null && selisih > 60000) {
+    return;
+  }
     let statusBadge = "🔴 Offline";
     let statusClass = "offline";
 
@@ -557,7 +547,15 @@ function renderTable(dataList){
 
         <td>${data.kelas || "-"}</td>
 
-        <td>${data.kodeUjian || "-"}</td>
+        <td>
+  ${
+    ["belum_mulai", "mengerjakan", "selesai"]
+      .includes(data.status)
+      && data.kodeUjian
+        ? data.kodeUjian
+        : "-"
+  }
+</td>
 
         <td class="${statusClass}">
           ${statusBadge}

@@ -3,7 +3,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 // Analytics OPTIONAL (boleh dihapus kalau tidak dipakai)
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDNj37IaDG51SoXKweOKQwD9WidR1DsB7I",
@@ -21,6 +20,3 @@ export const app = initializeApp(firebaseConfig);
 // SERVICES
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
-// OPTIONAL
-export const analytics = getAnalytics(app);
