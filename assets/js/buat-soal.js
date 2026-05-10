@@ -95,6 +95,55 @@ daftarKelas.forEach(kelas => {
   kelasInput.appendChild(opt);
 });
 
+function reindexOpsi(container, kunciSelect = null, isMCMA = false){
+
+  const rows = container.querySelectorAll(".opsi-row");
+
+  // reset dropdown PG
+  if(kunciSelect){
+    kunciSelect.innerHTML = "";
+  }
+
+  rows.forEach((row, index)=>{
+    const label = String.fromCharCode(65 + index);
+
+    // ubah label huruf
+    const b = row.querySelector("b");
+    if(b) b.innerText = label + ".";
+
+    // update checkbox MCMA
+    const checkbox = row.querySelector("input[type='checkbox']");
+    if(checkbox){
+      checkbox.value = label;
+    }
+
+    // rebuild dropdown PG
+    if(kunciSelect){
+      const opt = document.createElement("option");
+      opt.value = label;
+      opt.textContent = label;
+      kunciSelect.appendChild(opt);
+    }
+  });
+}
+
+function reindexKategori(table){
+
+  const rows = table.querySelectorAll("tr");
+
+  rows.forEach((row, index)=>{
+    if(index === 0) return; // skip header
+
+    const label = String.fromCharCode(97 + (index - 1)); // a, b, c
+
+    const span = row.querySelector("span");
+    if(span){
+      span.innerText = span.innerText.replace(/^[a-z]\.\s*/i, "");
+      span.innerText = `${label}. ${span.innerText.trim()}`;
+    }
+  });
+}
+
 // ======================================================
 // ======================== TOAST =======================
 // ======================================================
@@ -226,13 +275,13 @@ function parseSoalHtml(html){
     .filter(x => x);
 
   const lines = [];
+
   rawLines.forEach(line=>{
     let split = line
-      // pecah opsi (lebih aman)
-      .replace(/(^|\s)([A-D]\.)/g, '\n$2')
+      .replace(/(^|\s)([A-Z][\.\)\-])/g, '\n$2')
       .split('\n')
-      .map(x=>x.trim())
-      .filter(x=>x);
+      .map(x => x.trim())
+      .filter(x => x);
 
     lines.push(...split);
   });
@@ -242,21 +291,24 @@ function parseSoalHtml(html){
 
   lines.forEach(line=>{
 
-    // ================= DETEKSI TIPE GLOBAL =================
+    // ================= DETEKSI HEADER TIPE =================
+    if(/SOAL\s*PG/i.test(line) && !/KOMPLEKS|MCMA/i.test(line)){
+      currentTipe = "pg";
+      return;
+    }
+
     if(/SOAL\s*(PG KOMPLEKS|MCMA)/i.test(line)){
       currentTipe = "mcma";
       return;
     }
-    else if(/SOAL KATEGORI/i.test(line)){
-      currentTipe="kategori";
+
+    if(/SOAL\s*KATEGORI/i.test(line)){
+      currentTipe = "kategori";
       return;
     }
-    else if(/SOAL ESAI/i.test(line)){
-      currentTipe="esai";
-      return;
-    }
-    else if(/SOAL\s*PG/i.test(line)){
-      currentTipe = "pg";
+
+    if(/SOAL\s*ESA|SOAL\s*ESAI/i.test(line)){
+      currentTipe = "esai";
       return;
     }
 
@@ -267,24 +319,28 @@ function parseSoalHtml(html){
       soal = {
         tipe: currentTipe,
         pertanyaan: line.replace(/^\d+[\.\)\-]\s*/,""),
-        opsi:{},
-        jawabanBenar:[],
-        pernyataan:[]
+        opsi: {},
+        jawabanBenar: [],
+        pernyataan: []
       };
+
       return;
     }
 
     if(!soal) return;
 
     // ================= OPSI =================
-    let opsi = line.match(/^([A-D])\.\s*(.*)/);
-    if(opsi){
-      soal.opsi[opsi[1]] = opsi[2];
+    let opsi = line.match(/^([A-Z])\.\s*(.*)/);
 
-      // auto detect PG
+    if(opsi){
+      const key = opsi[1].toUpperCase();
+      soal.opsi[key] = opsi[2];
+
+      // auto PG kalau belum jelas
       if(soal.tipe === "esai"){
         soal.tipe = "pg";
       }
+
       return;
     }
 
@@ -295,21 +351,24 @@ function parseSoalHtml(html){
         .trim();
 
       soal.jawabanBenar = kunci
-        .split(/[^A-D]+/)
+        .split(/[^A-Z]+/)
         .map(x => x.trim().toUpperCase())
         .filter(x => x);
 
       return;
     }
 
-    // ================= KATEGORI =================
-    let kat = line.match(/^[a-z]\.\s*(.*?)\s*\((Benar|Salah)\)/i);
+    // ================= KATEGORI (FIX UTAMA) =================
+    let kat = line.match(/^([a-z])\.\s*(.*?)\s*\((benar|salah)\)/i);
+
     if(kat){
       soal.tipe = "kategori";
+
       soal.pernyataan.push({
-        teks: kat[1],
-        jawabanBenar: kat[2].toLowerCase()==="benar"
+        teks: kat[2], // ✅ FIX: sebelumnya salah (kat[1])
+        jawabanBenar: kat[3].toLowerCase() === "benar"
       });
+
       return;
     }
 
@@ -327,17 +386,24 @@ function parseSoalHtml(html){
   // ================= FINAL CHECK =================
   function finalizeSoal(s){
 
-    // PG → MCMA
+    // 🔥 PRIORITAS: KATEGORI HARUS PALING ATAS
+    if(s.pernyataan && s.pernyataan.length > 0){
+      s.tipe = "kategori";
+    }
+
+    // MCMA DETEKSI
     if(s.tipe === "pg" && s.jawabanBenar.length > 1){
       s.tipe = "mcma";
     }
 
-    // kalau tidak ada opsi & kategori → esai
-    if(Object.keys(s.opsi).length === 0 && s.pernyataan.length === 0){
+    // ESAI fallback
+    if(
+      (!s.opsi || Object.keys(s.opsi).length === 0) &&
+      (!s.pernyataan || s.pernyataan.length === 0)
+    ){
       s.tipe = "esai";
     }
 
-    // bersihin pertanyaan
     s.pertanyaan = s.pertanyaan.trim();
 
     renderSoal(s);
@@ -449,8 +515,14 @@ else if(data.tipe === "kategori"){
       </td>
     `;
 
-    tr.querySelector(".hapus-kategori").onclick = () => tr.remove();
+    const table = card.querySelector(".kategori-table");
+
+tr.querySelector("button").onclick = ()=>{
+  tr.remove();
+  reindexKategori(table);
+};
     table.appendChild(tr);
+    
   });
 }
 }
@@ -512,7 +584,7 @@ window.tambahSoal = () => {
 
   const kunciSelect = card.querySelector(".jawaban");
 
- function tambahOpsi(container, isMCMA=false){
+  function tambahOpsi(container, isMCMA=false){
   const i = container.children.length;
   const label = huruf(i);
 
@@ -540,10 +612,25 @@ window.tambahSoal = () => {
     kunciSelect.appendChild(opt);
   }
 
-  row.querySelector(".hapus-opsi").onclick = ()=>row.remove();
+  row.querySelector(".hapus-opsi").onclick = ()=>{
+
+  row.remove();
+
+  // PG
+  if(container.classList.contains("pg-options")){
+    reindexOpsi(container, kunciSelect, false);
+  }
+
+  // MCMA
+  else if(container.classList.contains("mcma-options")){
+    reindexOpsi(container, null, true);
+  }
+
+};
 }
 
-function tambahKategori(){
+function tambahKategori(table){
+
   const tr = document.createElement("tr");
 
   tr.innerHTML = `
@@ -558,39 +645,60 @@ function tambahKategori(){
           <option value="false">Salah</option>
         </select>
 
-        <button>✖</button>
+        <button type="button">✖</button>
       </div>
     </td>
   `;
 
-  tr.querySelector("button").onclick = ()=>tr.remove();
-  katTable.appendChild(tr);
+  table.appendChild(tr);
+
+  tr.querySelector("button").onclick = () => {
+    tr.remove();
+    reindexKategori(table);
+  };
+
+  reindexKategori(table);
 }
 
-  for(let i=0;i<4;i++){
-    tambahOpsi(pgBox);
-    tambahOpsi(mcmaBox,true);
-  }
+for(let i=0;i<4;i++){
+  tambahOpsi(pgBox);
+  tambahOpsi(mcmaBox,true);
+}
 
-  for(let i=0;i<2;i++) tambahKategori();
+for(let i=0;i<2;i++){
+  tambahKategori(katTable);
+}
 
-  btnAddPG.onclick = ()=>tambahOpsi(pgBox);
-  btnAddMCMA.onclick = ()=>tambahOpsi(mcmaBox,true);
-  btnAddKat.onclick = ()=>tambahKategori();
+btnAddPG.onclick = ()=>{
+  tambahOpsi(pgBox);
+  reindexOpsi(pgBox, kunciSelect, false);
+};
 
-  card.querySelector(".hapus").onclick = ()=>card.remove();
+btnAddMCMA.onclick = ()=>{
+  tambahOpsi(mcmaBox,true);
+  reindexOpsi(mcmaBox, null, true);
+};
 
-  tipe.onchange = ()=>{
-    pgBox.style.display = tipe.value==="pg"?"block":"none";
-    mcmaBox.style.display = tipe.value==="mcma"?"block":"none";
-    katTable.parentElement.style.display = tipe.value==="kategori"?"block":"none";
+btnAddKat.onclick = ()=>{
+  tambahKategori(katTable);
+  reindexKategori(katTable);
+};
 
-    btnAddPG.style.display = tipe.value==="pg"?"inline":"none";
-    btnAddMCMA.style.display = tipe.value==="mcma"?"inline":"none";
-    btnAddKat.style.display = tipe.value==="kategori"?"inline":"none";
+card.querySelector(".hapus").onclick = ()=>card.remove();
 
-    kunciSelect.style.display = tipe.value==="pg"?"block":"none";
-  };
+const katWrapper = card.querySelector(".kategori-options");
+
+tipe.onchange = ()=>{
+  pgBox.style.display = tipe.value==="pg"?"block":"none";
+  mcmaBox.style.display = tipe.value==="mcma"?"block":"none";
+  katWrapper.style.display = tipe.value==="kategori"?"block":"none";
+
+  btnAddPG.style.display = tipe.value==="pg"?"inline":"none";
+  btnAddMCMA.style.display = tipe.value==="mcma"?"inline":"none";
+  btnAddKat.style.display = tipe.value==="kategori"?"inline":"none";
+
+  kunciSelect.style.display = tipe.value==="pg" ? "" : "none";
+};
 };
 
 // ======================================================
@@ -598,50 +706,53 @@ function tambahKategori(){
 // ======================================================
 window.simpanSemua = async ()=>{
   try{
-const user = auth.currentUser;
+    const user = auth.currentUser;
 
-if (!user) {
-  throw new Error("User belum login");
-}
+    if (!user) {
+      throw new Error("User belum login");
+    }
 
-// 🔥 ambil dari collection users (PALING BENAR)
-const userRef = doc(db, "users", user.uid);
-const userSnap = await getDoc(userRef);
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
 
-if (!userSnap.exists()) {
-  throw new Error("Data user tidak ditemukan");
-}
+    if (!userSnap.exists()) {
+      throw new Error("Data user tidak ditemukan");
+    }
 
-const dataUser = userSnap.data();
+    const dataUser = userSnap.data();
 
-if (!dataUser.nama) {
-  throw new Error("Nama guru tidak ditemukan");
-}
+    if (!dataUser.nama) {
+      throw new Error("Nama guru tidak ditemukan");
+    }
 
-const namaGuru = dataUser.nama;
+    const namaGuru = dataUser.nama;
 
     // ===== JUDUL =====
-let judul = "";
+    let judul = "";
 
-if (judulSelect.value === "lainnya") {
-  judul = toTitleCase(judulManual.value.trim());
+    if (judulSelect.value === "lainnya") {
+      judul = toTitleCase(judulManual.value.trim());
 
-  if (!judul) {
-    throw new Error("Judul manual harus diisi");
-  }
+      if (!judul) {
+        throw new Error("Judul manual harus diisi");
+      }
 
-} else {
-  judul = judulSelect.value;
-}
-// ===== MAPEL =====
-const mapel = mapelInput.value.trim();
-const kelas = kelasInput.value.trim();
+    } else {
+      judul = judulSelect.value;
+    }
 
-if (!judul || !mapel || !kelas) {
-  throw new Error("Data wajib diisi");
-}
+    // ===== MAPEL =====
+    const mapel = mapelInput.value.trim();
+    const kelas = kelasInput.value.trim();
 
-    const soalPG=[], soalMCMA=[], soalKategori=[], soalEssay=[];
+    if (!judul || !mapel || !kelas) {
+      throw new Error("Data wajib diisi");
+    }
+
+    const soalPG = [];
+    const soalMCMA = [];
+    const soalKategori = [];
+    const soalEssay = [];
 
     document.querySelectorAll(".soal-card").forEach(card=>{
       const tipe = card.querySelector(".tipe-soal").value;
@@ -652,8 +763,10 @@ if (!judul || !mapel || !kelas) {
       if(tipe==="pg"){
         const opsi={};
 
-        card.querySelectorAll(".pg-options .opsi-text").forEach((o,i)=>{
-          opsi[huruf(i)] = o.innerText.trim();
+        card.querySelectorAll(".pg-options .opsi-row").forEach(row=>{
+          const key = row.querySelector("b").innerText.replace(".","");
+          const val = row.querySelector(".opsi-text").innerText.trim();
+          opsi[key] = val;
         });
 
         soalPG.push({
@@ -666,8 +779,10 @@ if (!judul || !mapel || !kelas) {
       else if(tipe==="mcma"){
         const opsi={}, kunci=[];
 
-        card.querySelectorAll(".mcma-options .opsi-text").forEach((o,i)=>{
-          opsi[huruf(i)] = o.innerText.trim();
+        card.querySelectorAll(".mcma-options .opsi-row").forEach(row=>{
+          const key = row.querySelector("b").innerText.replace(".","");
+          const val = row.querySelector(".opsi-text").innerText.trim();
+          opsi[key] = val;
         });
 
         card.querySelectorAll(".mcma-options input:checked").forEach(cb=>{
@@ -678,7 +793,11 @@ if (!judul || !mapel || !kelas) {
           throw new Error("MCMA wajib ada kunci");
         }
 
-        soalMCMA.push({ pertanyaan, opsi, jawabanBenar:kunci });
+        soalMCMA.push({
+          pertanyaan,
+          opsi,
+          jawabanBenar: kunci
+        });
       }
 
       else if(tipe==="kategori"){
@@ -698,7 +817,10 @@ if (!judul || !mapel || !kelas) {
           }
         });
 
-        soalKategori.push({ pertanyaan, pernyataan });
+        soalKategori.push({
+          pertanyaan,
+          pernyataan
+        });
       }
 
       else{
@@ -706,37 +828,47 @@ if (!judul || !mapel || !kelas) {
       }
     });
 
+    // ================= 🔥 VALIDASI WAJIB (INI YANG DITAMBAHKAN) =================
+    const totalSoal =
+      soalPG.length +
+      soalMCMA.length +
+      soalKategori.length +
+      soalEssay.length;
+
+    if(totalSoal === 0){
+      throw new Error("Tidak ada soal untuk disimpan");
+    }
+
+    // ================= SIMPAN =================
     const docId = `${buatDocId(judul, mapel, kelas)}_${Date.now()}`;
 
-await setDoc(doc(db,"bank_soal",docId),{
-  judul,
-  mapel,
-  kelas,
+    await setDoc(doc(db,"bank_soal",docId),{
+      judul,
+      mapel,
+      kelas,
 
-  soalPG,
-  soalMCMA,
-  soalKategori,
-  soalEssay,
+      soalPG,
+      soalMCMA,
+      soalKategori,
+      soalEssay,
 
-  guruId: user.uid,
-  namaGuru: namaGuru, // 👍 biar bisa tampil nanti
+      guruId: user.uid,
+      namaGuru,
 
-  dibuat: serverTimestamp()
-});
+      dibuat: serverTimestamp()
+    });
 
-toast("✅ Berhasil simpan");
+    toast("✅ Berhasil simpan");
 
-// 🔥 HAPUS SEMUA SOAL (TAPI TOMBOL TETAP ADA)
-daftarSoal.innerHTML = "";
+    // ================= RESET =================
+    daftarSoal.innerHTML = "";
 
-// reset semua input atas
-judulSelect.value = "";
-judulManual.value = "";
-mapelInput.value = "";
-kelasInput.value = "";
+    judulSelect.value = "";
+    judulManual.value = "";
+    mapelInput.value = "";
+    kelasInput.value = "";
 
-// sembunyikan judul manual
-judulManual.style.display = "none";
+    judulManual.style.display = "none";
 
   }catch(err){
     toast("❌ "+err.message,"error");
