@@ -431,12 +431,30 @@ function tampilkanSiswa(data) {
     });
 
     container.innerHTML += `
-      <div class="kelas-card">
+      <div class="kelas-card" data-kelas="${kelas}">
 
-        <div class="kelas-header">
-          <div class="kelas-title">Kelas ${kelas}</div>
-          <div class="kelas-total">${siswaKelas.length} siswa</div>
-        </div>
+<div class="kelas-header">
+
+  <div>
+    <div class="kelas-title">
+      Kelas ${kelas}
+    </div>
+
+    <div class="kelas-total">
+      ${siswaKelas.length} siswa
+    </div>
+  </div>
+
+  <button
+    class="btn btn-download"
+    onclick="exportExcelKelas('${kelas}')">
+
+    <i class="fa-solid fa-download"></i>
+    Unduh Excel
+
+  </button>
+
+</div>
 
         <table class="tabel-kelas">
           <thead>
@@ -461,6 +479,71 @@ function tampilkanSiswa(data) {
     `;
   });
 }
+
+/* ===============================
+   EXPORT EXCEL PER KELAS
+================================ */
+window.exportExcelKelas = function(kelas) {
+
+  const table = document.querySelector(
+    `[data-kelas="${kelas}"] table`
+  );
+
+  if (!table) {
+    return alert("Tabel tidak ditemukan");
+  }
+
+  // ambil semua row tbody
+  const rows = table.querySelectorAll("tbody tr");
+
+  const data = [];
+
+  rows.forEach((row, index) => {
+
+    const td = row.querySelectorAll("td");
+
+    data.push({
+      No: index + 1,
+      Nama: td[1]?.innerText || "",
+      Kelas: td[3]?.innerText || "",
+      Username: td[4]?.innerText || "", // email
+      Password: td[5]?.innerText || ""
+    });
+
+  });
+
+  // buat workbook
+  const wb = XLSX.utils.book_new();
+
+  // convert json -> sheet
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  // auto width
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 30 },
+    { wch: 12 },
+    { wch: 35 },
+    { wch: 20 }
+  ];
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    ws,
+    `Kelas ${kelas}`
+  );
+
+  // download
+  XLSX.writeFile(
+    wb,
+    `Data_Siswa_Kelas_${kelas}.xlsx`
+  );
+
+  showNotif(
+    `📥 Excel kelas ${kelas} berhasil diunduh`,
+    "#2563eb"
+  );
+};
 
 /* ===============================
    LOAD DATA
