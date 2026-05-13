@@ -221,15 +221,15 @@ onSnapshot(collection(db, "guru"), (snap) => {
 
       <td data-label="Aksi">
 
-        ${
-          g.aktif
-            ? `<button class="btn danger" onclick="toggleGuru('${g.id}', false)">
-                 Nonaktifkan
-               </button>`
-            : `<button class="btn success" onclick="toggleGuru('${g.id}', true)">
-                 Aktifkan
-               </button>`
-        }
+${
+  g.aktif
+    ? `<button class="btn danger" onclick="toggleGuru(\`${g.id}\`, false)">
+         Nonaktifkan
+       </button>`
+    : `<button class="btn success" onclick="toggleGuru(\`${g.id}\`, true)">
+         Aktifkan
+       </button>`
+}
 
         <button class="btn danger" onclick="hapusGuru('${g.id}')">
           Hapus
@@ -247,13 +247,29 @@ onSnapshot(collection(db, "guru"), (snap) => {
 ===================================================== */
 window.toggleGuru = async (id, status) => {
 
-  const ref = doc(db, "guru", id);
+  try {
 
-  await updateDoc(ref, {
-    aktif: status
-  });
+    const ref = doc(db, "guru", id);
 
-  showNotif(status ? "Guru diaktifkan" : "Guru dinonaktifkan");
+    await updateDoc(ref, {
+      aktif: status
+    });
+
+    showNotif(
+      status
+        ? "Guru diaktifkan ✅"
+        : "Guru dinonaktifkan ⛔"
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    showNotif(
+      "❌ Gagal update status",
+      "#dc2626"
+    );
+  }
 };
 
 /* =====================================================
