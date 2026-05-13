@@ -16,7 +16,6 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  deleteUser,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
@@ -139,24 +138,55 @@ function generateAkun(nama) {
    TAMBAH GURU
 ===================================================== */
 window.tambahGuru = async () => {
-  if (!namaInput.value || !mapelInput.value)
+
+  if (!namaInput.value || !mapelInput.value) {
     return showNotif("Lengkapi data ❌", "#dc2626");
+  }
 
-  const akun = generateAkun(namaInput.value);
+  try {
 
-  await setDoc(doc(db, "guru", akun.email), {
-    nama: namaInput.value,
-    mapel: mapelInput.value,
-    email: akun.email,
-    password: akun.password,
-    aktif: false,
-    createdAt: new Date()
-  });
+    const akun = generateAkun(namaInput.value);
 
-  showNotif("Guru berhasil ditambahkan ✅");
+    // ===============================
+    // BUAT AUTH SEKALI SAJA
+    // ===============================
+    const cred = await createUserWithEmailAndPassword(
+      secondaryAuth,
+      akun.email,
+      akun.password
+    );
 
-  namaInput.value = "";
-  mapelInput.value = "";
+    const uid = cred.user.uid;
+
+    // ===============================
+    // SIMPAN DATA GURU
+    // ===============================
+    await setDoc(doc(db, "guru", akun.email), {
+      uid,
+      nama: namaInput.value,
+      mapel: mapelInput.value,
+      email: akun.email,
+      password: akun.password,
+      aktif: false,
+      createdAt: new Date()
+    });
+
+    await signOut(secondaryAuth);
+
+    showNotif("Guru berhasil ditambahkan ✅");
+
+    namaInput.value = "";
+    mapelInput.value = "";
+
+  } catch (err) {
+
+    console.error(err);
+
+    showNotif(
+      "❌ Gagal menambah guru",
+      "#dc2626"
+    );
+  }
 };
 
 /* =====================================================

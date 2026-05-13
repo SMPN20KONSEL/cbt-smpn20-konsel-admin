@@ -22,7 +22,6 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  deleteUser,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
@@ -181,31 +180,30 @@ window.aktifkanAkun = async (nis, btn) => {
     let uid = "";
 
     // ===============================
-    // CEK / BUAT AUTH
+    // LOGIN AUTH YANG SUDAH ADA
     // ===============================
     try {
 
-      // coba buat akun baru
-      const cred = await createUserWithEmailAndPassword(
+      const login = await signInWithEmailAndPassword(
         secondaryAuth,
         siswa.email,
         siswa.password
       );
 
-      uid = cred.user.uid;
+      uid = login.user.uid;
 
     } catch (err) {
 
-      // kalau email sudah ada → login saja
-      if (err.code === "auth/email-already-in-use") {
+      // kalau akun auth belum ada
+      if (err.code === "auth/user-not-found") {
 
-        const login = await signInWithEmailAndPassword(
+        const cred = await createUserWithEmailAndPassword(
           secondaryAuth,
           siswa.email,
           siswa.password
         );
 
-        uid = login.user.uid;
+        uid = cred.user.uid;
 
       } else {
         throw err;
@@ -219,31 +217,33 @@ window.aktifkanAkun = async (nis, btn) => {
       uid,
       nis,
       email: siswa.email,
+      aktif: true,
       createdAt: new Date()
     });
 
     // ===============================
-    // UPDATE STATUS SISWA
+    // UPDATE STATUS
     // ===============================
     await updateDoc(siswaRef, {
-      aktif: true
+      aktif: true,
+      uid: uid
     });
 
     await signOut(secondaryAuth);
 
-    // notifikasi kecil otomatis hilang
-    showNotif("✅ Akun siswa berhasil diaktifkan");
+    showNotif(
+      "✅ Akun siswa berhasil diaktifkan"
+    );
 
-    // update UI tanpa reload
     updateUI(nis, true);
 
   } catch (err) {
 
     console.error(err);
 
-    alert(
-      "Gagal aktivasi ❌\n" +
-      (err.message || err)
+    showNotif(
+      "❌ Gagal mengaktifkan akun",
+      "#dc2626"
     );
 
   } finally {
@@ -252,6 +252,7 @@ window.aktifkanAkun = async (nis, btn) => {
 
   }
 };
+
 
 /* ===============================
    NONAKTIFKAN AKUN SISWA
@@ -263,46 +264,23 @@ window.nonaktifkanAkun = async (nis, btn) => {
   try {
 
     const siswaRef = doc(db, "siswa", nis);
+
     const snap = await getDoc(siswaRef);
 
     if (!snap.exists()) {
       throw new Error("Data siswa tidak ditemukan");
     }
 
-    const siswa = snap.data();
-
-    // LOGIN AUTH SISWA
-    const cred = await signInWithEmailAndPassword(
-      secondaryAuth,
-      siswa.email,
-      siswa.password
-    );
-
-    // HAPUS AUTH
-    await deleteUser(cred.user);
-
-    // HAPUS akun_siswa
-    const q = query(
-      collection(db, "akun_siswa"),
-      where("nis", "==", nis)
-    );
-
-    const akunSnap = await getDocs(q);
-
-    for (const d of akunSnap.docs) {
-      await deleteDoc(d.ref);
-    }
-
-    // UPDATE STATUS
+    // ===============================
+    // UPDATE STATUS SAJA
+    // ===============================
     await updateDoc(siswaRef, {
       aktif: false
     });
 
-    await signOut(secondaryAuth);
-
     // NOTIFIKASI
     showNotif(
-      "🗑️ Akun siswa berhasil dinonaktifkan",
+      "⛔ Akun siswa berhasil dinonaktifkan",
       "#dc2626"
     );
 
