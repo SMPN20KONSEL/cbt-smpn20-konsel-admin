@@ -249,11 +249,15 @@ window.toggleGuru = async (id, status) => {
 
   try {
 
+    console.log("UPDATE:", id, status);
+
     const ref = doc(db, "guru", id);
 
     await updateDoc(ref, {
       aktif: status
     });
+
+    console.log("BERHASIL");
 
     showNotif(
       status
@@ -263,10 +267,10 @@ window.toggleGuru = async (id, status) => {
 
   } catch (err) {
 
-    console.error(err);
+    console.error("ERROR FIRESTORE:", err);
 
     showNotif(
-      "❌ Gagal update status",
+      err.message || "Gagal update",
       "#dc2626"
     );
   }
