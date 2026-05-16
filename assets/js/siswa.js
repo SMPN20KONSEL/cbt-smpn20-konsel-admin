@@ -255,43 +255,38 @@ async (nis, btn) => {
 
     const siswa = snap.data();
 
-    let uid = "";
+    if (
+      !siswa.email ||
+      !siswa.password
+    ) {
+
+      throw new Error(
+        "Email/password belum tersedia"
+      );
+    }
+
+    let uid = siswa.uid || "";
 
     /* ===============================
-       LOGIN AUTH YANG SUDAH ADA
+       JIKA BELUM ADA UID
+       = BELUM PERNAH DIBUAT AUTH
     ================================ */
-    try {
+    if (!uid) {
 
-      const login =
-        await signInWithEmailAndPassword(
+      const cred =
+        await createUserWithEmailAndPassword(
           secondaryAuth,
           siswa.email,
           siswa.password
         );
 
-      uid = login.user.uid;
+      uid = cred.user.uid;
 
-    } catch (err) {
-
-      /* AKUN BELUM ADA */
-      if (
-        err.code ===
-        "auth/user-not-found"
-      ) {
-
-        const cred =
-          await createUserWithEmailAndPassword(
-            secondaryAuth,
-            siswa.email,
-            siswa.password
-          );
-
-        uid = cred.user.uid;
-
-      } else {
-
-        throw err;
-      }
+      /* SIMPAN UID */
+      await updateDoc(
+        siswaRef,
+        { uid }
+      );
     }
 
     /* ===============================
@@ -316,39 +311,39 @@ async (nis, btn) => {
       { merge: true }
     );
 
-    /* ===============================
-       UPDATE siswa
-    ================================ */
-    await updateDoc(
-      siswaRef,
-      {
-        uid
-      }
-    );
-
-    /* ===============================
-       LOGOUT SECONDARY AUTH
-    ================================ */
+    /* LOGOUT SECONDARY */
     await signOut(
       secondaryAuth
     );
 
-    /* NOTIF */
     showNotif(
       "✅ Akun siswa berhasil diaktifkan"
     );
 
-    /* UPDATE UI */
     updateUI(nis, true);
 
   } catch (err) {
 
     console.error(err);
 
-    showNotif(
-      "❌ Gagal mengaktifkan akun",
-      "#dc2626"
-    );
+    /* EMAIL SUDAH ADA */
+    if (
+      err.code ===
+      "auth/email-already-in-use"
+    ) {
+
+      showNotif(
+        "⚠️ Email sudah terdaftar",
+        "#dc2626"
+      );
+
+    } else {
+
+      showNotif(
+        "❌ Gagal mengaktifkan akun",
+        "#dc2626"
+      );
+    }
 
   } finally {
 
