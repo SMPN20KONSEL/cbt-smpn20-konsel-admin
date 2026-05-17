@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <title>Daftar Download Soal</title>
 
-<!-- RESPONSIVE -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- CSS -->
 <link rel="stylesheet" href="../assets/css/admin.css">
 
-<!-- FONT AWESOME -->
-<link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
+
 /* ================= CONTENT ================= */
 .content{
   flex:1;
@@ -79,6 +79,27 @@ tbody tr:hover{
   background:#15803d;
 }
 
+/* ================= TOGGLE ================= */
+.download-box{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.switch-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  color:#334155;
+}
+
+.switch-label input{
+  width:16px;
+  height:16px;
+  cursor:pointer;
+}
+
 /* ================= TEXT ================= */
 .loading{
   text-align:center;
@@ -110,12 +131,12 @@ tbody tr:hover{
   }
 
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- ================= TOPBAR ================= -->
 <header class="topbar">
 
   <div class="brand">
@@ -130,20 +151,17 @@ tbody tr:hover{
 
   </div>
 
-  <!-- MENU HP -->
   <div class="menu-toggle" onclick="toggleSidebar()">
     <i class="fas fa-bars"></i>
   </div>
 
 </header>
 
-<!-- OVERLAY -->
 <div class="overlay" onclick="toggleSidebar()"></div>
 
-<!-- ================= DASHBOARD ================= -->
 <div class="dashboard">
 
-  <!-- ================= SIDEBAR ================= -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
 
     <h2>
@@ -225,7 +243,7 @@ tbody tr:hover{
 
   </aside>
 
-  <!-- ================= CONTENT ================= -->
+  <!-- CONTENT -->
   <main class="content">
 
     <div class="container">
@@ -272,13 +290,10 @@ tbody tr:hover{
   </main>
 
 </div>
-<!-- DOCX LIBRARY -->
+
+<!-- DOCX -->
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 
-<!-- DOCX LIBRARY -->
-<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-
-<!-- ================= SCRIPT ================= -->
 <script type="module">
 
 import { db }
@@ -292,10 +307,9 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-// ================= ELEMENT =================
 const tbody = document.getElementById("tbody");
 
-// ================= LOAD IMAGE =================
+/* ================= LOAD IMAGE ================= */
 async function loadImage(url){
 
   const res = await fetch(url);
@@ -307,7 +321,7 @@ async function loadImage(url){
   return await res.arrayBuffer();
 }
 
-// ================= FORMAT JUDUL =================
+/* ================= FORMAT JUDUL ================= */
 function formatJudul(judul){
 
   if(!judul) return "BANK SOAL";
@@ -335,16 +349,14 @@ function formatJudul(judul){
     return "SUMATIF HARIAN (SH)";
   }
 
-  else if(
-    j.includes("usbn")
-  ){
+  else if(j.includes("usbn")){
     return "UJIAN SEKOLAH BERSTANDAR NASIONAL (USBN)";
   }
 
   return judul.toUpperCase();
 }
 
-// ================= LOAD DATA =================
+/* ================= LOAD DATA ================= */
 async function loadData(){
 
   try{
@@ -353,7 +365,6 @@ async function loadData(){
       collection(db, "bank_soal")
     );
 
-    // ================= DATA KOSONG =================
     if(snap.empty){
 
       tbody.innerHTML = `
@@ -370,7 +381,6 @@ async function loadData(){
     let html = "";
     let no = 1;
 
-    // ================= LOOP =================
     snap.forEach((docu) => {
 
       const d = docu.data();
@@ -388,14 +398,30 @@ async function loadData(){
 
         <td>
 
-          <button
-            class="btn-download"
-            data-id="${docu.id}">
+          <div class="download-box">
 
-            <i class="fa fa-download"></i>
-            Unduh
+            <label class="switch-label">
 
-          </button>
+              <input 
+                type="checkbox"
+                id="kunci-${docu.id}"
+                checked
+              >
+
+              <span>Dengan Jawaban</span>
+
+            </label>
+
+            <button
+              class="btn-download"
+              data-id="${docu.id}">
+
+              <i class="fa fa-download"></i>
+              Unduh
+
+            </button>
+
+          </div>
 
         </td>
 
@@ -405,7 +431,7 @@ async function loadData(){
 
     tbody.innerHTML = html;
 
-    // ================= BUTTON DOWNLOAD =================
+    /* ================= BUTTON DOWNLOAD ================= */
     document.querySelectorAll(".btn-download")
     .forEach((btn) => {
 
@@ -413,15 +439,11 @@ async function loadData(){
 
         try{
 
-          // ================= CEK DOCX =================
           if(!window.docx){
-
             alert("Library DOCX belum siap");
-
             return;
           }
 
-          // ================= DOCX =================
           const {
             Document,
             Packer,
@@ -436,7 +458,6 @@ async function loadData(){
             ImageRun
           } = window.docx;
 
-          // ================= GET DATA =================
           const id = btn.dataset.id;
 
           const soalSnap = await getDoc(
@@ -446,13 +467,16 @@ async function loadData(){
           if(!soalSnap.exists()){
 
             alert("Data tidak ditemukan");
-
             return;
           }
 
           const data = soalSnap.data();
 
-          // ================= LOAD LOGO =================
+          /* ================= CEK KUNCI ================= */
+          const pakaiKunci = document.getElementById(
+            `kunci-${id}`
+          )?.checked;
+
           const logoKiri = await loadImage(
             "../assets/img/logo-konawe.png"
           );
@@ -461,13 +485,11 @@ async function loadData(){
             "../assets/img/tutwuri.png"
           );
 
-          // ================= NOMOR =================
           let nomor = 1;
 
-          // ================= CHILDREN =================
           const children = [];
 
-          // ================= HEADER =================
+          /* ================= HEADER ================= */
           const kopTable = new Table({
 
             width:{
@@ -490,7 +512,6 @@ async function loadData(){
 
                 children:[
 
-                  // ================= LOGO KIRI =================
                   new TableCell({
 
                     width:{
@@ -532,7 +553,6 @@ async function loadData(){
 
                   }),
 
-                  // ================= TENGAH =================
                   new TableCell({
 
                     width:{
@@ -553,67 +573,12 @@ async function loadData(){
 
                         alignment:AlignmentType.CENTER,
 
-                        spacing:{ after:50 },
-
                         children:[
-
-                          new TextRun({
-                            text:"PEMERINTAH KABUPATEN KONAWE SELATAN",
-                            bold:true,
-                            size:28
-                          })
-
-                        ]
-
-                      }),
-
-                      new Paragraph({
-
-                        alignment:AlignmentType.CENTER,
-
-                        spacing:{ after:50 },
-
-                        children:[
-
-                          new TextRun({
-                            text:"DINAS PENDIDIKAN DAN KEBUDAYAAN",
-                            bold:true,
-                            size:28
-                          })
-
-                        ]
-
-                      }),
-
-                      new Paragraph({
-
-                        alignment:AlignmentType.CENTER,
-
-                        spacing:{ after:50 },
-
-                        children:[
-
                           new TextRun({
                             text:"SMP NEGERI 20 KONAWE SELATAN",
                             bold:true,
                             size:30
                           })
-
-                        ]
-
-                      }),
-
-                      new Paragraph({
-
-                        alignment:AlignmentType.CENTER,
-
-                        children:[
-
-                          new TextRun({
-                            text:"Jl. Sabulakoa - Landono Desa Sabulakoa Kec. Sabulakoa",
-                            size:22
-                          })
-
                         ]
 
                       })
@@ -622,7 +587,6 @@ async function loadData(){
 
                   }),
 
-                  // ================= LOGO KANAN =================
                   new TableCell({
 
                     width:{
@@ -674,7 +638,6 @@ async function loadData(){
 
           children.push(kopTable);
 
-          // ================= GARIS HEADER =================
           children.push(
 
             new Paragraph({
@@ -695,7 +658,6 @@ async function loadData(){
 
           );
 
-          // ================= JUDUL =================
           children.push(
 
             new Paragraph({
@@ -720,7 +682,6 @@ async function loadData(){
 
           );
 
-          // ================= IDENTITAS =================
           children.push(
 
             new Paragraph({
@@ -729,73 +690,32 @@ async function loadData(){
             }),
 
             new Paragraph({
-              text:`Guru           : ${data.namaGuru || "-"}`,
+              text:`Guru : ${data.namaGuru || "-"}`,
               spacing:{ line:360 }
             }),
 
             new Paragraph({
-              text:`Kelas          : ${data.kelas || "-"}`,
+              text:`Kelas : ${data.kelas || "-"}`,
               spacing:{ line:360 }
             }),
 
-            // ================= SPASI =================
             new Paragraph({
-              text:"",
-              spacing:{
-                after:200
-              }
-            }),
-
-            // ================= SOAL =================
-            new Paragraph({
-
-              alignment:AlignmentType.CENTER,
-
-              spacing:{
-                after:100
-              },
-
-              children:[
-
-                new TextRun({
-                  text:"SOAL - SOAL",
-                  bold:true,
-                  size:26
-                })
-
-              ]
-
-            }),
-
-            // ================= GARIS =================
-            new Paragraph({
-
-              text:"=".repeat(95),
-
-              alignment:AlignmentType.CENTER,
-
-              spacing:{
-                after:300
-              }
-
+              text:""
             })
 
           );
 
-          // ================= PG =================
+          /* ================= PG ================= */
           (data.soalPG || []).forEach((s) => {
 
             children.push(
 
               new Paragraph({
-
                 text:`${nomor++}. ${s.pertanyaan}`,
-
                 spacing:{
                   before:200,
                   line:360
                 }
-
               })
 
             );
@@ -806,10 +726,24 @@ async function loadData(){
               children.push(
 
                 new Paragraph({
-
                   text:`${k}. ${v}`,
+                  spacing:{ line:360 }
+                })
+
+              );
+
+            });
+
+            if(pakaiKunci){
+
+              children.push(
+
+                new Paragraph({
+
+                  text:`Jawaban : ${s.jawabanBenar || "-"}`,
 
                   spacing:{
+                    after:200,
                     line:360
                   }
 
@@ -817,39 +751,21 @@ async function loadData(){
 
               );
 
-            });
-
-            children.push(
-
-              new Paragraph({
-
-                text:`Jawaban : ${s.jawabanBenar || "-"}`,
-
-                spacing:{
-                  after:200,
-                  line:360
-                }
-
-              })
-
-            );
+            }
 
           });
 
-          // ================= MCMA =================
+          /* ================= MCMA ================= */
           (data.soalMCMA || []).forEach((s) => {
 
             children.push(
 
               new Paragraph({
-
                 text:`${nomor++}. ${s.pertanyaan}`,
-
                 spacing:{
                   before:200,
                   line:360
                 }
-
               })
 
             );
@@ -860,10 +776,24 @@ async function loadData(){
               children.push(
 
                 new Paragraph({
-
                   text:`${k}. ${v}`,
+                  spacing:{ line:360 }
+                })
+
+              );
+
+            });
+
+            if(pakaiKunci){
+
+              children.push(
+
+                new Paragraph({
+
+                  text:`Jawaban : ${(s.jawabanBenar || []).join(", ")}`,
 
                   spacing:{
+                    after:200,
                     line:360
                   }
 
@@ -871,63 +801,11 @@ async function loadData(){
 
               );
 
-            });
-
-            children.push(
-
-              new Paragraph({
-
-                text:`Jawaban : ${(s.jawabanBenar || []).join(", ")}`,
-
-                spacing:{
-                  after:200,
-                  line:360
-                }
-
-              })
-
-            );
+            }
 
           });
 
-          // ================= KATEGORI =================
-          (data.soalKategori || []).forEach((s) => {
-
-            children.push(
-
-              new Paragraph({
-
-                text:`${nomor++}. ${s.pertanyaan}`,
-
-                spacing:{
-                  before:200,
-                  line:360
-                }
-
-              })
-
-            );
-
-            const huruf = ["a","b","c","d","e","f"];
-
-(s.pernyataan || []).forEach((p,i) => {
-
-  children.push(
-    new Paragraph({
-      text:`${huruf[i]}. ${p.teks} (${p.jawabanBenar ? "Benar" : "Salah"})`,
-      spacing:{ line:360 }
-    })
-  );
-
-});
-
-            children.push(
-              new Paragraph({ text:"" })
-            );
-
-          });
-
-          // ================= ESSAY =================
+          /* ================= ESSAY ================= */
           (data.soalEssay || []).forEach((s) => {
 
             children.push(
@@ -948,24 +826,8 @@ async function loadData(){
 
           });
 
-          // ================= DOCUMENT =================
+          /* ================= DOCUMENT ================= */
           const docFile = new Document({
-
-            styles:{
-              default:{
-                document:{
-                  run:{
-                    font:"Times New Roman",
-                    size:24
-                  },
-                  paragraph:{
-                    spacing:{
-                      line:360
-                    }
-                  }
-                }
-              }
-            },
 
             sections:[
 
@@ -990,7 +852,6 @@ async function loadData(){
 
           });
 
-          // ================= EXPORT =================
           const blob = await Packer.toBlob(docFile);
 
           const url = URL.createObjectURL(blob);
@@ -999,7 +860,19 @@ async function loadData(){
 
           a.href = url;
 
-          a.download = `${data.judul || "bank-soal"}.docx`;
+          // ================= NAMA FILE =================
+const namaMapel = (data.mapel || "Mapel")
+.replace(/[\\/:*?"<>|]/g, "")
+.trim();
+
+const namaJudul = (data.judul || "Bank Soal")
+.replace(/[\\/:*?"<>|]/g, "")
+.trim();
+
+// CONTOH:
+// Informatika USBN.docx
+
+a.download = `${namaMapel} ${namaJudul}.docx`;
 
           document.body.appendChild(a);
 
@@ -1014,6 +887,7 @@ async function loadData(){
           console.error(err);
 
           alert("Gagal download");
+
         }
 
       });
@@ -1035,12 +909,10 @@ async function loadData(){
 
 }
 
-// ================= LOAD =================
 loadData();
 
 </script>
 
-<!-- LOGOUT -->
 <script type="module"
 src="../assets/js/logout.js"></script>
 
