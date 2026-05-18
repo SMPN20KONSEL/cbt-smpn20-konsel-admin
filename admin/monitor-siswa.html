@@ -6,9 +6,10 @@
 
 <title>Monitor Siswa</title>
 
-<!-- CSS -->
 <link rel="stylesheet" href="../assets/css/admin.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
 
@@ -29,6 +30,7 @@
 .page-title{
   width:100%;
   max-width:1100px;
+
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -42,6 +44,30 @@
 }
 
 /* =====================================================
+   BUTTON REFRESH
+===================================================== */
+.refresh-btn{
+  border:none;
+  background:#2563eb;
+  color:white;
+
+  padding:12px 18px;
+
+  border-radius:10px;
+
+  cursor:pointer;
+
+  font-size:14px;
+  font-weight:600;
+
+  transition:.2s;
+}
+
+.refresh-btn:hover{
+  background:#1d4ed8;
+}
+
+/* =====================================================
    STATISTIK
 ===================================================== */
 .stats{
@@ -49,15 +75,21 @@
   max-width:1100px;
 
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  grid-template-columns:
+  repeat(auto-fit,minmax(180px,1fr));
+
   gap:15px;
 }
 
 .stat-card{
   background:white;
+
   border-radius:14px;
+
   padding:20px;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);
+
+  box-shadow:
+  0 3px 10px rgba(0,0,0,.08);
 
   display:flex;
   align-items:center;
@@ -73,6 +105,7 @@
 .stat-icon{
   width:55px;
   height:55px;
+
   border-radius:12px;
 
   display:flex;
@@ -93,10 +126,6 @@
 
 .bg-selesai{
   background:#16a34a;
-}
-
-.bg-offline{
-  background:#dc2626;
 }
 
 .stat-info h2{
@@ -121,6 +150,7 @@
   display:flex;
   gap:15px;
   flex-wrap:wrap;
+
   justify-content:space-between;
   align-items:center;
 }
@@ -133,60 +163,80 @@
 
 .search-box input{
   width:100%;
-  padding:12px 15px 12px 45px;
+
+  padding:
+  12px 15px 12px 45px;
+
   border-radius:10px;
+
   border:1px solid #d1d5db;
+
   outline:none;
+
   font-size:14px;
 }
 
 .search-box i{
   position:absolute;
+
   left:15px;
   top:50%;
+
   transform:translateY(-50%);
+
   color:#64748b;
 }
 
 .filter-select{
   padding:12px;
-  border-radius:10px;
-  border:1px solid #d1d5db;
-  outline:none;
-}
 
-/* =====================================================
-   TABLE WRAP
-===================================================== */
-.table-wrap{
-  width:100%;
-  max-width:1100px;
-  overflow-x:auto;
+  border-radius:10px;
+
+  border:1px solid #d1d5db;
+
+  outline:none;
 }
 
 /* =====================================================
    TABLE
 ===================================================== */
+.table-wrap{
+  width:100%;
+  max-width:1100px;
+
+  overflow-x:auto;
+}
+
 table{
   width:100%;
+
   border-collapse:collapse;
+
   background:white;
+
   border-radius:14px;
+
   overflow:hidden;
 
-  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  box-shadow:
+  0 2px 10px rgba(0,0,0,.08);
 }
 
 th{
   background:#0b48ac;
   color:white;
+
   font-size:14px;
 }
 
 th,td{
   padding:12px;
-  border-bottom:1px solid #e5e7eb;
+
+  border-bottom:
+  1px solid #e5e7eb;
+
   text-align:center;
+
   font-size:14px;
 }
 
@@ -194,7 +244,6 @@ tr:hover{
   background:#f8fafc;
 }
 
-/* nama rata kiri */
 table td:nth-child(2),
 table th:nth-child(2){
   text-align:left;
@@ -222,22 +271,24 @@ table td:nth-child(2){
   font-weight:bold;
 }
 
-.offline{
-  color:#dc2626;
-  font-weight:bold;
-}
-
 /* =====================================================
    BUTTON
 ===================================================== */
 .btn{
   padding:8px 12px;
+
   border:none;
+
   border-radius:8px;
+
   background:#2563eb;
+
   color:white;
+
   cursor:pointer;
+
   font-size:13px;
+
   transition:.2s;
 }
 
@@ -251,15 +302,20 @@ table td:nth-child(2){
 .live-dot{
   width:10px;
   height:10px;
+
   border-radius:50%;
+
   background:#22c55e;
+
   display:inline-block;
+
   margin-right:6px;
 
   animation:pulse 1s infinite;
 }
 
 @keyframes pulse{
+
   0%{
     transform:scale(1);
     opacity:1;
@@ -274,6 +330,7 @@ table td:nth-child(2){
     transform:scale(1);
     opacity:1;
   }
+
 }
 
 /* =====================================================
@@ -302,14 +359,28 @@ table td:nth-child(2){
 
 <!-- ================= HEADER ================= -->
 <header class="topbar">
+
   <div class="brand">
-    <img src="../assets/img/logo-sekolah.png" class="brand-logo">
+
+    <img
+      src="../assets/img/logo-sekolah.png"
+      class="brand-logo"
+    >
 
     <div class="brand-text">
-      <strong>SMPN 20 KONAWE SELATAN</strong>
-      <small>CBT Application</small>
+
+      <strong>
+        SMPN 20 KONAWE SELATAN
+      </strong>
+
+      <small>
+        CBT Application
+      </small>
+
     </div>
+
   </div>
+
 </header>
 
 <div class="dashboard">
@@ -323,18 +394,79 @@ table td:nth-child(2){
   </h2>
 
   <ul class="menu">
-    <li><a href="dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
-    <li><a href="siswa.html"><i class="fa fa-users"></i> Data Siswa</a></li>
-    <li><a href="guru.html"><i class="fa fa-chalkboard-teacher"></i> Data Guru</a></li>
-    <li><a href="bank-soal.html"><i class="fa fa-book"></i> Bank Soal</a></li>
-    <li><a href="kartu-ujian.html"><i class="fa fa-id-card"></i> Kartu Ujian</a></li>
-    <li><a href="ujian.html"><i class="fa fa-desktop"></i> Ruang Ujian</a></li>
-    <li><a href="monitor-siswa.html" class="active"><i class="fa fa-eye"></i> Monitor Ujian</a></li>
-    <li><a href="nilai.html"><i class="fa fa-graduation-cap"></i> Nilai</a></li>
-    <li><a href="download-soal.html"><i class="fa fa-download"></i> Download Soal</a></li>
+
+    <li>
+      <a href="dashboard.html">
+        <i class="fa fa-home"></i>
+        Dashboard
+      </a>
+    </li>
+
+    <li>
+      <a href="siswa.html">
+        <i class="fa fa-users"></i>
+        Data Siswa
+      </a>
+    </li>
+
+    <li>
+      <a href="guru.html">
+        <i class="fa fa-chalkboard-teacher"></i>
+        Data Guru
+      </a>
+    </li>
+
+    <li>
+      <a href="bank-soal.html">
+        <i class="fa fa-book"></i>
+        Bank Soal
+      </a>
+    </li>
+
+    <li>
+      <a href="kartu-ujian.html">
+        <i class="fa fa-id-card"></i>
+        Kartu Ujian
+      </a>
+    </li>
+
+    <li>
+      <a href="ujian.html">
+        <i class="fa fa-desktop"></i>
+        Ruang Ujian
+      </a>
+    </li>
+
+    <li>
+      <a
+        href="monitor-siswa.html"
+        class="active"
+      >
+        <i class="fa fa-eye"></i>
+        Monitor Ujian
+      </a>
+    </li>
+
+    <li>
+      <a href="nilai.html">
+        <i class="fa fa-graduation-cap"></i>
+        Nilai
+      </a>
+    </li>
+
+    <li>
+      <a href="download-soal.html">
+        <i class="fa fa-download"></i>
+        Download Soal
+      </a>
+    </li>
+
   </ul>
 
-  <button class="logout" id="logout">
+  <button
+    class="logout"
+    id="logout"
+  >
     <i class="fas fa-sign-out-alt"></i>
     Logout
   </button>
@@ -349,8 +481,16 @@ table td:nth-child(2){
 
     <h1>
       <span class="live-dot"></span>
-      Monitoring Realtime Siswa Ujian
+      Monitoring Siswa Ujian
     </h1>
+
+    <button
+      class="refresh-btn"
+      onclick="loadPeserta()"
+    >
+      <i class="fa fa-rotate-right"></i>
+      Refresh
+    </button>
 
   </div>
 
@@ -358,28 +498,33 @@ table td:nth-child(2){
   <div class="stats">
 
     <div class="stat-card">
+
       <div class="stat-icon bg-online">
         <i class="fa fa-user"></i>
       </div>
 
       <div class="stat-info">
         <h2 id="jmlOnline">0</h2>
-        <p>Online</p>
+        <p>Login</p>
       </div>
+
     </div>
 
     <div class="stat-card">
+
       <div class="stat-icon bg-ujian">
         <i class="fa fa-pen"></i>
       </div>
 
       <div class="stat-info">
         <h2 id="jmlUjian">0</h2>
-        <p>Sedang Ujian</p>
+        <p>Mengerjakan</p>
       </div>
+
     </div>
 
     <div class="stat-card">
+
       <div class="stat-icon bg-selesai">
         <i class="fa fa-check"></i>
       </div>
@@ -388,6 +533,7 @@ table td:nth-child(2){
         <h2 id="jmlSelesai">0</h2>
         <p>Selesai</p>
       </div>
+
     </div>
 
   </div>
@@ -396,6 +542,7 @@ table td:nth-child(2){
   <div class="toolbar">
 
     <div class="search-box">
+
       <i class="fa fa-search"></i>
 
       <input
@@ -403,10 +550,16 @@ table td:nth-child(2){
         id="searchInput"
         placeholder="Cari nama siswa..."
       >
+
     </div>
 
-    <select id="filterKelas" class="filter-select">
-      <option value="">Semua Kelas</option>
+    <select
+      id="filterKelas"
+      class="filter-select"
+    >
+      <option value="">
+        Semua Kelas
+      </option>
     </select>
 
   </div>
@@ -417,7 +570,9 @@ table td:nth-child(2){
     <table>
 
       <thead>
+
         <tr>
+
           <th>No</th>
           <th>Nama</th>
           <th>Email</th>
@@ -426,7 +581,9 @@ table td:nth-child(2){
           <th>Status</th>
           <th>Login</th>
           <th>Aksi</th>
+
         </tr>
+
       </thead>
 
       <tbody id="table-body"></tbody>
@@ -441,139 +598,250 @@ table td:nth-child(2){
 <!-- ================= SCRIPT ================= -->
 <script type="module">
 
-import { db } from "../assets/js/firebase.js";
+import { db }
+from "../assets/js/firebase.js";
 
 import {
   collection,
-  onSnapshot
+  getDocs
 }
 from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-const tableBody = document.getElementById("table-body");
-const searchInput = document.getElementById("searchInput");
-const filterKelas = document.getElementById("filterKelas");
+/* ===============================
+   ELEMENT
+=============================== */
+const tableBody =
+document.getElementById("table-body");
 
+const searchInput =
+document.getElementById("searchInput");
+
+const filterKelas =
+document.getElementById("filterKelas");
+
+const jmlOnline =
+document.getElementById("jmlOnline");
+
+const jmlUjian =
+document.getElementById("jmlUjian");
+
+const jmlSelesai =
+document.getElementById("jmlSelesai");
+
+/* ===============================
+   GLOBAL
+=============================== */
 let semuaData = [];
 
-/* =====================================================
+/* ===============================
+   LOAD PESERTA
+=============================== */
+async function loadPeserta(){
+
+  tableBody.innerHTML = `
+    <tr>
+      <td colspan="8">
+        Memuat data...
+      </td>
+    </tr>
+  `;
+
+  try{
+
+    const snap =
+    await getDocs(
+      collection(db,"peserta")
+    );
+
+    semuaData = [];
+
+    const kelasSet =
+    new Set();
+
+    snap.forEach((docSnap)=>{
+
+      const data = {
+        id:docSnap.id,
+        ...docSnap.data()
+      };
+
+      // tampilkan hanya data penting
+      if(
+        data.status === "login" ||
+        data.status === "mengerjakan" ||
+        data.status === "selesai"
+      ){
+
+        semuaData.push(data);
+
+        if(data.kelas){
+          kelasSet.add(data.kelas);
+        }
+
+      }
+
+    });
+
+    // SORT
+    semuaData.sort((a,b)=>{
+
+      const urutan = {
+
+        mengerjakan : 1,
+        login       : 2,
+        selesai     : 3
+
+      };
+
+      return (
+        (urutan[a.status] || 4)
+        -
+        (urutan[b.status] || 4)
+      );
+
+    });
+
+    // FILTER KELAS
+    filterKelas.innerHTML =
+    `
+      <option value="">
+        Semua Kelas
+      </option>
+    `;
+
+    [...kelasSet]
+    .sort()
+    .forEach((kelas)=>{
+
+      filterKelas.innerHTML += `
+        <option value="${kelas}">
+          ${kelas}
+        </option>
+      `;
+
+    });
+
+    renderTable(semuaData);
+
+  }catch(err){
+
+    console.error(err);
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="8">
+          Gagal memuat data
+        </td>
+      </tr>
+    `;
+
+  }
+
+}
+
+/* ===============================
    RENDER TABLE
-===================================================== */
+=============================== */
 function renderTable(dataList){
 
   tableBody.innerHTML = "";
 
   let no = 1;
 
-  let totalOnline = 0;
+  let totalLogin = 0;
   let totalUjian = 0;
   let totalSelesai = 0;
-  let totalOffline = 0;
 
-dataList.forEach(data => {
+  dataList.forEach((data)=>{
 
-  const lastOnline = data.lastOnline;
+    let statusText = "";
+    let statusClass = "";
 
-  let isOnline = false;
-  let selisih = null;
+    // LOGIN
+    if(data.status === "login"){
 
-  if (lastOnline && lastOnline.toDate) {
-    selisih = Date.now() - lastOnline.toDate().getTime();
-    isOnline = selisih <= 60000;
-  }
+      statusText =
+      "🟡 Login";
 
-  // 🔴 SKIP: kalau offline lebih dari 1 menit
-  if (!isOnline && selisih !== null && selisih > 60000) {
-    return;
-  }
-    let statusBadge = "🔴 Offline";
-    let statusClass = "offline";
+      statusClass =
+      "online";
 
-    if(!isOnline){
-
-      totalOffline++;
+      totalLogin++;
 
     }
 
-    if(isOnline){
+    // MENGERJAKAN
+    if(data.status === "mengerjakan"){
 
-      if(data.status === "login"){
+      statusText =
+      "🔵 Mengerjakan";
 
-        statusBadge = "🟡 Login";
-        statusClass = "online";
+      statusClass =
+      "kerja";
 
-        totalOnline++;
-
-      }
-
-      if(data.status === "belum_mulai"){
-
-        statusBadge = "🟣 Belum Mulai";
-        statusClass = "online";
-
-        totalOnline++;
-
-      }
-
-      if(data.status === "mengerjakan"){
-
-        statusBadge = "🔵 Sedang Ujian";
-        statusClass = "kerja";
-
-        totalUjian++;
-
-      }
-
-      if(data.status === "selesai"){
-
-        statusBadge = "🟢 Selesai";
-        statusClass = "selesai";
-
-        totalSelesai++;
-
-      }
+      totalUjian++;
 
     }
 
-    const uid = data.id;
+    // SELESAI
+    if(data.status === "selesai"){
+
+      statusText =
+      "🟢 Selesai";
+
+      statusClass =
+      "selesai";
+
+      totalSelesai++;
+
+    }
 
     tableBody.innerHTML += `
+
       <tr>
 
         <td>${no++}</td>
 
-        <td>${data.nama || "-"}</td>
-
-        <td>${data.email || "-"}</td>
-
-        <td>${data.kelas || "-"}</td>
-
         <td>
-  ${
-    ["belum_mulai", "mengerjakan", "selesai"]
-      .includes(data.status)
-      && data.kodeUjian
-        ? data.kodeUjian
-        : "-"
-  }
-</td>
-
-        <td class="${statusClass}">
-          ${statusBadge}
+          ${data.nama || "-"}
         </td>
 
         <td>
+          ${data.email || "-"}
+        </td>
+
+        <td>
+          ${data.kelas || "-"}
+        </td>
+
+        <td>
+          ${data.kodeUjian || "-"}
+        </td>
+
+        <td class="${statusClass}">
+          ${statusText}
+        </td>
+
+        <td>
+
           ${
-            data.loginAt
-            ? data.loginAt.toDate().toLocaleTimeString()
+            data.loginAt?.toDate
+            ? data.loginAt
+              .toDate()
+              .toLocaleTimeString("id-ID")
             : "-"
           }
+
         </td>
 
         <td>
 
           <button
             class="btn"
-            onclick="location.href='detail-siswa.html?id=${encodeURIComponent(uid)}'"
+            onclick="
+              location.href=
+              'detail-siswa.html?id=${data.id}'
+            "
           >
             Lihat
           </button>
@@ -581,46 +849,46 @@ dataList.forEach(data => {
         </td>
 
       </tr>
+
     `;
 
   });
 
-  // statistik
-  document.getElementById("jmlOnline").textContent =
-    totalOnline;
+  // STATISTIK
+  jmlOnline.textContent =
+  totalLogin;
 
-  document.getElementById("jmlUjian").textContent =
-    totalUjian;
+  jmlUjian.textContent =
+  totalUjian;
 
-  document.getElementById("jmlSelesai").textContent =
-    totalSelesai;
-
-  document.getElementById("jmlOffline").textContent =
-    totalOffline;
+  jmlSelesai.textContent =
+  totalSelesai;
 
 }
 
-/* =====================================================
-   FILTER DATA
-===================================================== */
+/* ===============================
+   FILTER
+=============================== */
 function filterData(){
 
   const keyword =
-    searchInput.value.toLowerCase();
+  searchInput.value
+  .toLowerCase();
 
   const kelas =
-    filterKelas.value;
+  filterKelas.value;
 
-  let hasil = semuaData.filter(data => {
+  const hasil =
+  semuaData.filter((data)=>{
 
     const cocokNama =
-      (data.nama || "")
-      .toLowerCase()
-      .includes(keyword);
+    (data.nama || "")
+    .toLowerCase()
+    .includes(keyword);
 
     const cocokKelas =
-      kelas === ""
-      || data.kelas === kelas;
+    kelas === ""
+    || data.kelas === kelas;
 
     return cocokNama && cocokKelas;
 
@@ -630,72 +898,29 @@ function filterData(){
 
 }
 
-/* =====================================================
-   REALTIME FIRESTORE
-===================================================== */
-onSnapshot(collection(db, "peserta"), (snapshot) => {
+/* ===============================
+   EVENT
+=============================== */
+searchInput.addEventListener(
+  "input",
+  filterData
+);
 
-  semuaData = [];
+filterKelas.addEventListener(
+  "change",
+  filterData
+);
 
-  const kelasSet = new Set();
+/* ===============================
+   GLOBAL BUTTON
+=============================== */
+window.loadPeserta =
+loadPeserta;
 
-  snapshot.forEach(doc => {
-
-    const data = {
-      id: doc.id,
-      ...doc.data()
-    };
-
-    semuaData.push(data);
-
-    if(data.kelas){
-      kelasSet.add(data.kelas);
-    }
-
-  });
-
-  // sorting status
-  semuaData.sort((a,b) => {
-
-    const order = {
-      mengerjakan:1,
-      mulai:1,
-      login:2,
-      belum_mulai:2,
-      selesai:3
-    };
-
-    return (order[a.status] || 4)
-      - (order[b.status] || 4);
-
-  });
-
-  // isi filter kelas
-  filterKelas.innerHTML =
-    `<option value="">Semua Kelas</option>`;
-
-  [...kelasSet]
-  .sort()
-  .forEach(kelas => {
-
-    filterKelas.innerHTML += `
-      <option value="${kelas}">
-        ${kelas}
-      </option>
-    `;
-
-  });
-
-  renderTable(semuaData);
-
-});
-
-/* =====================================================
-   EVENT FILTER
-===================================================== */
-searchInput.addEventListener("input", filterData);
-
-filterKelas.addEventListener("change", filterData);
+/* ===============================
+   LOAD AWAL
+=============================== */
+loadPeserta();
 
 </script>
 
