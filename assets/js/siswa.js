@@ -292,24 +292,31 @@ async (nis, btn) => {
     /* ===============================
        SIMPAN akun_siswa
     ================================ */
-    await setDoc(
-      doc(db, "akun_siswa", uid),
-      {
-        uid,
-        nis,
+await setDoc(
+  doc(db, "akun_siswa", uid),
+  {
+    uid,
 
-        email:
-          siswa.email,
+    nis,
 
-        aktif: true,
+    nama:
+      siswa.nama || "",
 
-        role: "siswa",
+    kelas:
+      siswa.kelas || "",
 
-        createdAt:
-          new Date()
-      },
-      { merge: true }
-    );
+    email:
+      siswa.email,
+
+    aktif: true,
+
+    role: "siswa",
+
+    createdAt:
+      new Date()
+  },
+  { merge: true }
+);
 
     /* LOGOUT SECONDARY */
     await signOut(
