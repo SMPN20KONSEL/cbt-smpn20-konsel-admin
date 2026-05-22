@@ -468,11 +468,11 @@ async function loadData(){
 
             alert("Data tidak ditemukan");
             return;
+
           }
 
           const data = soalSnap.data();
 
-          /* ================= CEK KUNCI ================= */
           const pakaiKunci = document.getElementById(
             `kunci-${id}`
           )?.checked;
@@ -485,11 +485,10 @@ async function loadData(){
             "../assets/img/tutwuri.png"
           );
 
-          let nomor = 1;
-
           const children = [];
 
           /* ================= HEADER ================= */
+
           const kopTable = new Table({
 
             width:{
@@ -512,6 +511,7 @@ async function loadData(){
 
                 children:[
 
+                  /* LOGO KIRI */
                   new TableCell({
 
                     width:{
@@ -553,6 +553,7 @@ async function loadData(){
 
                   }),
 
+                  /* TENGAH */
                   new TableCell({
 
                     width:{
@@ -574,11 +575,44 @@ async function loadData(){
                         alignment:AlignmentType.CENTER,
 
                         children:[
+
+                          new TextRun({
+                            text:"PEMERINTAH KABUPATEN KONAWE SELATAN",
+                            bold:true,
+                            size:24
+                          })
+
+                        ]
+
+                      }),
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        children:[
+
                           new TextRun({
                             text:"SMP NEGERI 20 KONAWE SELATAN",
                             bold:true,
                             size:30
                           })
+
+                        ]
+
+                      }),
+
+                      new Paragraph({
+
+                        alignment:AlignmentType.CENTER,
+
+                        children:[
+
+                          new TextRun({
+                            text:"CBT APPLICATION",
+                            size:20
+                          })
+
                         ]
 
                       })
@@ -587,6 +621,7 @@ async function loadData(){
 
                   }),
 
+                  /* LOGO KANAN */
                   new TableCell({
 
                     width:{
@@ -638,6 +673,8 @@ async function loadData(){
 
           children.push(kopTable);
 
+          /* ================= GARIS ================= */
+
           children.push(
 
             new Paragraph({
@@ -658,6 +695,8 @@ async function loadData(){
 
           );
 
+          /* ================= JUDUL ================= */
+
           children.push(
 
             new Paragraph({
@@ -671,7 +710,7 @@ async function loadData(){
               children:[
 
                 new TextRun({
-                  text: formatJudul(data.judul),
+                  text:formatJudul(data.judul),
                   bold:true,
                   size:28
                 })
@@ -681,6 +720,8 @@ async function loadData(){
             })
 
           );
+
+          /* ================= INFO ================= */
 
           children.push(
 
@@ -706,31 +747,69 @@ async function loadData(){
           );
 
           /* ================= PG ================= */
+
           (data.soalPG || []).forEach((s) => {
 
             children.push(
 
               new Paragraph({
-                text:`${nomor++}. ${s.pertanyaan}`,
+
+                numbering:{
+                  reference:"soal-numbering",
+                  level:0
+                },
+
                 spacing:{
                   before:200,
+                  after:100,
                   line:360
-                }
+                },
+
+                children:[
+
+                  new TextRun({
+                    text:s.pertanyaan || "",
+                    size:24
+                  })
+
+                ]
+
               })
 
             );
 
-            Object.entries(s.opsi || {})
-            .forEach(([k,v]) => {
+            const urutanOpsi = ["A","B","C","D","E"];
 
-              children.push(
+            urutanOpsi.forEach((huruf) => {
 
-                new Paragraph({
-                  text:`${k}. ${v}`,
-                  spacing:{ line:360 }
-                })
+              if(s.opsi?.[huruf]){
 
-              );
+                children.push(
+
+                  new Paragraph({
+
+                    indent:{
+                      left:700
+                    },
+
+                    spacing:{
+                      line:320
+                    },
+
+                    children:[
+
+                      new TextRun({
+                        text:`${huruf}. ${s.opsi[huruf]}`,
+                        size:24
+                      })
+
+                    ]
+
+                  })
+
+                );
+
+              }
 
             });
 
@@ -740,12 +819,24 @@ async function loadData(){
 
                 new Paragraph({
 
-                  text:`Jawaban : ${s.jawabanBenar || "-"}`,
+                  indent:{
+                    left:700
+                  },
 
                   spacing:{
-                    after:200,
-                    line:360
-                  }
+                    after:250,
+                    line:320
+                  },
+
+                  children:[
+
+                    new TextRun({
+                      text:`Jawaban : ${s.jawabanBenar || "-"}`,
+                      bold:true,
+                      size:24
+                    })
+
+                  ]
 
                 })
 
@@ -756,31 +847,69 @@ async function loadData(){
           });
 
           /* ================= MCMA ================= */
+
           (data.soalMCMA || []).forEach((s) => {
 
             children.push(
 
               new Paragraph({
-                text:`${nomor++}. ${s.pertanyaan}`,
+
+                numbering:{
+                  reference:"soal-numbering",
+                  level:0
+                },
+
                 spacing:{
                   before:200,
+                  after:100,
                   line:360
-                }
+                },
+
+                children:[
+
+                  new TextRun({
+                    text:s.pertanyaan || "",
+                    size:24
+                  })
+
+                ]
+
               })
 
             );
 
-            Object.entries(s.opsi || {})
-            .forEach(([k,v]) => {
+            const urutanOpsi = ["A","B","C","D","E"];
 
-              children.push(
+            urutanOpsi.forEach((huruf) => {
 
-                new Paragraph({
-                  text:`${k}. ${v}`,
-                  spacing:{ line:360 }
-                })
+              if(s.opsi?.[huruf]){
 
-              );
+                children.push(
+
+                  new Paragraph({
+
+                    indent:{
+                      left:700
+                    },
+
+                    spacing:{
+                      line:320
+                    },
+
+                    children:[
+
+                      new TextRun({
+                        text:`${huruf}. ${s.opsi[huruf]}`,
+                        size:24
+                      })
+
+                    ]
+
+                  })
+
+                );
+
+              }
 
             });
 
@@ -790,12 +919,24 @@ async function loadData(){
 
                 new Paragraph({
 
-                  text:`Jawaban : ${(s.jawabanBenar || []).join(", ")}`,
+                  indent:{
+                    left:700
+                  },
 
                   spacing:{
-                    after:200,
-                    line:360
-                  }
+                    after:250,
+                    line:320
+                  },
+
+                  children:[
+
+                    new TextRun({
+                      text:`Jawaban : ${(s.jawabanBenar || []).join(", ")}`,
+                      bold:true,
+                      size:24
+                    })
+
+                  ]
 
                 })
 
@@ -804,21 +945,141 @@ async function loadData(){
             }
 
           });
+/* ================= KATEGORI ================= */
+(data.soalKategori || []).forEach((s) => {
 
-          /* ================= ESSAY ================= */
+  // ================= SOAL =================
+  children.push(
+
+    new Paragraph({
+
+      numbering:{
+        reference:"soal-numbering",
+        level:0
+      },
+
+      spacing:{
+        before:200,
+        after:120,
+        line:360
+      },
+
+      children:[
+
+        new TextRun({
+          text:s.pertanyaan || "",
+          size:24
+        })
+
+      ]
+
+    })
+
+  );
+
+  // ================= HURUF KECIL =================
+  const huruf = ["a","b","c","d","e","f"];
+
+  // ================= PERNYATAAN =================
+  (s.pernyataan || []).forEach((p,i) => {
+
+    children.push(
+
+      new Paragraph({
+
+        indent:{
+          left:700
+        },
+
+        spacing:{
+          line:360
+        },
+
+        children:[
+
+          new TextRun({
+            text:`${huruf[i]}. ${p.teks || ""}`,
+            size:24
+          })
+
+        ]
+
+      })
+
+    );
+
+  });
+
+  // ================= JAWABAN =================
+  if(pakaiKunci){
+
+    const jawabanKategori = [];
+
+    (s.pernyataan || []).forEach((p,i) => {
+
+      jawabanKategori.push(
+        `${huruf[i]} = ${p.jawabanBenar ? "Benar" : "Salah"}`
+      );
+
+    });
+
+    children.push(
+
+      new Paragraph({
+
+        indent:{
+          left:700
+        },
+
+        spacing:{
+          after:250,
+          line:360
+        },
+
+        children:[
+
+          new TextRun({
+            text:`Jawaban : ${jawabanKategori.join(", ")}`,
+            bold:true,
+            size:24
+          })
+
+        ]
+
+      })
+
+    );
+
+  }
+
+});
+/* ================= ESSAY ================= */
+
           (data.soalEssay || []).forEach((s) => {
 
             children.push(
 
               new Paragraph({
 
-                text:`${nomor++}. ${s.pertanyaan}`,
+                numbering:{
+                  reference:"soal-numbering",
+                  level:0
+                },
 
                 spacing:{
-                  before:200,
+                  before:250,
                   after:400,
                   line:360
-                }
+                },
+
+                children:[
+
+                  new TextRun({
+                    text:s.pertanyaan || "",
+                    size:24
+                  })
+
+                ]
 
               })
 
@@ -827,7 +1088,35 @@ async function loadData(){
           });
 
           /* ================= DOCUMENT ================= */
+
           const docFile = new Document({
+
+            numbering:{
+              config:[
+                {
+                  reference:"soal-numbering",
+
+                  levels:[
+                    {
+                      level:0,
+                      format:"decimal",
+                      text:"%1.",
+                      alignment:AlignmentType.START,
+
+                      style:{
+                        paragraph:{
+                          indent:{
+                            left:500,
+                            hanging:300
+                          }
+                        }
+                      }
+
+                    }
+                  ]
+                }
+              ]
+            },
 
             sections:[
 
@@ -860,19 +1149,15 @@ async function loadData(){
 
           a.href = url;
 
-          // ================= NAMA FILE =================
-const namaMapel = (data.mapel || "Mapel")
-.replace(/[\\/:*?"<>|]/g, "")
-.trim();
+          const namaMapel = (data.mapel || "Mapel")
+          .replace(/[\\/:*?"<>|]/g, "")
+          .trim();
 
-const namaJudul = (data.judul || "Bank Soal")
-.replace(/[\\/:*?"<>|]/g, "")
-.trim();
+          const namaJudul = (data.judul || "Bank Soal")
+          .replace(/[\\/:*?"<>|]/g, "")
+          .trim();
 
-// CONTOH:
-// Informatika USBN.docx
-
-a.download = `${namaMapel} ${namaJudul}.docx`;
+          a.download = `${namaMapel} ${namaJudul}.docx`;
 
           document.body.appendChild(a);
 
